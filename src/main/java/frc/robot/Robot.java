@@ -7,12 +7,25 @@
 
 package frc.robot;
 
+import java.util.Optional;
+
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
+
+import com.ctre.phoenix6.SignalLogger;
+
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.Threads;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -21,6 +34,17 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
  * project.
  */
 public class Robot extends LoggedRobot {
+
+  private Command autonomousCommand;
+
+  private final RobotContainer robotContainer;
+
+  private Optional<Alliance> alliance = Optional.of(Alliance.Blue);
+
+  static final int REAL_TIME_PRIORITY = 2;
+  static final int NON_REAL_TIME_PRIORITY = 1;
+
+
   public Robot() {
     // Record metadata
     Logger.recordMetadata("ProjectName", BuildConstants.MAVEN_NAME);
@@ -40,8 +64,10 @@ public class Robot extends LoggedRobot {
     switch (Constants.currentMode) {
       case REAL:
         // Running on a real robot, log to a USB stick ("/U/logs")
+        if(!DriverStation.isFMSAttached()) {
+          Logger.addDataReceiver(new NT4Publisher());
+        }
         Logger.addDataReceiver(new WPILOGWriter());
-        Logger.addDataReceiver(new NT4Publisher());
         break;
 
       case SIM:
@@ -60,11 +86,27 @@ public class Robot extends LoggedRobot {
 
     // Start AdvantageKit logger
     Logger.start();
+    if(!Logger.hasReplaySource()) {
+      RobotController.setTimeSource(RobotController::getFPGATime);
+    }
+
+    robotContainer = new RobotContainer();
+    SmartDashboard.putData("Command Scheduler", CommandScheduler.getInstance());
+    SignalLogger.enableAutoLogging(false);
+
   }
 
   /** This function is called periodically during all modes. */
   @Override
-  public void robotPeriodic() {}
+  public void robotPeriodic() {
+    if(DriverStation.isEnabled()) {
+      Threads.setCurrentThreadPriority(true, REAL_TIME_PRIORITY);
+    } else {
+      Threads.setCurrentThreadPriority(false, NON_REAL_TIME_PRIORITY);
+    }
+    
+    CommandScheduler.getInstance().run();
+  }
 
   /** This function is called once when the robot is disabled. */
   @Override
@@ -72,19 +114,41 @@ public class Robot extends LoggedRobot {
 
   /** This function is called periodically when disabled. */
   @Override
-  public void disabledPeriodic() {}
+  public void disabledPeriodic() {
+    autonomousCommand = robotContainer.getAutonomousCommand();
+    alliance = DriverStation.getAlliance().isPresent() ? DriverStation.getAlliance() : alliance;
+  }
+
+  @Override
+  public void disabledExit() {
+    SmartDashboard.setNetworkTableInstance(NetworkTableInstance.getDefault());
+  }
 
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
-  public void autonomousInit() {}
+  public void autonomousInit() {
+    if(autonomousCommand != null) {
+      CommandScheduler.getInstance().schedule(autonomousCommand);
+    }
+  }
 
   /** This function is called periodically during autonomous. */
   @Override
   public void autonomousPeriodic() {}
 
+  @Override
+  public void autonomousExit() {}
+
   /** This function is called once when teleop is enabled. */
   @Override
-  public void teleopInit() {}
+  public void teleopInit() {
+    Threads.setCurrentThreadPriority(true, REAL_TIME_PRIORITY);
+    SmartDashboard.setNetworkTableInstance(NetworkTableInstance.getDefault());
+    
+    if(autonomousCommand != null) {
+      CommandScheduler.getInstance().cancel(autonomousCommand);
+    }
+  }
 
   /** This function is called periodically during operator control. */
   @Override
@@ -92,7 +156,9 @@ public class Robot extends LoggedRobot {
 
   /** This function is called once when test mode is enabled. */
   @Override
-  public void testInit() {}
+  public void testInit() {
+    CommandScheduler.getInstance().cancelAll();
+  }
 
   /** This function is called periodically during test mode. */
   @Override

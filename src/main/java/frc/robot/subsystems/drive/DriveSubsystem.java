@@ -14,6 +14,9 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.RobotState;
 import frc.robot.subsystems.vision.VisionPoseEstimateInField;
+
+import static edu.wpi.first.units.Units.MetersPerSecond;
+
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
@@ -21,6 +24,7 @@ public class DriveSubsystem extends SubsystemBase {
 
   DriveIO io;
   DriveIOInputsAutoLogged inputs = new DriveIOInputsAutoLogged();
+  DriveTelemetry telemetry = new DriveTelemetry(TunerConstants.kSpeedAt12Volts.in(MetersPerSecond));
 
   RobotState robotState;
 
@@ -82,6 +86,7 @@ public class DriveSubsystem extends SubsystemBase {
   public void periodic() {
     double timestamp = Timer.getFPGATimestamp();
     io.updateInputs(inputs);
+    telemetry.telemeterize(inputs);
     Logger.processInputs("SwerveDriveInputs", inputs);
     io.getModuleStates(inputs);
 

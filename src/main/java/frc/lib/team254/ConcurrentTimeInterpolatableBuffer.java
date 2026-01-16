@@ -1,5 +1,4 @@
 /** Credits to: FRC Team 254 The Cheesy Poofs */
-
 package frc.lib.team254;
 
 import edu.wpi.first.math.MathUtil;

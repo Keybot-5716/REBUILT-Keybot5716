@@ -2,6 +2,7 @@ package frc.robot.subsystems.drive;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
+import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.swerve.SwerveDrivetrain;
@@ -18,11 +19,11 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.LinearAcceleration;
-import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Subsystem;
+import frc.robot.RobotState;
 import frc.robot.subsystems.vision.VisionPoseEstimateInField;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
@@ -84,7 +85,18 @@ public class DriveIOCTRE extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> im
   }
 
   @Override
-  public void addVisionMeasurement(VisionPoseEstimateInField fieldEstimate) {}
+  public void addVisionMeasurement(VisionPoseEstimateInField fieldEstimate) {
+    if(fieldEstimate.getVisionMeasurementStdDevs() == null) {
+        this.addVisionMeasurement(
+            fieldEstimate.getRobotPose(), Utils.fpgaToCurrentTime(fieldEstimate.getTimestamp()));
+    } else {
+        this.addVisionMeasurement(
+            fieldEstimate.getRobotPose(),
+            Utils.fpgaToCurrentTime(fieldEstimate.getTimestamp()),
+            fieldEstimate.getVisionMeasurementStdDevs()
+        );
+    }
+  }
 
   @Override
   public void setStateStandardDeviations(double x, double y, double r) {
@@ -95,6 +107,8 @@ public class DriveIOCTRE extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> im
   Consumer<SwerveDriveState> telemetryConsumer =
       state -> {
         telemetryCache.set(state.clone());
+        robotState.addOdometryTimeMeasurement(
+            Timer.getFPGATimestamp() / Utils.getCurrentTimeSeconds() + state.Timestamp, state.Pose);
       };
 
   @Override
@@ -134,6 +148,22 @@ public class DriveIOCTRE extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> im
     double rollRads = Units.degreesToRadians(roll.getValueAsDouble());
     double accelX = accelerationX.getValueAsDouble();
     double accelY = accelerationY.getValueAsDouble();
+
+    robotState.addSwerveDriveMotionMeasurement(
+        timestamp, 
+        rollRadsPs, 
+        pitchRadsPS, 
+        yawRadPS, 
+        pitchRads, 
+        rollRads, 
+        accelX, 
+        accelY,
+        desiredRobotRelativeChassisSpeeds,
+        desiredFieldRelativeChassisSpeeds,
+        measuredRobotRelativeChassisSpeeds,
+        measuredFieldRelativeChassisSpeeds,
+        fusedFieldRelativeChassisSpeeds
+    );
   }
 
   @Override

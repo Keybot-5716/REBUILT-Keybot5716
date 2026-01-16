@@ -12,7 +12,6 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
-
 import org.littletonrobotics.junction.Logger;
 
 public class RobotState {
@@ -140,58 +139,55 @@ public class RobotState {
   }
 
   public void updateLogger() {
-    if(drivePitchAngularVelocity.getInternalBuffer().lastEntry() != null) {
-        Logger.recordOutput(
-            "RobotState/PitchAngularVel", 
-            drivePitchAngularVelocity.getInternalBuffer().lastEntry().getValue());
+    if (drivePitchAngularVelocity.getInternalBuffer().lastEntry() != null) {
+      Logger.recordOutput(
+          "RobotState/PitchAngularVel",
+          drivePitchAngularVelocity.getInternalBuffer().lastEntry().getValue());
     }
-    if(driveRollAngularVelocity.getInternalBuffer().lastEntry() != null) {
-        Logger.recordOutput(
-            "RobotState/RollAngularVel", 
-            driveRollAngularVelocity.getInternalBuffer().lastEntry().getValue());
+    if (driveRollAngularVelocity.getInternalBuffer().lastEntry() != null) {
+      Logger.recordOutput(
+          "RobotState/RollAngularVel",
+          driveRollAngularVelocity.getInternalBuffer().lastEntry().getValue());
     }
-    if(driveYawAngularVelocity.getInternalBuffer().lastEntry() != null) {
-        Logger.recordOutput(
-            "RobotState/YawAngularVel", 
-            driveYawAngularVelocity.getInternalBuffer().lastEntry().getValue());
+    if (driveYawAngularVelocity.getInternalBuffer().lastEntry() != null) {
+      Logger.recordOutput(
+          "RobotState/YawAngularVel",
+          driveYawAngularVelocity.getInternalBuffer().lastEntry().getValue());
     }
-    if(drivePitchRads.getInternalBuffer().lastEntry() != null) {
-        Logger.recordOutput(
-            "RobotState/PitchRads", 
-            drivePitchRads.getInternalBuffer().lastEntry().getValue());
+    if (drivePitchRads.getInternalBuffer().lastEntry() != null) {
+      Logger.recordOutput(
+          "RobotState/PitchRads", drivePitchRads.getInternalBuffer().lastEntry().getValue());
     }
-    if(driveRollRads.getInternalBuffer().lastEntry() != null) {
-        Logger.recordOutput(
-            "RobotState/RollRads", 
-            driveRollRads.getInternalBuffer().lastEntry().getValue());
+    if (driveRollRads.getInternalBuffer().lastEntry() != null) {
+      Logger.recordOutput(
+          "RobotState/RollRads", driveRollRads.getInternalBuffer().lastEntry().getValue());
     }
-    if(accelX.getInternalBuffer().lastEntry() != null) {
-        Logger.recordOutput(
-            "RobotState/AccelX", 
-            accelX.getInternalBuffer().lastEntry().getValue());
+    if (accelX.getInternalBuffer().lastEntry() != null) {
+      Logger.recordOutput("RobotState/AccelX", accelX.getInternalBuffer().lastEntry().getValue());
     }
-    if(accelY.getInternalBuffer().lastEntry() != null) {
-        Logger.recordOutput(
-            "RobotState/AccelY", 
-            accelY.getInternalBuffer().lastEntry().getValue());
+    if (accelY.getInternalBuffer().lastEntry() != null) {
+      Logger.recordOutput("RobotState/AccelY", accelY.getInternalBuffer().lastEntry().getValue());
     }
     Logger.recordOutput(
-            "RobotState/DesiredChassisSpeedRobotFrame", 
-            getLatestDesiredRobotRelativeChassisSpeeds());
+        "RobotState/DesiredChassisSpeedRobotFrame", getLatestDesiredRobotRelativeChassisSpeeds());
     Logger.recordOutput(
-            "RobotState/DesiredChassisSpeedFieldFrame", 
-            getLatestDesiredFieldRelativeChassisSpeeds());
+        "RobotState/DesiredChassisSpeedFieldFrame", getLatestDesiredFieldRelativeChassisSpeeds());
     Logger.recordOutput(
-            "RobotState/MeasuredChassisSpeedFieldFrame", 
-            getLatestMeasuredFieldRelativeChassisSpeeds());
+        "RobotState/MeasuredChassisSpeedFieldFrame", getLatestMeasuredFieldRelativeChassisSpeeds());
     Logger.recordOutput(
-            "RobotState/FusedChassisSpeedFieldFrame", 
-            getLatestFusedFieldRelativeChassisSpeeds());
+        "RobotState/FusedChassisSpeedFieldFrame", getLatestFusedFieldRelativeChassisSpeeds());
   }
 
   public double getDrivePitchRads() {
-    if(this.drivePitchRads.getInternalBuffer().lastEntry() != null) {
-        return drivePitchRads.getInternalBuffer().lastEntry().getValue();
+    if (this.drivePitchRads.getInternalBuffer().lastEntry() != null) {
+      return drivePitchRads.getInternalBuffer().lastEntry().getValue();
+    }
+    return 0.0;
+  }
+
+  public double getDriveRollRads() {
+    if (this.driveRollRads.getInternalBuffer().lastEntry() != null) {
+      return driveRollRads.getInternalBuffer().lastEntry().getValue();
     }
     return 0.0;
   }

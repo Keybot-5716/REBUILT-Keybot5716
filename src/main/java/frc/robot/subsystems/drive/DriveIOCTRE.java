@@ -86,15 +86,14 @@ public class DriveIOCTRE extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> im
 
   @Override
   public void addVisionMeasurement(VisionPoseEstimateInField fieldEstimate) {
-    if(fieldEstimate.getVisionMeasurementStdDevs() == null) {
-        this.addVisionMeasurement(
-            fieldEstimate.getRobotPose(), Utils.fpgaToCurrentTime(fieldEstimate.getTimestamp()));
+    if (fieldEstimate.getVisionMeasurementStdDevs() == null) {
+      this.addVisionMeasurement(
+          fieldEstimate.getRobotPose(), Utils.fpgaToCurrentTime(fieldEstimate.getTimestamp()));
     } else {
-        this.addVisionMeasurement(
-            fieldEstimate.getRobotPose(),
-            Utils.fpgaToCurrentTime(fieldEstimate.getTimestamp()),
-            fieldEstimate.getVisionMeasurementStdDevs()
-        );
+      this.addVisionMeasurement(
+          fieldEstimate.getRobotPose(),
+          Utils.fpgaToCurrentTime(fieldEstimate.getTimestamp()),
+          fieldEstimate.getVisionMeasurementStdDevs());
     }
   }
 
@@ -150,20 +149,19 @@ public class DriveIOCTRE extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> im
     double accelY = accelerationY.getValueAsDouble();
 
     robotState.addSwerveDriveMotionMeasurement(
-        timestamp, 
-        rollRadsPs, 
-        pitchRadsPS, 
-        yawRadPS, 
-        pitchRads, 
-        rollRads, 
-        accelX, 
+        timestamp,
+        rollRadsPs,
+        pitchRadsPS,
+        yawRadPS,
+        pitchRads,
+        rollRads,
+        accelX,
         accelY,
         desiredRobotRelativeChassisSpeeds,
         desiredFieldRelativeChassisSpeeds,
         measuredRobotRelativeChassisSpeeds,
         measuredFieldRelativeChassisSpeeds,
-        fusedFieldRelativeChassisSpeeds
-    );
+        fusedFieldRelativeChassisSpeeds);
   }
 
   @Override

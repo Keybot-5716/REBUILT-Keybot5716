@@ -101,6 +101,8 @@ public class Robot extends LoggedRobot {
     }
 
     CommandScheduler.getInstance().run();
+
+    robotContainer.getRobotState().updateLogger();
   }
 
   /** This function is called once when the robot is disabled. */
@@ -122,6 +124,7 @@ public class Robot extends LoggedRobot {
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
+    Threads.setCurrentThreadPriority(true, REAL_TIME_PRIORITY);
     if (autonomousCommand != null) {
       CommandScheduler.getInstance().schedule(autonomousCommand);
     }

@@ -1,19 +1,19 @@
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Twist2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import frc.lib.team254.ConcurrentTimeInterpolatableBuffer;
+import frc.robot.subsystems.vision.VisionPoseEstimateInField;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Twist2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import frc.lib.team254.ConcurrentTimeInterpolatableBuffer;
-import frc.robot.subsystems.vision.VisionPoseEstimateInField;
+import org.littletonrobotics.junction.Logger;
 
 public class RobotState {
   public static final double BUFFER_TIME = 1.0;
@@ -28,21 +28,33 @@ public class RobotState {
 
   private final ConcurrentTimeInterpolatableBuffer<Pose2d> fieldToRobot =
       ConcurrentTimeInterpolatableBuffer.createBuffer(BUFFER_TIME);
-  
-  private final AtomicReference<ChassisSpeeds> measuredRobotRelativeChassisSpeeds = new AtomicReference<>(new ChassisSpeeds());
-  private final AtomicReference<ChassisSpeeds> measuredFieldRelativeChassisSpeeds = new AtomicReference<>(new ChassisSpeeds());
-  private final AtomicReference<ChassisSpeeds> desiredRobotRelativeChassisSpeeds = new AtomicReference<>(new ChassisSpeeds());
-  private final AtomicReference<ChassisSpeeds> desiredFieldRelativeChassisSpeeds = new AtomicReference<>(new ChassisSpeeds());
-  private final AtomicReference<ChassisSpeeds> fusedFieldRelativeChassisSpeeds = new AtomicReference<>(new ChassisSpeeds());
 
-  private final ConcurrentTimeInterpolatableBuffer<Double> drivePitchAngularVelocity = ConcurrentTimeInterpolatableBuffer.createDoubleBuffer(BUFFER_TIME);
-  private final ConcurrentTimeInterpolatableBuffer<Double> driveRollAngularVelocity = ConcurrentTimeInterpolatableBuffer.createDoubleBuffer(BUFFER_TIME);
-  private final ConcurrentTimeInterpolatableBuffer<Double> driveYawAngularVelocity = ConcurrentTimeInterpolatableBuffer.createDoubleBuffer(BUFFER_TIME);
+  private final AtomicReference<ChassisSpeeds> measuredRobotRelativeChassisSpeeds =
+      new AtomicReference<>(new ChassisSpeeds());
+  private final AtomicReference<ChassisSpeeds> measuredFieldRelativeChassisSpeeds =
+      new AtomicReference<>(new ChassisSpeeds());
+  private final AtomicReference<ChassisSpeeds> desiredRobotRelativeChassisSpeeds =
+      new AtomicReference<>(new ChassisSpeeds());
+  private final AtomicReference<ChassisSpeeds> desiredFieldRelativeChassisSpeeds =
+      new AtomicReference<>(new ChassisSpeeds());
+  private final AtomicReference<ChassisSpeeds> fusedFieldRelativeChassisSpeeds =
+      new AtomicReference<>(new ChassisSpeeds());
 
-  private final ConcurrentTimeInterpolatableBuffer<Double> drivePitchRads = ConcurrentTimeInterpolatableBuffer.createDoubleBuffer(BUFFER_TIME);
-  private final ConcurrentTimeInterpolatableBuffer<Double> driveRollRads = ConcurrentTimeInterpolatableBuffer.createDoubleBuffer(BUFFER_TIME);
-  private final ConcurrentTimeInterpolatableBuffer<Double> accelX = ConcurrentTimeInterpolatableBuffer.createDoubleBuffer(BUFFER_TIME);
-  private final ConcurrentTimeInterpolatableBuffer<Double> accelY = ConcurrentTimeInterpolatableBuffer.createDoubleBuffer(BUFFER_TIME);
+  private final ConcurrentTimeInterpolatableBuffer<Double> drivePitchAngularVelocity =
+      ConcurrentTimeInterpolatableBuffer.createDoubleBuffer(BUFFER_TIME);
+  private final ConcurrentTimeInterpolatableBuffer<Double> driveRollAngularVelocity =
+      ConcurrentTimeInterpolatableBuffer.createDoubleBuffer(BUFFER_TIME);
+  private final ConcurrentTimeInterpolatableBuffer<Double> driveYawAngularVelocity =
+      ConcurrentTimeInterpolatableBuffer.createDoubleBuffer(BUFFER_TIME);
+
+  private final ConcurrentTimeInterpolatableBuffer<Double> drivePitchRads =
+      ConcurrentTimeInterpolatableBuffer.createDoubleBuffer(BUFFER_TIME);
+  private final ConcurrentTimeInterpolatableBuffer<Double> driveRollRads =
+      ConcurrentTimeInterpolatableBuffer.createDoubleBuffer(BUFFER_TIME);
+  private final ConcurrentTimeInterpolatableBuffer<Double> accelX =
+      ConcurrentTimeInterpolatableBuffer.createDoubleBuffer(BUFFER_TIME);
+  private final ConcurrentTimeInterpolatableBuffer<Double> accelY =
+      ConcurrentTimeInterpolatableBuffer.createDoubleBuffer(BUFFER_TIME);
 
   private final AtomicInteger iteration = new AtomicInteger(0);
 
@@ -55,20 +67,19 @@ public class RobotState {
   }
 
   public void addSwerveDriveMotionMeasurement(
-    double timestamp,
-    double angularRollRadPS,
-    double angularPitchRadPS,
-    double angularYawRadPS,
-    double pitchRad,
-    double rollRad,
-    double accelX,
-    double accelY,
-    ChassisSpeeds desiredRobotRelativeChassisSpeeds,
-    ChassisSpeeds desiredFieldRelativeChassisSpeeds,
-    ChassisSpeeds measuredSpeeds,
-    ChassisSpeeds measuredFieldRelativeSpeeds,
-    ChassisSpeeds fusedFieldRelativeSpeeds
-  ) {
+      double timestamp,
+      double angularRollRadPS,
+      double angularPitchRadPS,
+      double angularYawRadPS,
+      double pitchRad,
+      double rollRad,
+      double accelX,
+      double accelY,
+      ChassisSpeeds desiredRobotRelativeChassisSpeeds,
+      ChassisSpeeds desiredFieldRelativeChassisSpeeds,
+      ChassisSpeeds measuredSpeeds,
+      ChassisSpeeds measuredFieldRelativeSpeeds,
+      ChassisSpeeds fusedFieldRelativeSpeeds) {
     this.driveRollAngularVelocity.addSample(timestamp, angularPitchRadPS);
     this.drivePitchAngularVelocity.addSample(timestamp, angularPitchRadPS);
     this.driveYawAngularVelocity.addSample(timestamp, angularYawRadPS);
@@ -85,11 +96,13 @@ public class RobotState {
   }
 
   public boolean isBlueAlliance() {
-    return DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().equals(Optional.of(Alliance.Blue));
+    return DriverStation.getAlliance().isPresent()
+        && DriverStation.getAlliance().equals(Optional.of(Alliance.Blue));
   }
 
   public boolean isRedAlliance() {
-    return DriverStation.getAlliance().isPresent() && DriverStation.getAlliance().equals(Optional.of(Alliance.Red));
+    return DriverStation.getAlliance().isPresent()
+        && DriverStation.getAlliance().equals(Optional.of(Alliance.Red));
   }
 
   public Map.Entry<Double, Pose2d> getLatestFieldToRobot() {
@@ -100,11 +113,90 @@ public class RobotState {
     return measuredRobotRelativeChassisSpeeds.get();
   }
 
+  public ChassisSpeeds getLatestMeasuredFieldRelativeChassisSpeeds() {
+    return measuredFieldRelativeChassisSpeeds.get();
+  }
+
+  public ChassisSpeeds getLatestDesiredRobotRelativeChassisSpeeds() {
+    return desiredRobotRelativeChassisSpeeds.get();
+  }
+
+  public ChassisSpeeds getLatestDesiredFieldRelativeChassisSpeeds() {
+    return desiredFieldRelativeChassisSpeeds.get();
+  }
+
+  public ChassisSpeeds getLatestFusedFieldRelativeChassisSpeeds() {
+    return fusedFieldRelativeChassisSpeeds.get();
+  }
+
   public Pose2d getPredictedFieldToRobot(double bufferTime) {
     var fieldToRobotPredicted = getLatestFieldToRobot();
-    Pose2d fieldToRobot = (fieldToRobotPredicted == null) ? Pose2d.kZero : fieldToRobotPredicted.getValue();
+    Pose2d fieldToRobot =
+        (fieldToRobotPredicted == null) ? Pose2d.kZero : fieldToRobotPredicted.getValue();
     var delta = getLatestRobotRelativeChassisSpeeds();
     delta = delta.times(bufferTime);
-    return fieldToRobot.exp(new Twist2d(delta.vxMetersPerSecond, delta.vyMetersPerSecond, delta.omegaRadiansPerSecond));
+    return fieldToRobot.exp(
+        new Twist2d(delta.vxMetersPerSecond, delta.vyMetersPerSecond, delta.omegaRadiansPerSecond));
+  }
+
+  public void updateLogger() {
+    if(drivePitchAngularVelocity.getInternalBuffer().lastEntry() != null) {
+        Logger.recordOutput(
+            "RobotState/PitchAngularVel", 
+            drivePitchAngularVelocity.getInternalBuffer().lastEntry().getValue());
+    }
+    if(driveRollAngularVelocity.getInternalBuffer().lastEntry() != null) {
+        Logger.recordOutput(
+            "RobotState/RollAngularVel", 
+            driveRollAngularVelocity.getInternalBuffer().lastEntry().getValue());
+    }
+    if(driveYawAngularVelocity.getInternalBuffer().lastEntry() != null) {
+        Logger.recordOutput(
+            "RobotState/YawAngularVel", 
+            driveYawAngularVelocity.getInternalBuffer().lastEntry().getValue());
+    }
+    if(drivePitchRads.getInternalBuffer().lastEntry() != null) {
+        Logger.recordOutput(
+            "RobotState/PitchRads", 
+            drivePitchRads.getInternalBuffer().lastEntry().getValue());
+    }
+    if(driveRollRads.getInternalBuffer().lastEntry() != null) {
+        Logger.recordOutput(
+            "RobotState/RollRads", 
+            driveRollRads.getInternalBuffer().lastEntry().getValue());
+    }
+    if(accelX.getInternalBuffer().lastEntry() != null) {
+        Logger.recordOutput(
+            "RobotState/AccelX", 
+            accelX.getInternalBuffer().lastEntry().getValue());
+    }
+    if(accelY.getInternalBuffer().lastEntry() != null) {
+        Logger.recordOutput(
+            "RobotState/AccelY", 
+            accelY.getInternalBuffer().lastEntry().getValue());
+    }
+    Logger.recordOutput(
+            "RobotState/DesiredChassisSpeedRobotFrame", 
+            getLatestDesiredRobotRelativeChassisSpeeds());
+    Logger.recordOutput(
+            "RobotState/DesiredChassisSpeedFieldFrame", 
+            getLatestDesiredFieldRelativeChassisSpeeds());
+    Logger.recordOutput(
+            "RobotState/MeasuredChassisSpeedFieldFrame", 
+            getLatestMeasuredFieldRelativeChassisSpeeds());
+    Logger.recordOutput(
+            "RobotState/FusedChassisSpeedFieldFrame", 
+            getLatestFusedFieldRelativeChassisSpeeds());
+  }
+
+  public double getDrivePitchRads() {
+    if(this.drivePitchRads.getInternalBuffer().lastEntry() != null) {
+        return drivePitchRads.getInternalBuffer().lastEntry().getValue();
+    }
+    return 0.0;
+  }
+
+  public void updateMegatagEstimate(VisionPoseEstimateInField megatag) {
+    fieldEstimation.accept(megatag);
   }
 }

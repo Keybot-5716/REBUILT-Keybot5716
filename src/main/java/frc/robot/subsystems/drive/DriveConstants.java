@@ -17,4 +17,7 @@ public class DriveConstants {
   public static final double maxVelocityToAutoAllign = Units.feetToMeters(8.0);
 
   public static final CommandSwerveDrivetrain SWERVE_DRIVETRAIN = TunerConstants.createDrivetrain();
+
+  public static final double MAX_SPEED = 4.58;
+  public static final double WHEEL_COF = 1.0;
 }

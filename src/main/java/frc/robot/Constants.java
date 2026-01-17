@@ -28,4 +28,7 @@ public final class Constants {
     /** Replaying from a log file. */
     REPLAY
   }
+
+  public static final double ROBOT_MASS_KG = 50;
+  public static final double ROBOT_MOI = 1.0;
 }

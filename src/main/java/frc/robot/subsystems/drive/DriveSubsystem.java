@@ -1,22 +1,36 @@
 package frc.robot.subsystems.drive;
 
+import static edu.wpi.first.units.Units.MetersPerSecond;
+
 import com.ctre.phoenix6.swerve.SwerveModule;
+import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
+import com.ctre.phoenix6.swerve.SwerveRequest.ApplyRobotSpeeds;
 import com.ctre.phoenix6.swerve.utility.PhoenixPIDController;
+import com.pathplanner.lib.config.ModuleConfig;
+import com.pathplanner.lib.config.PIDConstants;
+import com.pathplanner.lib.config.RobotConfig;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import com.pathplanner.lib.controllers.PathFollowingController;
+import com.pathplanner.lib.trajectory.PathPlannerTrajectory;
+import com.pathplanner.lib.trajectory.PathPlannerTrajectoryState;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Notifier;
+import edu.wpi.first.wpilibj.Threads;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.Constants;
 import frc.robot.RobotState;
 import frc.robot.subsystems.vision.VisionPoseEstimateInField;
-
-import static edu.wpi.first.units.Units.MetersPerSecond;
-
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
@@ -30,6 +44,8 @@ public class DriveSubsystem extends SubsystemBase {
 
   CommandXboxController controller;
 
+  Controller pathplannerController;
+
   private final double maxVelocity;
   private final double maxAngularVelocity;
 
@@ -38,6 +54,14 @@ public class DriveSubsystem extends SubsystemBase {
 
   private Rotation2d desiredRotationToLock = new Rotation2d();
   private Pose2d desiredPoseToAutoAllign = new Pose2d();
+
+  private final ApplyRobotSpeeds stopRequest =
+      new ApplyRobotSpeeds().withDriveRequestType(DriveRequestType.OpenLoopVoltage);
+
+  private final ApplyRobotSpeeds pathplannerRequest =
+      new ApplyRobotSpeeds()
+          .withDriveRequestType(DriveRequestType.Velocity)
+          .withDesaturateWheelSpeeds(true);
 
   private final SwerveRequest.FieldCentricFacingAngle rotationLocked =
       new SwerveRequest.FieldCentricFacingAngle()
@@ -82,6 +106,57 @@ public class DriveSubsystem extends SubsystemBase {
     autoAllign.HeadingController.enableContinuousInput(-Math.PI, Math.PI);
   }
 
+  private class Controller implements Consumer<PathPlannerTrajectory>, Runnable {
+    private final PathFollowingController PFContoller;
+    private volatile PathPlannerTrajectory trajectory = null;
+    private volatile Timer Timer = null;
+    private Notifier notifier;
+
+    boolean hasPrior = false;
+
+    public Controller(PathFollowingController PFController) {
+      this.PFContoller = PFController;
+      this.Timer = new Timer();
+      notifier = new Notifier(this);
+      notifier.startPeriodic(0.01);
+    }
+
+    @Override
+    public void accept(PathPlannerTrajectory tra) {
+      trajectory = tra;
+      Timer.reset();
+      Timer.start();
+      PFContoller.reset(null, null);
+    }
+
+    @Override
+    public void run() {
+      if (!hasPrior) {
+        hasPrior = Threads.setCurrentThreadPriority(true, 41);
+      }
+
+      PathPlannerTrajectory traj = trajectory;
+      if (traj == null) return;
+      /**
+       * if(traj.isStayStoppedTrajectory()) { setControl(stopRequest); trajectory = null; return; }
+       */
+      double currentTime = Timer.get();
+      PathPlannerTrajectoryState targetState = traj.sample(currentTime);
+      ChassisSpeeds speeds =
+          PFContoller.calculateRobotRelativeSpeeds(
+              robotState.getLatestFieldToRobot().getValue(), targetState);
+
+      if (DriverStation.isEnabled()) {
+        setControl(
+            pathplannerRequest
+                .withSpeeds(speeds)
+                .withWheelForceFeedforwardsX(targetState.feedforwards.robotRelativeForcesXNewtons())
+                .withWheelForceFeedforwardsY(
+                    targetState.feedforwards.robotRelativeForcesYNewtons()));
+      }
+    }
+  }
+
   @Override
   public void periodic() {
     double timestamp = Timer.getFPGATimestamp();
@@ -105,6 +180,33 @@ public class DriveSubsystem extends SubsystemBase {
     Logger.recordOutput("Drive/States/Current State", currentState);
     Logger.recordOutput("Drive/States/Desired State", desiredState);
     applyStates();
+  }
+
+  private void configurePathPlanner() {
+    ModuleConfig moduleConfig =
+        new ModuleConfig(
+            DriveConstants.SWERVE_DRIVETRAIN.getModuleConstants()[0].WheelRadius,
+            DriveConstants.MAX_SPEED,
+            DriveConstants.WHEEL_COF,
+            DCMotor.getKrakenX60(1),
+            DriveConstants.SWERVE_DRIVETRAIN.getModuleConstants()[0].DriveMotorGearRatio,
+            DriveConstants.SWERVE_DRIVETRAIN.getModuleConstants()[0].SlipCurrent,
+            1);
+
+    RobotConfig robotConfig =
+        new RobotConfig(
+            Constants.ROBOT_MASS_KG,
+            Constants.ROBOT_MOI,
+            moduleConfig,
+            new Translation2d(),
+            new Translation2d(),
+            new Translation2d(),
+            new Translation2d());
+
+    pathplannerController =
+        new Controller(
+            new PPHolonomicDriveController(
+                new PIDConstants(maxAngularVelocity), new PIDConstants(maxAngularVelocity), 0.01));
   }
 
   private SubsystemState handleStateTransitions() {

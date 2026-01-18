@@ -8,12 +8,7 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.ctre.phoenix6.swerve.SwerveRequest.ApplyRobotSpeeds;
 import com.ctre.phoenix6.swerve.utility.PhoenixPIDController;
 import com.pathplanner.lib.config.ModuleConfig;
-import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
-import com.pathplanner.lib.controllers.PPHolonomicDriveController;
-import com.pathplanner.lib.controllers.PathFollowingController;
-import com.pathplanner.lib.trajectory.PathPlannerTrajectory;
-import com.pathplanner.lib.trajectory.PathPlannerTrajectoryState;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -21,16 +16,14 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.Notifier;
-import edu.wpi.first.wpilibj.Threads;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants;
 import frc.robot.RobotState;
+import frc.robot.simulation.MapleSimSwerveDrivetrain;
 import frc.robot.subsystems.vision.VisionPoseEstimateInField;
-import java.util.function.Consumer;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
@@ -43,8 +36,6 @@ public class DriveSubsystem extends SubsystemBase {
   RobotState robotState;
 
   CommandXboxController controller;
-
-  Controller pathplannerController;
 
   private final double maxVelocity;
   private final double maxAngularVelocity;
@@ -106,57 +97,6 @@ public class DriveSubsystem extends SubsystemBase {
     autoAllign.HeadingController.enableContinuousInput(-Math.PI, Math.PI);
   }
 
-  private class Controller implements Consumer<PathPlannerTrajectory>, Runnable {
-    private final PathFollowingController PFContoller;
-    private volatile PathPlannerTrajectory trajectory = null;
-    private volatile Timer Timer = null;
-    private Notifier notifier;
-
-    boolean hasPrior = false;
-
-    public Controller(PathFollowingController PFController) {
-      this.PFContoller = PFController;
-      this.Timer = new Timer();
-      notifier = new Notifier(this);
-      notifier.startPeriodic(0.01);
-    }
-
-    @Override
-    public void accept(PathPlannerTrajectory tra) {
-      trajectory = tra;
-      Timer.reset();
-      Timer.start();
-      PFContoller.reset(null, null);
-    }
-
-    @Override
-    public void run() {
-      if (!hasPrior) {
-        hasPrior = Threads.setCurrentThreadPriority(true, 41);
-      }
-
-      PathPlannerTrajectory traj = trajectory;
-      if (traj == null) return;
-      /**
-       * if(traj.isStayStoppedTrajectory()) { setControl(stopRequest); trajectory = null; return; }
-       */
-      double currentTime = Timer.get();
-      PathPlannerTrajectoryState targetState = traj.sample(currentTime);
-      ChassisSpeeds speeds =
-          PFContoller.calculateRobotRelativeSpeeds(
-              robotState.getLatestFieldToRobot().getValue(), targetState);
-
-      if (DriverStation.isEnabled()) {
-        setControl(
-            pathplannerRequest
-                .withSpeeds(speeds)
-                .withWheelForceFeedforwardsX(targetState.feedforwards.robotRelativeForcesXNewtons())
-                .withWheelForceFeedforwardsY(
-                    targetState.feedforwards.robotRelativeForcesYNewtons()));
-      }
-    }
-  }
-
   @Override
   public void periodic() {
     double timestamp = Timer.getFPGATimestamp();
@@ -202,11 +142,6 @@ public class DriveSubsystem extends SubsystemBase {
             new Translation2d(),
             new Translation2d(),
             new Translation2d());
-
-    pathplannerController =
-        new Controller(
-            new PPHolonomicDriveController(
-                new PIDConstants(maxAngularVelocity), new PIDConstants(maxAngularVelocity), 0.01));
   }
 
   private SubsystemState handleStateTransitions() {
@@ -360,5 +295,12 @@ public class DriveSubsystem extends SubsystemBase {
         ChassisSpeeds.fromFieldRelativeSpeeds(
             new ChassisSpeeds(xVelocity, yVelocity, -angularVelocity), inputs.Pose.getRotation()),
         inputs.Pose.getRotation().plus(skewCompensationFactor));
+  }
+
+  public MapleSimSwerveDrivetrain getMapleSimDrive() {
+    if (io instanceof DriveIOSim) {
+      return ((DriveIOSim) io).getSimSwerve();
+    }
+    return null;
   }
 }

@@ -8,15 +8,19 @@
 package frc.robot;
 
 import com.ctre.phoenix6.SignalLogger;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Threads;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import java.util.Optional;
+import org.ironmaple.simulation.SimulatedArena;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -40,6 +44,7 @@ public class Robot extends LoggedRobot {
 
   static final int REAL_TIME_PRIORITY = 2;
   static final int NON_REAL_TIME_PRIORITY = 1;
+  boolean isEnabled = false;
 
   public Robot() {
     // Record metadata
@@ -89,6 +94,11 @@ public class Robot extends LoggedRobot {
     robotContainer = new RobotContainer();
     SmartDashboard.putData("Command Scheduler", CommandScheduler.getInstance());
     SignalLogger.enableAutoLogging(false);
+
+    if (RobotBase.isSimulation()) {
+      robotContainer.getDriveSubsystem().resetOdometry(new Pose2d(2, 2, new Rotation2d()));
+      // robotContainer.getDriveSubsystem().resetOdometry(new Pose2d(0, 0, new Rotation2d()));
+    }
   }
 
   /** This function is called periodically during all modes. */
@@ -100,9 +110,11 @@ public class Robot extends LoggedRobot {
       Threads.setCurrentThreadPriority(false, NON_REAL_TIME_PRIORITY);
     }
 
-    CommandScheduler.getInstance().run();
-
     robotContainer.getRobotState().updateLogger();
+    if (RobotBase.isSimulation()) {
+      robotContainer.getSimRobotState().updateSim();
+    }
+    CommandScheduler.getInstance().run();
   }
 
   /** This function is called once when the robot is disabled. */
@@ -143,6 +155,15 @@ public class Robot extends LoggedRobot {
     Threads.setCurrentThreadPriority(true, REAL_TIME_PRIORITY);
     SmartDashboard.setNetworkTableInstance(NetworkTableInstance.getDefault());
 
+    if (RobotBase.isSimulation() && !isEnabled) {
+      SimulatedArena.getInstance().placeGamePiecesOnField();
+      // SimulatedArena.getInstance().addGamePiece(new RebuiltFuelOnField(null));
+    }
+
+    if (!isEnabled) {
+      isEnabled = true;
+    }
+
     if (autonomousCommand != null) {
       CommandScheduler.getInstance().cancel(autonomousCommand);
     }
@@ -168,5 +189,8 @@ public class Robot extends LoggedRobot {
 
   /** This function is called periodically whilst in simulation. */
   @Override
-  public void simulationPeriodic() {}
+  public void simulationPeriodic() {
+    Logger.recordOutput(
+        "FieldSimulation/Fuel", SimulatedArena.getInstance().getGamePiecesArrayByType("Fuel"));
+  }
 }

@@ -94,11 +94,6 @@ public class RobotState {
     this.fusedFieldRelativeChassisSpeeds.set(fusedFieldRelativeSpeeds);
   }
 
-  public boolean isBlueAlliance() {
-    return DriverStation.getAlliance().isPresent()
-        && DriverStation.getAlliance().equals(Optional.of(Alliance.Blue));
-  }
-
   public boolean isRedAlliance() {
     return DriverStation.getAlliance().isPresent()
         && DriverStation.getAlliance().equals(Optional.of(Alliance.Red));

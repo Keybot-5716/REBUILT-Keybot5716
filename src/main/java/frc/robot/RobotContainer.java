@@ -1,11 +1,15 @@
 package frc.robot;
 
-import edu.wpi.first.units.Units;
+import static edu.wpi.first.units.Units.MetersPerSecond;
+
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.simulation.SimulatedRobotState;
 import frc.robot.subsystems.drive.DriveConstants;
 import frc.robot.subsystems.drive.DriveIOCTRE;
+import frc.robot.subsystems.drive.DriveIOSim;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.drive.DriveSubsystem.DesiredState;
 import frc.robot.subsystems.drive.TunerConstants;
@@ -15,15 +19,28 @@ import java.util.function.Consumer;
 public class RobotContainer {
 
   private DriveSubsystem buildDriveSubsystem() {
-    return new DriveSubsystem(
-        new DriveIOCTRE(
-            robotState,
-            DriveConstants.SWERVE_DRIVETRAIN.getDrivetrainConstants(),
-            DriveConstants.SWERVE_DRIVETRAIN.getModuleConstants()),
-        robotState,
-        controller,
-        TunerConstants.kSpeedAt12Volts.in(Units.MetersPerSecond),
-        TunerConstants.kSpeedAt12Volts.in(Units.MetersPerSecond));
+    if (RobotBase.isSimulation()) {
+      return new DriveSubsystem(
+          new DriveIOSim(
+              robotState,
+              simulatedRobotState,
+              DriveConstants.SWERVE_DRIVETRAIN.getDrivetrainConstants(),
+              DriveConstants.SWERVE_DRIVETRAIN.getModuleConstants()),
+          robotState,
+          controller,
+          TunerConstants.kSpeedAt12Volts.in(MetersPerSecond),
+          TunerConstants.kSpeedAt12Volts.in(MetersPerSecond));
+    } else {
+      return new DriveSubsystem(
+          new DriveIOCTRE(
+              robotState,
+              DriveConstants.SWERVE_DRIVETRAIN.getDrivetrainConstants(),
+              DriveConstants.SWERVE_DRIVETRAIN.getModuleConstants()),
+          robotState,
+          controller,
+          TunerConstants.kSpeedAt12Volts.in(MetersPerSecond),
+          TunerConstants.kSpeedAt12Volts.in(MetersPerSecond));
+    }
   }
 
   // -- Controller
@@ -39,6 +56,8 @@ public class RobotContainer {
 
   private final RobotState robotState = new RobotState(visionFieldEstimate);
 
+  private final SimulatedRobotState simulatedRobotState =
+      RobotBase.isSimulation() ? new SimulatedRobotState(this) : null;
   // -- Subsystems
   private final DriveSubsystem driveSub = buildDriveSubsystem();
 
@@ -47,6 +66,11 @@ public class RobotContainer {
 
   public RobotContainer() {
     // autoChooser = new LoggedDashboardChooser<>("Auto Chooser", AutoBuilder.buildAutoChooser());
+
+    if (RobotBase.isSimulation()) {
+      assert this.simulatedRobotState != null;
+      this.simulatedRobotState.init();
+    }
 
     driveSub.setState(DesiredState.MANUAL_FIELD_DRIVE);
     configureButtonBindings(controller);
@@ -62,6 +86,10 @@ public class RobotContainer {
 
   public RobotState getRobotState() {
     return robotState;
+  }
+
+  public SimulatedRobotState getSimRobotState() {
+    return simulatedRobotState;
   }
 
   public Command getAutonomousCommand() {

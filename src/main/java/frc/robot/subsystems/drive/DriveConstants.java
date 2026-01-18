@@ -2,6 +2,7 @@ package frc.robot.subsystems.drive;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.util.Units;
+import frc.robot.Robot;
 
 public class DriveConstants {
 
@@ -16,7 +17,10 @@ public class DriveConstants {
 
   public static final double maxVelocityToAutoAllign = Units.feetToMeters(8.0);
 
-  public static final CommandSwerveDrivetrain SWERVE_DRIVETRAIN = TunerConstants.createDrivetrain();
+  public static final CommandSwerveDrivetrain SWERVE_DRIVETRAIN =
+      Robot.isSimulation()
+          ? SimTunerConstants.createDrivetrain()
+          : TunerConstants.createDrivetrain();
 
   public static final double MAX_SPEED = 4.58;
   public static final double WHEEL_COF = 1.0;

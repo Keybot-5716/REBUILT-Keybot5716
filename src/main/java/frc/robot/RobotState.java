@@ -171,6 +171,8 @@ public class RobotState {
         "RobotState/MeasuredChassisSpeedFieldFrame", getLatestMeasuredFieldRelativeChassisSpeeds());
     Logger.recordOutput(
         "RobotState/FusedChassisSpeedFieldFrame", getLatestFusedFieldRelativeChassisSpeeds());
+
+    Logger.recordOutput("RobotState/isRedAlliance", isRedAlliance());
   }
 
   public double getDrivePitchRads() {

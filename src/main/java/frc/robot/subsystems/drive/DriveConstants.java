@@ -1,7 +1,14 @@
 package frc.robot.subsystems.drive;
 
+import com.pathplanner.lib.config.ModuleConfig;
+import com.pathplanner.lib.config.PIDConstants;
+import com.pathplanner.lib.config.RobotConfig;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
+import frc.robot.Constants;
 import frc.robot.Robot;
 
 public class DriveConstants {
@@ -24,4 +31,28 @@ public class DriveConstants {
 
   public static final double MAX_SPEED = 4.58;
   public static final double WHEEL_COF = 1.0;
+
+  public static ModuleConfig moduleConfig =
+      new ModuleConfig(
+          SWERVE_DRIVETRAIN.getModuleConstants()[0].WheelRadius,
+          MAX_SPEED,
+          WHEEL_COF,
+          DCMotor.getKrakenX60(1),
+          SWERVE_DRIVETRAIN.getModuleConstants()[0].DriveMotorGearRatio,
+          SWERVE_DRIVETRAIN.getModuleConstants()[0].SlipCurrent,
+          1);
+
+  public static RobotConfig robotConfig =
+      new RobotConfig(
+          Constants.ROBOT_MASS_KG,
+          Constants.ROBOT_MOI,
+          moduleConfig,
+          new Translation2d(0.292, 0.292),
+          new Translation2d(0.292, -0.292),
+          new Translation2d(-0.292, 0.292),
+          new Translation2d(-0.292, -0.292));
+
+  public static PPHolonomicDriveController pathPlannerController =
+      new PPHolonomicDriveController(
+          new PIDConstants(3.0, 0.0, 0.0), new PIDConstants(5.0, 0.0, 0.0));
 }

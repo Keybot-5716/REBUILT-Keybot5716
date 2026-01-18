@@ -7,20 +7,16 @@ import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.ctre.phoenix6.swerve.SwerveRequest.ApplyRobotSpeeds;
 import com.ctre.phoenix6.swerve.utility.PhoenixPIDController;
-import com.pathplanner.lib.config.ModuleConfig;
-import com.pathplanner.lib.config.RobotConfig;
+import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.Constants;
 import frc.robot.RobotState;
 import frc.robot.simulation.MapleSimSwerveDrivetrain;
 import frc.robot.subsystems.vision.VisionPoseEstimateInField;
@@ -95,6 +91,8 @@ public class DriveSubsystem extends SubsystemBase {
 
     autoAllign.HeadingController = new PhoenixPIDController(5, 0, 0);
     autoAllign.HeadingController.enableContinuousInput(-Math.PI, Math.PI);
+
+    configurePathPlanner();
   }
 
   @Override
@@ -123,25 +121,24 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   private void configurePathPlanner() {
-    ModuleConfig moduleConfig =
-        new ModuleConfig(
-            DriveConstants.SWERVE_DRIVETRAIN.getModuleConstants()[0].WheelRadius,
-            DriveConstants.MAX_SPEED,
-            DriveConstants.WHEEL_COF,
-            DCMotor.getKrakenX60(1),
-            DriveConstants.SWERVE_DRIVETRAIN.getModuleConstants()[0].DriveMotorGearRatio,
-            DriveConstants.SWERVE_DRIVETRAIN.getModuleConstants()[0].SlipCurrent,
-            1);
-
-    RobotConfig robotConfig =
-        new RobotConfig(
-            Constants.ROBOT_MASS_KG,
-            Constants.ROBOT_MOI,
-            moduleConfig,
-            new Translation2d(),
-            new Translation2d(),
-            new Translation2d(),
-            new Translation2d());
+    try {
+      AutoBuilder.configure(
+          () -> robotState.getLatestFieldToRobot().getValue(),
+          this::resetOdometry,
+          () -> robotState.getLatestFusedFieldRelativeChassisSpeeds(),
+          (speeds, feedforwards) ->
+              setControl(
+                  pathplannerRequest
+                      .withSpeeds(speeds)
+                      .withWheelForceFeedforwardsX(feedforwards.robotRelativeForcesXNewtons())
+                      .withWheelForceFeedforwardsY(feedforwards.robotRelativeForcesYNewtons())),
+          DriveConstants.pathPlannerController,
+          DriveConstants.robotConfig,
+          () -> robotState.isRedAlliance(),
+          this);
+    } catch (Exception err) {
+      DriverStation.reportError("Failed to load PathPlanner config", err.getStackTrace());
+    }
   }
 
   private SubsystemState handleStateTransitions() {
@@ -284,8 +281,12 @@ public class DriveSubsystem extends SubsystemBase {
 
     teleopVelocityCoefficient = controller.leftBumper().getAsBoolean() ? 0.5 : 1.0;
 
-    double xVelocity = -xMagnitude * maxVelocity * teleopVelocityCoefficient;
-    double yVelocity = -yMagnitude * maxVelocity * teleopVelocityCoefficient;
+    double xVelocity =
+        (robotState.isRedAlliance() ? xMagnitude * maxVelocity : -xMagnitude * maxVelocity)
+            * teleopVelocityCoefficient;
+    double yVelocity =
+        (robotState.isRedAlliance() ? yMagnitude * maxVelocity : -yMagnitude * maxVelocity)
+            * teleopVelocityCoefficient;
     double angularVelocity = angularMagnitude * maxAngularVelocity * rotationVelocityCoefficient;
 
     Rotation2d skewCompensationFactor =

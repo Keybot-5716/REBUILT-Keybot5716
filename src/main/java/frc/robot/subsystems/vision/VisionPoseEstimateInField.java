@@ -6,7 +6,7 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 
 public class VisionPoseEstimateInField {
-    private final Pose2d robotPose;
+  private final Pose2d robotPose;
   private final double timestamp;
   private final Matrix<N3, N1> visionMeasurementStdDevs;
   private final int numTags;
@@ -37,5 +37,4 @@ public class VisionPoseEstimateInField {
   public int getNumTags() {
     return numTags;
   }
-
 }

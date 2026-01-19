@@ -29,4 +29,8 @@ public final class Constants {
     REPLAY
   }
 
+  public static final double ROBOT_MASS_KG = 50;
+  public static final double ROBOT_MOI = 1.0;
+
+  public static boolean useMapleSim = true;
 }

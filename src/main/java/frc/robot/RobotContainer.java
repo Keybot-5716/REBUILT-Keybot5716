@@ -1,16 +1,13 @@
 package frc.robot;
 
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.pathplanner.lib.auto.AutoBuilder;
-
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.subsystems.vision.rollers.RollerIOSim;
-import frc.robot.subsystems.vision.rollers.RollerSubsystem;
-import frc.robot.subsystems.vision.rollers.RolllerIOTalonFx;
-
+import frc.robot.subsystems.rollers.RollerIOSim;
+import frc.robot.subsystems.rollers.RollerSubsystem;
+import frc.robot.subsystems.rollers.RolllerIOTalonFx;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 public class RobotContainer {
@@ -40,8 +37,20 @@ public class RobotContainer {
   }
 
   public void configureButtonBindings() {
-    controller.a().onTrue(Commands.runOnce(() -> rollerSub.setDesiredStateWithSpeed(RollerSubsystem.DesiredState.FORWARD, 0.75)));
-    controller.b().onTrue(Commands.runOnce(() -> rollerSub.setDesiredStateWithSpeed(RollerSubsystem.DesiredState.FORWARD, 0.6)));
+    controller
+        .a()
+        .onTrue(
+            Commands.runOnce(
+                () ->
+                    rollerSub.setDesiredStateWithVoltage(
+                        RollerSubsystem.DesiredState.FORWARD, 13)));
+    controller
+        .b()
+        .onTrue(
+            Commands.runOnce(
+                () ->
+                    rollerSub.setDesiredStateWithVoltage(
+                        RollerSubsystem.DesiredState.REVERSE, 80)));
   }
 
   public Command getAutonomousCommand() {

@@ -1,4 +1,4 @@
-package frc.robot.subsystems.vision.rollers;
+package frc.robot.subsystems.rollers;
 
 import org.littletonrobotics.junction.AutoLog;
 
@@ -14,9 +14,7 @@ public interface RollerIO {
 
   void updateInputs(RollerIOInputs inputs);
 
-  void setRollerSpeed(double output);
+  void setVoltage(double voltage);
 
   void stopRoller();
-
-  void runOpenLoop(double output);
 }

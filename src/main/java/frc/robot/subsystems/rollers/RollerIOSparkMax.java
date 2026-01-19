@@ -1,4 +1,4 @@
-package frc.robot.subsystems.vision.rollers;
+package frc.robot.subsystems.rollers;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
@@ -6,6 +6,8 @@ import com.revrobotics.PersistMode;
 import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
+
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
@@ -35,17 +37,13 @@ public class RollerIOSparkMax implements RollerIO {
   }
 
   @Override
-  public void setRollerSpeed(double speed) {
-    motor.set(speed);
+  public void setVoltage(double voltage) {
+    voltage = MathUtil.clamp(voltage, -12, 12);
+    motor.setVoltage(voltage);
   }
 
   @Override
   public void stopRoller() {
     motor.stopMotor();
-  }
-
-  @Override
-  public void runOpenLoop(double output) {
-    motor.set(output);
   }
 }

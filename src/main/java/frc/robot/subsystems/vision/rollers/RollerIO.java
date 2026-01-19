@@ -3,22 +3,20 @@ package frc.robot.subsystems.vision.rollers;
 import org.littletonrobotics.junction.AutoLog;
 
 public interface RollerIO {
-    
-    @AutoLog
-    public class RollerIOInputs {
-        public boolean motorConnected;
-        public double acceleration;
-        public double appliedVolts;
-        public double tempCelcius;    
-    }
 
+  @AutoLog
+  public class RollerIOInputs {
+    public boolean motorConnected;
+    public double acceleration;
+    public double appliedVolts;
+    public double tempCelcius;
+  }
 
-   void updateInputs(RollerIOInputs inputs);
-   
-   void setRollerSpeed(double output);
+  void updateInputs(RollerIOInputs inputs);
 
-   void stopRoller();
+  void setRollerSpeed(double output);
 
-   void runOpenLoop(double output);
-} 
+  void stopRoller();
 
+  void runOpenLoop(double output);
+}

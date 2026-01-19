@@ -30,7 +30,7 @@ public class RollerSubsystem extends SubsystemBase {
     REVERSING
   }
 
-  public RollerSubsystem(RollerIO io /*RobotState robotState*/) {
+  public RollerSubsystem(RollerIO io /*, RobotState robotState*/) {
     this.io = io;
     // this.robotState = robotState;
   }

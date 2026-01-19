@@ -10,6 +10,11 @@ public interface RollerIO {
     public double acceleration;
     public double appliedVolts;
     public double tempCelcius;
+    // Second motor inputs
+    public boolean motorConnected2;
+    public double acceleration2;
+    public double appliedVolts2;
+    public double tempCelcius2;
   }
 
   void updateInputs(RollerIOInputs inputs);

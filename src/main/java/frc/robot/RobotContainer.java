@@ -15,9 +15,9 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.lib.team6328.LocalADStarAK;
-import frc.robot.Auto.Auto1Test;
-import frc.robot.Auto.Auto2Test;
-import frc.robot.Auto.NoneAuto;
+import frc.robot.auto.Auto1Test;
+import frc.robot.auto.Auto2Test;
+import frc.robot.auto.NoneAuto;
 import frc.robot.simulation.SimulatedRobotState;
 import frc.robot.subsystems.drive.DriveConstants;
 import frc.robot.subsystems.drive.DriveIOCTRE;
@@ -76,7 +76,7 @@ public class RobotContainer {
   private final DriveSubsystem driveSub = buildDriveSubsystem();
 
   // -- AutoChooser
-  private final LoggedDashboardChooser<frc.robot.Auto.AutoBuilder> autoChooser =
+  private final LoggedDashboardChooser<frc.robot.auto.AutoBuilder> autoChooser =
       new LoggedDashboardChooser<>("Auto Chooser");
   public static Field2d autoPrev = new Field2d();
 

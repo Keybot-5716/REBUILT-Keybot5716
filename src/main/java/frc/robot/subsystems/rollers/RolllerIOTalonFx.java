@@ -1,4 +1,3 @@
-
 package frc.robot.subsystems.rollers;
 
 import com.ctre.phoenix6.BaseStatusSignal;
@@ -7,8 +6,9 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
-
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.Temperature;
@@ -20,6 +20,7 @@ public class RolllerIOTalonFx implements RollerIO {
   protected final TalonFX motor;
   protected final TalonFX motor2;
   private final TalonFXConfiguration config = new TalonFXConfiguration();
+  private final TalonFXConfiguration config2 = new TalonFXConfiguration();
 
   private final StatusSignal<AngularAcceleration> acceleration;
   private final StatusSignal<Voltage> appliedVolts;
@@ -32,12 +33,24 @@ public class RolllerIOTalonFx implements RollerIO {
 
   public RolllerIOTalonFx() {
 
-    // CAMBIAR!!!!!
-    motor = new TalonFX(6);
-    motor2 = new TalonFX(7);
+    motor = new TalonFX(16);
+    motor2 = new TalonFX(17);
 
+    config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+    config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+    config.CurrentLimits.SupplyCurrentLimitEnable = true;
+    config.CurrentLimits.SupplyCurrentLimit = 60;
+    config.CurrentLimits.SupplyCurrentLowerLimit = 40;
+    config.CurrentLimits.SupplyCurrentLowerTime = 1.0;
     motor.getConfigurator().apply(config);
-    motor2.getConfigurator().apply(config);
+
+    config2.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+    config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+    config2.CurrentLimits.SupplyCurrentLimitEnable = true;
+    config2.CurrentLimits.SupplyCurrentLimit = 60;
+    config2.CurrentLimits.SupplyCurrentLowerLimit = 40;
+    config2.CurrentLimits.SupplyCurrentLowerTime = 1.0;
+    motor2.getConfigurator().apply(config2);
 
     acceleration = motor.getAcceleration();
     appliedVolts = motor.getMotorVoltage();
@@ -66,9 +79,8 @@ public class RolllerIOTalonFx implements RollerIO {
   public void setVoltage(double voltage) {
     voltage = MathUtil.clamp(voltage, -12, 12);
     motor.setControl(voltageOut.withOutput(voltage));
-    motor2.setControl(voltageOut.withOutput(voltage));
-
-    motor2.setControl(new Follower(motor.getDeviceID(), MotorAlignmentValue.Aligned));
+    // Preguntar si el segund motor va igual o al reves
+    motor2.setControl(new Follower(motor.getDeviceID(), MotorAlignmentValue.Opposed));
   }
 
   @Override
@@ -76,5 +88,4 @@ public class RolllerIOTalonFx implements RollerIO {
     motor.stopMotor();
     motor2.stopMotor();
   }
-
 }

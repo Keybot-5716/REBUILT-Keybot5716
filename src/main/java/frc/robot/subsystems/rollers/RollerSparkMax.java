@@ -1,4 +1,3 @@
-
 package frc.robot.subsystems.rollers;
 
 import com.ctre.phoenix6.BaseStatusSignal;
@@ -7,7 +6,6 @@ import com.revrobotics.PersistMode;
 import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
-
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.Temperature;

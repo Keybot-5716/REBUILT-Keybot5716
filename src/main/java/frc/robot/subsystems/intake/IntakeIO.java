@@ -2,8 +2,6 @@ package frc.robot.subsystems.intake;
 
 import org.littletonrobotics.junction.AutoLog;
 
-import frc.robot.subsystems.rollers.RollerIO.RollerIOInputs;
-
 public interface IntakeIO {
 
   @AutoLog

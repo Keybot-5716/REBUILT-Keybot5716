@@ -1,19 +1,19 @@
 package frc.robot.subsystems.intake;
 
+import static edu.wpi.first.units.Units.Volts;
+
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
-
 import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
 
 public class IntakeIOTalonFx implements IntakeIO {
   protected TalonFX motor;
-  private final VoltageOut voltageOut = new VoltageOut(0);
+  private final VoltageOut voltageOut = new VoltageOut(Volts.zero());
 
   private final TalonFXConfiguration config = new TalonFXConfiguration();
 
@@ -32,6 +32,10 @@ public class IntakeIOTalonFx implements IntakeIO {
     positionIntake = motor.getPosition();
     appliedVolts = motor.getMotorVoltage();
     tempCelsius = motor.getDeviceTemp();
+
+    BaseStatusSignal.setUpdateFrequencyForAll(100.0, positionIntake, appliedVolts, tempCelsius);
+
+    motor.optimizeBusUtilization();
   }
 
   @Override

@@ -11,7 +11,7 @@ public class IntakeSubsystem extends SubsystemBase {
   private final IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
 
   // Creamos un objeto TrapezoidProfile que tenga velocidad y aceleración máximas
-  private TrapezoidProfile.Constraints profile = new TrapezoidProfile.Constraints(1, 2);
+  private TrapezoidProfile.Constraints profile = new TrapezoidProfile.Constraints(2.0, 2.0);
 
   // Creamos un controller para el trapezoidProfile
   private ProfiledPIDController controller = new ProfiledPIDController(5, 0, 0, profile);

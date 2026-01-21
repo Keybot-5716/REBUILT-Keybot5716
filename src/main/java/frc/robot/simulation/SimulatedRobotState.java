@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj.Timer;
 import frc.robot.RobotContainer;
 import frc.robot.RobotState;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
+import org.littletonrobotics.junction.Logger;
 
 public class SimulatedRobotState {
   TimeInterpolatableBuffer<Pose2d> fieldToRobotSim =
@@ -34,5 +35,6 @@ public class SimulatedRobotState {
 
   public synchronized void updateSim() {
     var pose = simSwerveDrive.getSimulatedDriveTrainPose();
+    Logger.recordOutput("FieldSimulation/SimulatedPose", pose);
   }
 }

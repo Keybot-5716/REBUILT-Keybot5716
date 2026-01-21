@@ -11,6 +11,8 @@ public class VisionPoseEstimateInField {
   private final Matrix<N3, N1> visionMeasurementStdDevs;
   private final int numTags;
 
+  // implementar este archivo para la odometría
+
   public VisionPoseEstimateInField(
       Pose2d visionRobotPoseMeters,
       double timestampSeconds,

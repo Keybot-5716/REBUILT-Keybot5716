@@ -28,7 +28,7 @@ public class IntakeSubsystem extends SubsystemBase {
     io.updateInputs(inputs);
 
     if (DriverStation.isDisabled()) {
-        controller.reset(inputs.positionIntake);
+      controller.reset(inputs.positionIntake);
     }
   }
 

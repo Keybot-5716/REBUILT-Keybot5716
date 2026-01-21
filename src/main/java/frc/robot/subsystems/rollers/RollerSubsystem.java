@@ -1,7 +1,6 @@
 package frc.robot.subsystems.rollers;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import org.littletonrobotics.junction.Logger;
 
 public class RollerSubsystem extends SubsystemBase {
   // Creamos un objeto de nuestra interfaz para manejar todo desde ahí
@@ -38,7 +37,6 @@ public class RollerSubsystem extends SubsystemBase {
   public void periodic() {
     // Hacer sistema para loggeo
     io.updateInputs(inputs);
-    Logger.recordOutput("Rollers/ CurrentVoltage", inputs.appliedVolts);
     // Para que los estados funcionen
     rollersState = setStateTransition();
     applyStates();

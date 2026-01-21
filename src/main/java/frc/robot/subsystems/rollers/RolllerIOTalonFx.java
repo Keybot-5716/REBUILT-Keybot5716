@@ -33,14 +33,14 @@ public class RolllerIOTalonFx implements RollerIO {
 
   public RolllerIOTalonFx() {
 
-    motor = new TalonFX(16);
-    motor2 = new TalonFX(17);
+    motor = new TalonFX(RollerConstants.talon1Id);
+    motor2 = new TalonFX(RollerConstants.talon2Id);
 
     config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
     config.CurrentLimits.SupplyCurrentLimitEnable = true;
     config.CurrentLimits.SupplyCurrentLimit = 60;
-    config.CurrentLimits.SupplyCurrentLowerLimit = 40;
+    config.CurrentLimits.SupplyCurrentLowerLimit = 30;
     config.CurrentLimits.SupplyCurrentLowerTime = 1.0;
     motor.getConfigurator().apply(config);
 
@@ -48,7 +48,7 @@ public class RolllerIOTalonFx implements RollerIO {
     config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
     config2.CurrentLimits.SupplyCurrentLimitEnable = true;
     config2.CurrentLimits.SupplyCurrentLimit = 60;
-    config2.CurrentLimits.SupplyCurrentLowerLimit = 40;
+    config2.CurrentLimits.SupplyCurrentLowerLimit = 30;
     config2.CurrentLimits.SupplyCurrentLowerTime = 1.0;
     motor2.getConfigurator().apply(config2);
 

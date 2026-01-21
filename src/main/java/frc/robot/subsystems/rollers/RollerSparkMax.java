@@ -4,7 +4,9 @@ import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.revrobotics.PersistMode;
 import com.revrobotics.ResetMode;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.units.measure.AngularAcceleration;
@@ -22,7 +24,9 @@ public class RollerSparkMax implements RollerIO {
   private StatusSignal<Temperature> tempCelsius;
 
   public RollerSparkMax() {
-    motor = new SparkMax(0, null);
+    motor = new SparkMax(22, MotorType.kBrushless);
+
+    config.smartCurrentLimit(40).idleMode(IdleMode.kBrake);
 
     motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
   }

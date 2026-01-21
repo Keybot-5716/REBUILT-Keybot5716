@@ -36,16 +36,16 @@ public class IntakeIOSim implements IntakeIO {
     // collection
   }
 
-  public boolean isAnyBallInsideIntake() {
+  public boolean isAnyFuelInsideIntake() {
     return intakeSimulation.getGamePiecesAmount()
         != 0; // True if there is a game piece in the intake
   }
 
-  public void launchBall() {
-    // if there is a ball in the intake, it will be removed and return true; otherwise, returns
+  public void launchFuel() {
+    // if there is a fuel in the intake, it will be removed and return true; otherwise, returns
     // false
     if (intakeSimulation.obtainGamePieceFromIntake()) {}
-    // ShooterIOSim.launchNote(); //notify the simulated flywheels to launch a ball (We need the
+    // ShooterIOSim.launchNote(); //notify the simulated flywheels to launch a fuel (We need the
     // shooter to be aware of this)
   }
 

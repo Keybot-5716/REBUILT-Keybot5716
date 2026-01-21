@@ -25,6 +25,9 @@ import frc.robot.subsystems.drive.DriveIOSim;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.drive.DriveSubsystem.DesiredState;
 import frc.robot.subsystems.drive.TunerConstants;
+import frc.robot.subsystems.rollers.RollerIOSim;
+import frc.robot.subsystems.rollers.RollerSparkMax;
+import frc.robot.subsystems.rollers.RollerSubsystem;
 import frc.robot.subsystems.vision.VisionPoseEstimateInField;
 import java.util.function.Consumer;
 import org.littletonrobotics.junction.Logger;
@@ -57,6 +60,15 @@ public class RobotContainer {
     }
   }
 
+  private RollerSubsystem buildRollerSubsystem() {
+    if (RobotBase.isSimulation()) {
+      // return new RollerSubsystem(new RollerIOSim(), robotState);
+      return new RollerSubsystem(new RollerIOSim());
+    } else {
+      return new RollerSubsystem(new RollerSparkMax());
+    }
+  }
+
   // -- Controller
   private final CommandXboxController controller = new CommandXboxController(0);
 
@@ -74,6 +86,7 @@ public class RobotContainer {
       RobotBase.isSimulation() ? new SimulatedRobotState(this) : null;
   // -- Subsystems
   private final DriveSubsystem driveSub = buildDriveSubsystem();
+  private final RollerSubsystem rollerSub = buildRollerSubsystem();
 
   // -- AutoChooser
   private final LoggedDashboardChooser<frc.robot.auto.AutoBuilder> autoChooser =
@@ -92,7 +105,26 @@ public class RobotContainer {
   }
 
   public void configureButtonBindings(CommandXboxController control) {
-    control.a().onTrue(Commands.none());
+    control
+        .a()
+        .whileTrue(
+            Commands.run(
+                () ->
+                    rollerSub.setDesiredStateWithVoltage(RollerSubsystem.DesiredState.FORWARD, 1.0),
+                rollerSub))
+        .onFalse(
+            Commands.runOnce(
+                () -> rollerSub.setDesiredState(RollerSubsystem.DesiredState.STOPPED), rollerSub));
+    control
+        .b()
+        .whileTrue(
+            Commands.run(
+                () ->
+                    rollerSub.setDesiredStateWithVoltage(RollerSubsystem.DesiredState.REVERSE, 1.0),
+                rollerSub))
+        .onFalse(
+            Commands.runOnce(
+                () -> rollerSub.setDesiredState(RollerSubsystem.DesiredState.STOPPED), rollerSub));
   }
 
   public void configureAuto() {

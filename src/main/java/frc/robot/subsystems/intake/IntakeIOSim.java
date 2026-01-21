@@ -12,7 +12,7 @@ public class IntakeIOSim implements IntakeIO {
     this.intakeSimulation =
         IntakeSimulation.OverTheBumperIntake(
             // Este es el tipo de objeto que el intake va a recoger
-            "Ball",
+            "Fuel",
             // Specify the drivetrain to which this intake is attached
             driveTrain,
             // The width of the intake (CHANGEEEEE)

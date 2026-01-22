@@ -94,33 +94,33 @@ public class AIRobotSimulated extends SubsystemBase {
 
       instances[1] = new AIRobotSimulated(1);
       instances[1].buildBehaviorChooser(
-          PathPlannerPath.fromPathFile("opponent robot cycle path 1"),
+          PathPlannerPath.fromPathFile("oponentPath_1_1"),
           instances[1].noneCommand(),
-          PathPlannerPath.fromPathFile("opponent robot cycle path 1 backwards"),
+          PathPlannerPath.fromPathFile("oponentPath_1_2"),
           Commands.none(),
           new XboxController(2));
 
       instances[2] = new AIRobotSimulated(2);
       instances[2].buildBehaviorChooser(
-          PathPlannerPath.fromPathFile("opponent robot cycle path 2"),
+          PathPlannerPath.fromPathFile("oponentPath_1_1"),
           instances[2].noneCommand(),
-          PathPlannerPath.fromPathFile("opponent robot cycle path 2 backwards"),
+          PathPlannerPath.fromPathFile("oponentPath_1_2"),
           Commands.none(),
           new XboxController(3));
 
       instances[3] = new AIRobotSimulated(3);
       instances[3].buildBehaviorChooser(
-          PathPlannerPath.fromPathFile("opponent robot cycle path 3"),
+          PathPlannerPath.fromPathFile("oponentPath_1_1"),
           instances[3].noneCommand(),
-          PathPlannerPath.fromPathFile("opponent robot cycle path 3 backwards"),
+          PathPlannerPath.fromPathFile("oponentPath_1_2"),
           Commands.none(),
           new XboxController(4));
 
       instances[4] = new AIRobotSimulated(4);
       instances[4].buildBehaviorChooser(
-          PathPlannerPath.fromPathFile("opponent robot cycle path 4"),
+          PathPlannerPath.fromPathFile("oponentPath_1_1"),
           instances[4].noneCommand(),
-          PathPlannerPath.fromPathFile("opponent robot cycle path 4 backwards"),
+          PathPlannerPath.fromPathFile("oponentPath_1_2"),
           Commands.none(),
           new XboxController(5));
     } catch (Exception e) {
@@ -187,6 +187,7 @@ public class AIRobotSimulated extends SubsystemBase {
     // Display the behavior chooser on the dashboard for the user to select the desired robot
     // behavior
     SmartDashboard.putData("AIRobotBehaviors/Opponent Robot " + id + " Behavior", behaviorChooser);
+    
   }
 
   private Command getAutoCycleCommand(

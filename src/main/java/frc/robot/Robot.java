@@ -169,6 +169,7 @@ public class Robot extends LoggedRobot {
     if (autonomousCommand != null) {
       CommandScheduler.getInstance().cancel(autonomousCommand);
     }
+
   }
 
   /** This function is called periodically during operator control. */

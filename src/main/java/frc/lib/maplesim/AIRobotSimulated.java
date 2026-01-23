@@ -187,7 +187,6 @@ public class AIRobotSimulated extends SubsystemBase {
     // Display the behavior chooser on the dashboard for the user to select the desired robot
     // behavior
     SmartDashboard.putData("AIRobotBehaviors/Opponent Robot " + id + " Behavior", behaviorChooser);
-    
   }
 
   private Command getAutoCycleCommand(

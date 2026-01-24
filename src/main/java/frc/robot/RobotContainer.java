@@ -27,6 +27,7 @@ import frc.robot.subsystems.drive.DriveSubsystem.DesiredState;
 import frc.robot.subsystems.drive.TunerConstants;
 import frc.robot.subsystems.rollers.RollerSubsystem;
 import frc.robot.subsystems.rollers.RolllerIOTalonFx;
+import frc.robot.subsystems.rollers.RolllerIOTalonFx2;
 import frc.robot.subsystems.vision.VisionPoseEstimateInField;
 import java.util.function.Consumer;
 import org.littletonrobotics.junction.Logger;
@@ -64,6 +65,10 @@ public class RobotContainer {
     return new RollerSubsystem(new RolllerIOTalonFx());
   }
 
+  private RollerSubsystem buildRollerSubsystem2() {
+    return new RollerSubsystem(new RolllerIOTalonFx2());
+  }
+
   // -- Controller
   private final CommandXboxController controller = new CommandXboxController(0);
 
@@ -82,6 +87,7 @@ public class RobotContainer {
   // -- Subsystems
   private final DriveSubsystem driveSub = buildDriveSubsystem();
   private final RollerSubsystem rollerSub = buildRollerSubsystem();
+  private final RollerSubsystem rollerSub2 = buildRollerSubsystem2();
 
   // -- AutoChooser
   private final LoggedDashboardChooser<frc.robot.auto.AutoBuilder> autoChooser =
@@ -118,6 +124,25 @@ public class RobotContainer {
         .onFalse(
             Commands.runOnce(
                 () -> rollerSub.setDesiredState(RollerSubsystem.DesiredState.STOPPED)));
+    // Para los rollers
+    control
+        .leftBumper()
+        .whileTrue(
+            Commands.run(
+                () ->
+                    rollerSub2.setDesiredStateWithVoltage(RollerSubsystem.DesiredState.FORWARD, 8)))
+        .onFalse(
+            Commands.runOnce(
+                () -> rollerSub2.setDesiredState(RollerSubsystem.DesiredState.STOPPED)));
+    control
+        .rightBumper()
+        .whileTrue(
+            Commands.run(
+                () ->
+                    rollerSub2.setDesiredStateWithVoltage(RollerSubsystem.DesiredState.REVERSE, 8)))
+        .onFalse(
+            Commands.runOnce(
+                () -> rollerSub2.setDesiredState(RollerSubsystem.DesiredState.STOPPED)));
   }
 
   public void configureAuto() {

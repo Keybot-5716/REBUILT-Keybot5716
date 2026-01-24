@@ -1,5 +1,3 @@
- 
-
 package frc.robot.subsystems.vision;
 
 import edu.wpi.first.util.struct.Struct;

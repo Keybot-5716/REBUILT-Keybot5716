@@ -11,7 +11,7 @@ import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
 
-public class RolllerIOTalonFx implements RollerIO {
+public class RolllerIOTalonFx2 implements RollerIO {
   private final VoltageOut voltageOut = new VoltageOut(0);
 
   // protected final TalonFX motor;
@@ -28,10 +28,10 @@ public class RolllerIOTalonFx implements RollerIO {
   private final StatusSignal<Voltage> appliedVolts2;
   private final StatusSignal<Temperature> tempCelsius2;
 
-  public RolllerIOTalonFx() {
+  public RolllerIOTalonFx2() {
 
     // motor = new TalonFX(RollerConstants.talon1Id);
-    motor2 = new TalonFX(RollerConstants.talon1Id);
+    motor2 = new TalonFX(RollerConstants.talon2Id);
 
     /*
     config.MotorOutput.NeutralMode = NeutralModeValue.Brake;

@@ -25,9 +25,9 @@ import frc.robot.subsystems.drive.DriveIOSim;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.drive.DriveSubsystem.DesiredState;
 import frc.robot.subsystems.drive.TunerConstants;
-import frc.robot.subsystems.rollers.RollerIOSim;
-import frc.robot.subsystems.rollers.RollerSparkMax;
 import frc.robot.subsystems.rollers.RollerSubsystem;
+import frc.robot.subsystems.rollers.RolllerIOTalonFx;
+import frc.robot.subsystems.rollers.RolllerIOTalonFx2;
 import frc.robot.subsystems.vision.VisionPoseEstimateInField;
 import java.util.function.Consumer;
 import org.littletonrobotics.junction.Logger;
@@ -61,12 +61,12 @@ public class RobotContainer {
   }
 
   private RollerSubsystem buildRollerSubsystem() {
-    if (RobotBase.isSimulation()) {
-      // return new RollerSubsystem(new RollerIOSim(), robotState);
-      return new RollerSubsystem(new RollerIOSim());
-    } else {
-      return new RollerSubsystem(new RollerSparkMax());
-    }
+
+    return new RollerSubsystem(new RolllerIOTalonFx());
+  }
+
+  private RollerSubsystem buildRollerSubsystem2() {
+    return new RollerSubsystem(new RolllerIOTalonFx2());
   }
 
   // -- Controller
@@ -87,6 +87,7 @@ public class RobotContainer {
   // -- Subsystems
   private final DriveSubsystem driveSub = buildDriveSubsystem();
   private final RollerSubsystem rollerSub = buildRollerSubsystem();
+  private final RollerSubsystem rollerSub2 = buildRollerSubsystem2();
 
   // -- AutoChooser
   private final LoggedDashboardChooser<frc.robot.auto.AutoBuilder> autoChooser =
@@ -106,25 +107,42 @@ public class RobotContainer {
 
   public void configureButtonBindings(CommandXboxController control) {
     control
-        .a()
+        .leftTrigger()
         .whileTrue(
             Commands.run(
                 () ->
-                    rollerSub.setDesiredStateWithVoltage(RollerSubsystem.DesiredState.FORWARD, 1.0),
-                rollerSub))
+                    rollerSub.setDesiredStateWithVoltage(RollerSubsystem.DesiredState.FORWARD, 7)))
         .onFalse(
             Commands.runOnce(
-                () -> rollerSub.setDesiredState(RollerSubsystem.DesiredState.STOPPED), rollerSub));
+                () -> rollerSub.setDesiredState(RollerSubsystem.DesiredState.STOPPED)));
     control
-        .b()
+        .rightTrigger()
         .whileTrue(
             Commands.run(
                 () ->
-                    rollerSub.setDesiredStateWithVoltage(RollerSubsystem.DesiredState.REVERSE, 1.0),
-                rollerSub))
+                    rollerSub.setDesiredStateWithVoltage(RollerSubsystem.DesiredState.REVERSE, 7)))
         .onFalse(
             Commands.runOnce(
-                () -> rollerSub.setDesiredState(RollerSubsystem.DesiredState.STOPPED), rollerSub));
+                () -> rollerSub.setDesiredState(RollerSubsystem.DesiredState.STOPPED)));
+    // Para los rollers
+    control
+        .leftBumper()
+        .whileTrue(
+            Commands.run(
+                () ->
+                    rollerSub2.setDesiredStateWithVoltage(RollerSubsystem.DesiredState.FORWARD, 8)))
+        .onFalse(
+            Commands.runOnce(
+                () -> rollerSub2.setDesiredState(RollerSubsystem.DesiredState.STOPPED)));
+    control
+        .rightBumper()
+        .whileTrue(
+            Commands.run(
+                () ->
+                    rollerSub2.setDesiredStateWithVoltage(RollerSubsystem.DesiredState.REVERSE, 8)))
+        .onFalse(
+            Commands.runOnce(
+                () -> rollerSub2.setDesiredState(RollerSubsystem.DesiredState.STOPPED)));
   }
 
   public void configureAuto() {

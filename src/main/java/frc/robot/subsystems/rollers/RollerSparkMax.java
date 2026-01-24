@@ -1,7 +1,5 @@
 package frc.robot.subsystems.rollers;
 
-import com.ctre.phoenix6.BaseStatusSignal;
-import com.ctre.phoenix6.StatusSignal;
 import com.revrobotics.PersistMode;
 import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
@@ -9,9 +7,6 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.units.measure.AngularAcceleration;
-import edu.wpi.first.units.measure.Temperature;
-import edu.wpi.first.units.measure.Voltage;
 
 public class RollerSparkMax implements RollerIO {
 
@@ -19,9 +14,9 @@ public class RollerSparkMax implements RollerIO {
 
   private SparkMaxConfig config = new SparkMaxConfig();
 
-  private StatusSignal<AngularAcceleration> acceleration;
-  private StatusSignal<Voltage> appliedVolts;
-  private StatusSignal<Temperature> tempCelsius;
+  private double acceleration;
+  private double appliedVolts;
+  private double tempCelsius;
 
   public RollerSparkMax() {
     motor = new SparkMax(22, MotorType.kBrushless);
@@ -33,10 +28,10 @@ public class RollerSparkMax implements RollerIO {
 
   @Override
   public void updateInputs(RollerIOInputs inputs) {
-    inputs.motorConnected = BaseStatusSignal.isAllGood(acceleration, appliedVolts, tempCelsius);
-    inputs.acceleration = acceleration.getValueAsDouble();
-    inputs.appliedVolts = appliedVolts.getValueAsDouble();
-    inputs.tempCelcius = tempCelsius.getValueAsDouble();
+    inputs.motorConnected = true;
+    inputs.acceleration = motor.getAppliedOutput();
+    inputs.appliedVolts = motor.getAppliedOutput();
+    inputs.tempCelcius = motor.getMotorTemperature();
   }
 
   @Override

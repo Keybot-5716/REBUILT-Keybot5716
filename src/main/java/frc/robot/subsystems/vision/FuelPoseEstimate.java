@@ -17,11 +17,7 @@ import java.nio.ByteBuffer;
  * @param fiducialIds IDs of fiducials used for this estimate
  */
 public record FuelPoseEstimate(
-    Pose2d fieldToRobot,
-    double timestampSeconds,
-    double latency,
-    double avgTagArea,
-    double quality)
+    Pose2d fieldToRobot, double timestampSeconds, double latency, double avgTagArea)
     implements StructSerializable {
 
   public FuelPoseEstimate {
@@ -36,14 +32,9 @@ public record FuelPoseEstimate(
     if (fieldToRobot == null) {
       fieldToRobot = Pose2d.kZero;
     }
-  m
+
     return new FuelPoseEstimate(
-        fieldToRobot,
-        poseEstimate.timestampSeconds,
-        poseEstimate.latency,
-        poseEstimate.avgTagArea,
-        fiducialIds.length > 1 ? 1.0 : 1.0 - poseEstimate.rawFiducials[0].ambiguity,
-        fiducialIds);
+        fieldToRobot, poseEstimate.timestampSeconds, poseEstimate.latency, poseEstimate.avgTagArea);
   }
 
   public static final MegatagPoseEstimateStruct struct = new MegatagPoseEstimateStruct();
@@ -81,10 +72,7 @@ public record FuelPoseEstimate(
       double timestampSeconds = bb.getDouble();
       double latency = bb.getDouble();
       double avgTagArea = bb.getDouble();
-      double quality = bb.getDouble();
-      int[] fiducialIds = new int[0];
-      return new FuelPoseEstimate(
-          fieldToRobot, timestampSeconds, latency, avgTagArea, quality, fiducialIds);
+      return new FuelPoseEstimate(fieldToRobot, timestampSeconds, latency, avgTagArea);
     }
 
     @Override
@@ -93,7 +81,6 @@ public record FuelPoseEstimate(
       bb.putDouble(value.timestampSeconds());
       bb.putDouble(value.latency());
       bb.putDouble(value.avgTagArea());
-      bb.putDouble(value.quality());
     }
 
     @Override

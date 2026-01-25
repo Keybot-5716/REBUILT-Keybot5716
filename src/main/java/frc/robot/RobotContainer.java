@@ -7,6 +7,7 @@ import com.pathplanner.lib.commands.PathfindingCommand;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -107,6 +108,14 @@ public class RobotContainer {
 
   public void configureButtonBindings(CommandXboxController control) {
     control
+        .rightTrigger()
+        .whileTrue(
+            Commands.run(() -> driveSub.setDesiredPointToLock(new Translation2d(4.626, 4.033))))
+        .onFalse(
+            Commands.runOnce(
+                () -> driveSub.setState(DriveSubsystem.DesiredState.MANUAL_FIELD_DRIVE)));
+    /*
+    control
         .leftTrigger()
         .whileTrue(
             Commands.run(
@@ -142,7 +151,7 @@ public class RobotContainer {
                     rollerSub2.setDesiredStateWithVoltage(RollerSubsystem.DesiredState.REVERSE, 8)))
         .onFalse(
             Commands.runOnce(
-                () -> rollerSub2.setDesiredState(RollerSubsystem.DesiredState.STOPPED)));
+                () -> rollerSub2.setDesiredState(RollerSubsystem.DesiredState.STOPPED)));*/
   }
 
   public void configureAuto() {

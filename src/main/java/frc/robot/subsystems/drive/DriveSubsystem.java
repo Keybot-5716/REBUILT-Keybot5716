@@ -11,6 +11,7 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
@@ -41,6 +42,7 @@ public class DriveSubsystem extends SubsystemBase {
 
   private Rotation2d desiredRotationToLock = new Rotation2d();
   private Pose2d desiredPoseToAutoAllign = new Pose2d();
+  private Translation2d desiredPoint = new Translation2d();
 
   private final ApplyRobotSpeeds stopRequest =
       new ApplyRobotSpeeds().withDriveRequestType(DriveRequestType.OpenLoopVoltage);
@@ -61,6 +63,7 @@ public class DriveSubsystem extends SubsystemBase {
     STOPPED,
     MANUAL_FIELD_DRIVE,
     ROTATION_LOCK,
+    ROTATION_TO_POINT,
     DRIVE_TO_POSE
   }
 
@@ -68,6 +71,7 @@ public class DriveSubsystem extends SubsystemBase {
     STOPPED,
     MANUAL_FIELD_DRIVE,
     ROTATED_TO_ANGLE,
+    ROTATED_TO_POINT,
     DRIVEN_TO_POSE
   }
 
@@ -145,6 +149,7 @@ public class DriveSubsystem extends SubsystemBase {
     return switch (desiredState) {
       case MANUAL_FIELD_DRIVE -> SubsystemState.MANUAL_FIELD_DRIVE;
       case ROTATION_LOCK -> SubsystemState.ROTATED_TO_ANGLE;
+      case ROTATION_TO_POINT -> SubsystemState.ROTATED_TO_POINT;
       case DRIVE_TO_POSE -> SubsystemState.DRIVEN_TO_POSE;
       case STOPPED -> SubsystemState.STOPPED;
       default -> SubsystemState.STOPPED;
@@ -161,6 +166,9 @@ public class DriveSubsystem extends SubsystemBase {
       case ROTATED_TO_ANGLE:
         rotatedToAngle();
         break;
+      case ROTATED_TO_POINT:
+        rotatedToPoint();
+        break;
       case DRIVEN_TO_POSE:
         drivenToPose();
         break;
@@ -174,6 +182,11 @@ public class DriveSubsystem extends SubsystemBase {
   public void setDesiredRotationToLock(Rotation2d desiredRotation) {
     setState(DesiredState.ROTATION_LOCK);
     this.desiredRotationToLock = desiredRotation;
+  }
+
+  public void setDesiredPointToLock(Translation2d desiredPoint) {
+    setState(DesiredState.ROTATION_TO_POINT);
+    this.desiredPoint = desiredPoint;
   }
 
   public void setDesiredPoseToAutoAllign(Pose2d desiredPose) {
@@ -219,6 +232,17 @@ public class DriveSubsystem extends SubsystemBase {
         new SwerveRequest.ApplyFieldSpeeds()
             .withSpeeds(speeds)
             .withDriveRequestType(SwerveModule.DriveRequestType.OpenLoopVoltage));
+  }
+
+  private void rotatedToPoint() {
+    var pos = inputs.Pose.getTranslation();
+    var delta = desiredPoint.minus(pos);
+
+    io.setRequest(
+        rotationLocked
+            .withVelocityX(calculateSpeedsBasedOnJoystickInputs().vxMetersPerSecond)
+            .withVelocityY(calculateSpeedsBasedOnJoystickInputs().vyMetersPerSecond)
+            .withTargetDirection(delta.getAngle()));
   }
 
   private void rotatedToAngle() {

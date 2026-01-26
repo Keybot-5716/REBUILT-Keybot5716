@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.lib.team6328.LocalADStarAK;
 import frc.robot.auto.Auto1Test;
 import frc.robot.auto.Auto2Test;
+import frc.robot.auto.AutoBuilder;
 import frc.robot.auto.NoneAuto;
 import frc.robot.simulation.SimulatedRobotState;
 import frc.robot.subsystems.drive.DriveConstants;
@@ -62,7 +63,6 @@ public class RobotContainer {
   }
 
   private RollerSubsystem buildRollerSubsystem() {
-
     return new RollerSubsystem(new RolllerIOTalonFx());
   }
 
@@ -85,13 +85,14 @@ public class RobotContainer {
 
   private final SimulatedRobotState simulatedRobotState =
       RobotBase.isSimulation() ? new SimulatedRobotState(this) : null;
+      
   // -- Subsystems
   private final DriveSubsystem driveSub = buildDriveSubsystem();
   private final RollerSubsystem rollerSub = buildRollerSubsystem();
   private final RollerSubsystem rollerSub2 = buildRollerSubsystem2();
 
   // -- AutoChooser
-  private final LoggedDashboardChooser<frc.robot.auto.AutoBuilder> autoChooser =
+  private final LoggedDashboardChooser<AutoBuilder> autoChooser =
       new LoggedDashboardChooser<>("Auto Chooser");
   public static Field2d autoPrev = new Field2d();
 
@@ -114,7 +115,7 @@ public class RobotContainer {
         .onFalse(
             Commands.runOnce(
                 () -> driveSub.setState(DriveSubsystem.DesiredState.MANUAL_FIELD_DRIVE)));
-    
+
     controller
         .leftTrigger()
         .whileTrue(

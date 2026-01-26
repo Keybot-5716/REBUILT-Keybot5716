@@ -14,12 +14,12 @@ public class VisionPoseEstimateInField {
   // implementar este archivo para la odometría
 
   public VisionPoseEstimateInField(
-      Pose2d visionRobotPoseMeters,
-      double timestampSeconds,
+      Pose2d robotPose,
+      double timestamp,
       Matrix<N3, N1> visionMeasurementStdDevs,
       int numTags) {
-    this.robotPose = visionRobotPoseMeters;
-    this.timestamp = timestampSeconds;
+    this.robotPose = robotPose;
+    this.timestamp = timestamp;
     this.visionMeasurementStdDevs = visionMeasurementStdDevs;
     this.numTags = numTags;
   }

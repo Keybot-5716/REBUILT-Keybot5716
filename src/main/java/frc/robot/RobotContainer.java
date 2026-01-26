@@ -45,7 +45,7 @@ public class RobotContainer {
               DriveConstants.SWERVE_DRIVETRAIN.getDrivetrainConstants(),
               DriveConstants.SWERVE_DRIVETRAIN.getModuleConstants()),
           robotState,
-          controller,
+          DRIVE_CONTROLLER,
           TunerConstants.kSpeedAt12Volts.in(MetersPerSecond),
           TunerConstants.kSpeedAt12Volts.in(MetersPerSecond));
     } else {
@@ -55,7 +55,7 @@ public class RobotContainer {
               DriveConstants.SWERVE_DRIVETRAIN.getDrivetrainConstants(),
               DriveConstants.SWERVE_DRIVETRAIN.getModuleConstants()),
           robotState,
-          controller,
+          DRIVE_CONTROLLER,
           TunerConstants.kSpeedAt12Volts.in(MetersPerSecond),
           TunerConstants.kSpeedAt12Volts.in(MetersPerSecond));
     }
@@ -71,7 +71,7 @@ public class RobotContainer {
   }
 
   // -- Controller
-  private final CommandXboxController controller = new CommandXboxController(0);
+  private final CommandXboxController DRIVE_CONTROLLER = new CommandXboxController(0);
 
   private final Consumer<VisionPoseEstimateInField> visionFieldEstimate =
       new Consumer<VisionPoseEstimateInField>() {
@@ -102,20 +102,20 @@ public class RobotContainer {
     }
 
     driveSub.setState(DesiredState.MANUAL_FIELD_DRIVE);
-    configureButtonBindings(controller);
+    configureButtonBindings(DRIVE_CONTROLLER);
     configureAuto();
   }
 
-  public void configureButtonBindings(CommandXboxController control) {
-    control
-        .rightTrigger()
+  public void configureButtonBindings(CommandXboxController controller) {
+    controller
+        .a()
         .whileTrue(
             Commands.run(() -> driveSub.setDesiredPointToLock(new Translation2d(4.626, 4.033))))
         .onFalse(
             Commands.runOnce(
                 () -> driveSub.setState(DriveSubsystem.DesiredState.MANUAL_FIELD_DRIVE)));
-    /*
-    control
+    
+    controller
         .leftTrigger()
         .whileTrue(
             Commands.run(
@@ -124,7 +124,7 @@ public class RobotContainer {
         .onFalse(
             Commands.runOnce(
                 () -> rollerSub.setDesiredState(RollerSubsystem.DesiredState.STOPPED)));
-    control
+    controller
         .rightTrigger()
         .whileTrue(
             Commands.run(
@@ -134,7 +134,7 @@ public class RobotContainer {
             Commands.runOnce(
                 () -> rollerSub.setDesiredState(RollerSubsystem.DesiredState.STOPPED)));
     // Para los rollers
-    control
+    controller
         .leftBumper()
         .whileTrue(
             Commands.run(
@@ -143,7 +143,7 @@ public class RobotContainer {
         .onFalse(
             Commands.runOnce(
                 () -> rollerSub2.setDesiredState(RollerSubsystem.DesiredState.STOPPED)));
-    control
+    controller
         .rightBumper()
         .whileTrue(
             Commands.run(
@@ -151,7 +151,7 @@ public class RobotContainer {
                     rollerSub2.setDesiredStateWithVoltage(RollerSubsystem.DesiredState.REVERSE, 8)))
         .onFalse(
             Commands.runOnce(
-                () -> rollerSub2.setDesiredState(RollerSubsystem.DesiredState.STOPPED)));*/
+                () -> rollerSub2.setDesiredState(RollerSubsystem.DesiredState.STOPPED)));
   }
 
   public void configureAuto() {

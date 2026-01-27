@@ -6,4 +6,13 @@ public class angleConstants {
   public static final double MIN_OFFSET = 0.1;
   public static final double NONE = 3;
 
+  public static double degreesToRotations(double degrees) {
+  return degrees / 360.0 * GEARBOX_REDUCTION;
+}
+
+public static double rotationsToDegrees(double rotations) {
+  return rotations * 360.0 / GEARBOX_REDUCTION;
+}
+
+
 }

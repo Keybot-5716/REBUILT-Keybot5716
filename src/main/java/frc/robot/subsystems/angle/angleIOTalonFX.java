@@ -56,7 +56,7 @@ public class angleIOTalonFX implements angleIO {
   @Override
   public void updateInputs(angleIOInputs inputs) {
     inputs.data =
-        new ArmIOData(
+        new angleIOData(
             BaseStatusSignal.isAllGood(
                 motor.getPosition(),
                 motor.getVelocity(),

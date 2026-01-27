@@ -85,7 +85,7 @@ public class RobotContainer {
 
   private final SimulatedRobotState simulatedRobotState =
       RobotBase.isSimulation() ? new SimulatedRobotState(this) : null;
-      
+
   // -- Subsystems
   private final DriveSubsystem driveSub = buildDriveSubsystem();
   private final RollerSubsystem rollerSub = buildRollerSubsystem();

@@ -7,6 +7,7 @@ import com.pathplanner.lib.commands.PathfindingCommand;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -19,6 +20,7 @@ import frc.lib.team6328.LocalADStarAK;
 import frc.robot.auto.Auto1Test;
 import frc.robot.auto.Auto2Test;
 import frc.robot.auto.AutoBuilder;
+import frc.robot.auto.AutoForwardTest;
 import frc.robot.auto.NoneAuto;
 import frc.robot.simulation.SimulatedRobotState;
 import frc.robot.subsystems.drive.DriveConstants;
@@ -85,7 +87,7 @@ public class RobotContainer {
 
   private final SimulatedRobotState simulatedRobotState =
       RobotBase.isSimulation() ? new SimulatedRobotState(this) : null;
-      
+
   // -- Subsystems
   private final DriveSubsystem driveSub = buildDriveSubsystem();
   private final RollerSubsystem rollerSub = buildRollerSubsystem();
@@ -108,10 +110,19 @@ public class RobotContainer {
   }
 
   public void configureButtonBindings(CommandXboxController controller) {
+    controller.start().onTrue(Commands.runOnce(() -> driveSub.resetOdometry()));
+
     controller
         .a()
         .whileTrue(
             Commands.run(() -> driveSub.setDesiredPointToLock(new Translation2d(4.626, 4.033))))
+        .onFalse(
+            Commands.runOnce(
+                () -> driveSub.setState(DriveSubsystem.DesiredState.MANUAL_FIELD_DRIVE)));
+
+    controller
+        .b()
+        .whileTrue(Commands.run(() -> driveSub.setDesiredRotationToLock(new Rotation2d())))
         .onFalse(
             Commands.runOnce(
                 () -> driveSub.setState(DriveSubsystem.DesiredState.MANUAL_FIELD_DRIVE)));
@@ -140,7 +151,7 @@ public class RobotContainer {
         .whileTrue(
             Commands.run(
                 () ->
-                    rollerSub2.setDesiredStateWithVoltage(RollerSubsystem.DesiredState.FORWARD, 8)))
+                    rollerSub2.setDesiredStateWithVoltage(RollerSubsystem.DesiredState.FORWARD, 6)))
         .onFalse(
             Commands.runOnce(
                 () -> rollerSub2.setDesiredState(RollerSubsystem.DesiredState.STOPPED)));
@@ -149,7 +160,7 @@ public class RobotContainer {
         .whileTrue(
             Commands.run(
                 () ->
-                    rollerSub2.setDesiredStateWithVoltage(RollerSubsystem.DesiredState.REVERSE, 8)))
+                    rollerSub2.setDesiredStateWithVoltage(RollerSubsystem.DesiredState.REVERSE, 7)))
         .onFalse(
             Commands.runOnce(
                 () -> rollerSub2.setDesiredState(RollerSubsystem.DesiredState.STOPPED)));
@@ -159,6 +170,7 @@ public class RobotContainer {
     autoChooser.addDefaultOption("None Auto", new NoneAuto());
     autoChooser.addOption("Testing Auto", new Auto1Test());
     autoChooser.addOption("Testing Auto 2", new Auto2Test());
+    autoChooser.addOption("Auto Forward", new AutoForwardTest());
 
     autoChooser.onChange(
         auto -> {

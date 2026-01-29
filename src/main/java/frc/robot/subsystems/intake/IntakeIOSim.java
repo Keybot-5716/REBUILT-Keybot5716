@@ -54,4 +54,7 @@ public class IntakeIOSim implements IntakeIO {
 
   @Override
   public void setVoltage(double voltage) {}
+
+  @Override
+  public void stopRollers() {}
 }

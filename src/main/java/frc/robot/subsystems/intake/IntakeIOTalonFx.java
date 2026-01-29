@@ -23,7 +23,7 @@ public class IntakeIOTalonFx implements IntakeIO {
 
   public IntakeIOTalonFx() {
     // Cambiar el ID del motor
-    motor = new TalonFX(16);
+    motor = new TalonFX(IntakeIOConstants.talonId);
 
     config.Slot0.kP = 5;
     config.Slot0.kI = 0;
@@ -38,13 +38,18 @@ public class IntakeIOTalonFx implements IntakeIO {
     motor.optimizeBusUtilization();
   }
 
+  public void setPosition(double position) {
+    motor.setPosition(position);
+  }
+
   @Override
   public void setVoltage(double voltage) {
     motor.setControl(voltageOut.withOutput(voltage));
   }
 
-  public void setPosition(double position) {
-    motor.setPosition(position);
+  @Override
+  public void stopRollers() {
+    motor.stopMotor();
   }
 
   @Override

@@ -15,4 +15,6 @@ public interface IntakeIO {
   void updateInputs(IntakeIOInputs inputs);
 
   void setVoltage(double voltage);
+
+  void stopRollers();
 }

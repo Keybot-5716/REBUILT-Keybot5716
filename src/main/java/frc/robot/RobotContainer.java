@@ -7,7 +7,6 @@ import com.pathplanner.lib.commands.PathfindingCommand;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -29,9 +28,11 @@ import frc.robot.subsystems.drive.DriveIOSim;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.drive.DriveSubsystem.DesiredState;
 import frc.robot.subsystems.drive.TunerConstants;
+import frc.robot.subsystems.intake.IntakeIOSparkMax;
+import frc.robot.subsystems.intake.IntakeIOTalonFx;
+import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.rollers.RollerSubsystem;
 import frc.robot.subsystems.rollers.RolllerIOTalonFx;
-import frc.robot.subsystems.rollers.RolllerIOTalonFx2;
 import frc.robot.subsystems.vision.VisionPoseEstimateInField;
 import java.util.function.Consumer;
 import org.littletonrobotics.junction.Logger;
@@ -68,8 +69,14 @@ public class RobotContainer {
     return new RollerSubsystem(new RolllerIOTalonFx());
   }
 
-  private RollerSubsystem buildRollerSubsystem2() {
-    return new RollerSubsystem(new RolllerIOTalonFx2());
+  // -- Intake Rollers
+  private IntakeSubsystem buildIntakeSubsystem() {
+    return new IntakeSubsystem(new IntakeIOSparkMax());
+  }
+
+  // -- Intake Pivot
+  private IntakeSubsystem buildIntakePivotSubsystem() {
+    return new IntakeSubsystem(new IntakeIOTalonFx());
   }
 
   // -- Controller
@@ -91,7 +98,8 @@ public class RobotContainer {
   // -- Subsystems
   private final DriveSubsystem driveSub = buildDriveSubsystem();
   private final RollerSubsystem rollerSub = buildRollerSubsystem();
-  private final RollerSubsystem rollerSub2 = buildRollerSubsystem2();
+  private final IntakeSubsystem intakeSub = buildIntakeSubsystem();
+  private final IntakeSubsystem intakePivotSub = buildIntakePivotSubsystem();
 
   // -- AutoChooser
   private final LoggedDashboardChooser<AutoBuilder> autoChooser =
@@ -110,19 +118,11 @@ public class RobotContainer {
   }
 
   public void configureButtonBindings(CommandXboxController controller) {
-    controller.start().onTrue(Commands.runOnce(() -> driveSub.resetOdometry()));
-
+    // Para el shooter
     controller
         .a()
         .whileTrue(
             Commands.run(() -> driveSub.setDesiredPointToLock(new Translation2d(4.626, 4.033))))
-        .onFalse(
-            Commands.runOnce(
-                () -> driveSub.setState(DriveSubsystem.DesiredState.MANUAL_FIELD_DRIVE)));
-
-    controller
-        .b()
-        .whileTrue(Commands.run(() -> driveSub.setDesiredRotationToLock(new Rotation2d())))
         .onFalse(
             Commands.runOnce(
                 () -> driveSub.setState(DriveSubsystem.DesiredState.MANUAL_FIELD_DRIVE)));
@@ -151,19 +151,37 @@ public class RobotContainer {
         .whileTrue(
             Commands.run(
                 () ->
-                    rollerSub2.setDesiredStateWithVoltage(RollerSubsystem.DesiredState.FORWARD, 6)))
+                    intakeSub.setDesiredStateWithVoltage(IntakeSubsystem.DesiredState.FORWARD, 8)))
         .onFalse(
             Commands.runOnce(
-                () -> rollerSub2.setDesiredState(RollerSubsystem.DesiredState.STOPPED)));
+                () -> intakeSub.setDesiredState(IntakeSubsystem.DesiredState.STOPPED)));
     controller
         .rightBumper()
         .whileTrue(
             Commands.run(
                 () ->
-                    rollerSub2.setDesiredStateWithVoltage(RollerSubsystem.DesiredState.REVERSE, 7)))
+                    intakeSub.setDesiredStateWithVoltage(IntakeSubsystem.DesiredState.REVERSE, 8)))
         .onFalse(
             Commands.runOnce(
-                () -> rollerSub2.setDesiredState(RollerSubsystem.DesiredState.STOPPED)));
+                () -> intakeSub.setDesiredState(IntakeSubsystem.DesiredState.STOPPED)));
+
+    // Para el intake pivot
+    controller
+        .b()
+        .onTrue(
+            Commands.runOnce(
+                () -> intakePivotSub.setDesiredState(IntakeSubsystem.DesiredState.IN)));
+    controller
+        .x()
+        .onTrue(
+            Commands.runOnce(
+                () -> intakePivotSub.setDesiredState(IntakeSubsystem.DesiredState.OUT)));
+    //
+    controller
+        .x()
+        .onTrue(
+            Commands.runOnce(
+                () -> intakePivotSub.setDesiredState(IntakeSubsystem.DesiredState.OUT)));
   }
 
   public void configureAuto() {

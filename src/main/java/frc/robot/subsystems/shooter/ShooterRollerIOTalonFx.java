@@ -1,4 +1,4 @@
-package frc.robot.subsystems.intake;
+package frc.robot.subsystems.shooter;
 
 import static edu.wpi.first.units.Units.Volts;
 
@@ -10,9 +10,8 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
-import frc.robot.subsystems.superstructure.SuperstructureIDs;
 
-public class IntakeIOTalonFx implements IntakeIO {
+public class ShooterRollerIOTalonFx implements ShooterRollerIO {
   protected TalonFX motor;
   private final VoltageOut voltageOut = new VoltageOut(Volts.zero());
 
@@ -22,9 +21,9 @@ public class IntakeIOTalonFx implements IntakeIO {
   private final StatusSignal<Voltage> appliedVolts;
   private final StatusSignal<Temperature> tempCelsius;
 
-  public IntakeIOTalonFx() {
+  public ShooterRollerIOTalonFx() {
     // Cambiar el ID del motor
-    motor = new TalonFX(SuperstructureIDs.talonIntakeRollersId);
+    motor = new TalonFX(ShooterRollerIOConstants.talonId);
 
     config.Slot0.kP = 5;
     config.Slot0.kI = 0;
@@ -54,7 +53,7 @@ public class IntakeIOTalonFx implements IntakeIO {
   }
 
   @Override
-  public void updateInputs(IntakeIOInputs inputs) {
+  public void updateInputs(ShooterRollerIOInputs inputs) {
     inputs.motorConnected = BaseStatusSignal.isAllGood(positionIntake, appliedVolts, tempCelsius);
     inputs.positionIntake = positionIntake.getValueAsDouble();
     inputs.appliedVolts = appliedVolts.getValueAsDouble();

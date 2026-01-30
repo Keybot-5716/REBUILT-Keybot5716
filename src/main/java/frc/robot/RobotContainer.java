@@ -178,10 +178,10 @@ public class RobotContainer {
                 () -> intakePivotSub.setDesiredState(IntakeSubsystem.DesiredState.OUT)));
     //
     controller
-        .x()
+        .y()
         .onTrue(
             Commands.runOnce(
-                () -> intakePivotSub.setDesiredState(IntakeSubsystem.DesiredState.OUT)));
+                () -> intakePivotSub.setDesiredState(IntakeSubsystem.DesiredState.TEST)));
   }
 
   public void configureAuto() {

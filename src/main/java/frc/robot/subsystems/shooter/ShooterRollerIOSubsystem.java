@@ -1,15 +1,16 @@
-package frc.robot.subsystems.intake;
+package frc.robot.subsystems.shooter;
+
+import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.team6328.LoggedTunableNumber;
-import org.littletonrobotics.junction.Logger;
 
-public class IntakeSubsystem extends SubsystemBase {
-  private final IntakeIO io;
+public class ShooterRollerIOSubsystem extends SubsystemBase {
+  private final ShooterRollerIO io;
 
-  private final IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
+  private final ShooterRollerIOInputsAutoLogged inputs = new ShooterRollerIOInputsAutoLogged();
 
   private static final LoggedTunableNumber rollerVolts =
       new LoggedTunableNumber("Intake/Rollers/RollerVolts", 7.0);
@@ -46,7 +47,7 @@ public class IntakeSubsystem extends SubsystemBase {
     TESTING
   }
 
-  public IntakeSubsystem(IntakeIO io) {
+  public ShooterRollerIOSubsystem(ShooterRollerIO io) {
     this.io = io;
   }
 
@@ -103,11 +104,11 @@ public class IntakeSubsystem extends SubsystemBase {
         break;
 
       case INING:
-        setPosition(IntakeIOConstants.In);
+        setPosition(ShooterRollerIOConstants.In);
         break;
 
       case OUTING:
-        setPosition(IntakeIOConstants.Out);
+        setPosition(ShooterRollerIOConstants.Out);
         break;
 
       case TESTING:

@@ -19,7 +19,7 @@ public class IntakeIOSparkMax implements IntakeIO {
   private double tempCelsius;
 
   public IntakeIOSparkMax() {
-    motor = new SparkMax(IntakeIOConstants.sparkId, MotorType.kBrushless);
+    motor = new SparkMax(SuperstructureIDs.sparkIntakeRollers, MotorType.kBrushless);
 
     config.smartCurrentLimit(40).idleMode(IdleMode.kBrake);
 

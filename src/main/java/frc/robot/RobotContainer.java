@@ -7,7 +7,6 @@ import com.pathplanner.lib.commands.PathfindingCommand;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -28,9 +27,9 @@ import frc.robot.subsystems.drive.DriveIOSim;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.drive.DriveSubsystem.DesiredState;
 import frc.robot.subsystems.drive.TunerConstants;
-import frc.robot.subsystems.intake.IntakeIOSparkMax;
 import frc.robot.subsystems.intake.IntakeIOTalonFx;
 import frc.robot.subsystems.intake.IntakeSubsystem;
+import frc.robot.subsystems.rollers.RollerSparkMax;
 import frc.robot.subsystems.rollers.RollerSubsystem;
 import frc.robot.subsystems.rollers.RolllerIOTalonFx;
 import frc.robot.subsystems.vision.VisionPoseEstimateInField;
@@ -70,8 +69,12 @@ public class RobotContainer {
   }
 
   // -- Intake Rollers
-  private IntakeSubsystem buildIntakeSubsystem() {
-    return new IntakeSubsystem(new IntakeIOSparkMax());
+  private RollerSubsystem buildIntakeRoller() {
+    return new RollerSubsystem(new RollerSparkMax(20));
+  }
+
+  private RollerSubsystem buildTransfer() {
+    return new RollerSubsystem(new RollerSparkMax(21));
   }
 
   // -- Intake Pivot
@@ -98,7 +101,8 @@ public class RobotContainer {
   // -- Subsystems
   private final DriveSubsystem driveSub = buildDriveSubsystem();
   private final RollerSubsystem rollerSub = buildRollerSubsystem();
-  private final IntakeSubsystem intakeSub = buildIntakeSubsystem();
+  private final RollerSubsystem intakeRollerSub = buildIntakeRoller();
+  private final RollerSubsystem transferRoller = buildTransfer();
   private final IntakeSubsystem intakePivotSub = buildIntakePivotSubsystem();
 
   // -- AutoChooser
@@ -119,7 +123,8 @@ public class RobotContainer {
 
   public void configureButtonBindings(CommandXboxController controller) {
     // Para el shooter
-    controller
+    /*
+     * controller
         .a()
         .whileTrue(
             Commands.run(() -> driveSub.setDesiredPointToLock(new Translation2d(4.626, 4.033))))
@@ -176,12 +181,91 @@ public class RobotContainer {
         .onTrue(
             Commands.runOnce(
                 () -> intakePivotSub.setDesiredState(IntakeSubsystem.DesiredState.OUT)));
-    //
+
+     */
+    controller
+        .leftTrigger()
+        .whileTrue(
+            Commands.run(
+                () ->
+                    rollerSub.setDesiredStateWithVoltage(RollerSubsystem.DesiredState.FORWARD, 7)))
+        .onFalse(
+            Commands.runOnce(
+                () -> rollerSub.setDesiredState(RollerSubsystem.DesiredState.STOPPED)));
+    controller
+        .rightTrigger()
+        .whileTrue(
+            Commands.run(
+                () ->
+                    rollerSub.setDesiredStateWithVoltage(RollerSubsystem.DesiredState.REVERSE, 7)))
+        .onFalse(
+            Commands.runOnce(
+                () -> rollerSub.setDesiredState(RollerSubsystem.DesiredState.STOPPED)));
+
+    controller
+        .leftBumper()
+        .whileTrue(
+            Commands.run(
+                () ->
+                    intakeRollerSub.setDesiredStateWithVoltage(
+                        RollerSubsystem.DesiredState.FORWARD, 7)))
+        .onFalse(
+            Commands.runOnce(
+                () -> intakeRollerSub.setDesiredState(RollerSubsystem.DesiredState.STOPPED)));
+    controller
+        .rightBumper()
+        .whileTrue(
+            Commands.run(
+                () ->
+                    intakeRollerSub.setDesiredStateWithVoltage(
+                        RollerSubsystem.DesiredState.REVERSE, 7)))
+        .onFalse(
+            Commands.runOnce(
+                () -> intakeRollerSub.setDesiredState(RollerSubsystem.DesiredState.STOPPED)));
+
+    controller
+        .a()
+        .whileTrue(
+            Commands.run(
+                () ->
+                    transferRoller.setDesiredStateWithVoltage(
+                        RollerSubsystem.DesiredState.FORWARD, 5)))
+        .onFalse(
+            Commands.runOnce(
+                () -> transferRoller.setDesiredState(RollerSubsystem.DesiredState.STOPPED)));
+
+    controller
+        .b()
+        .whileTrue(
+            Commands.run(
+                () ->
+                    transferRoller.setDesiredStateWithVoltage(
+                        RollerSubsystem.DesiredState.REVERSE, 5)))
+        .onFalse(
+            Commands.runOnce(
+                () -> transferRoller.setDesiredState(RollerSubsystem.DesiredState.STOPPED)));
+
+    controller
+        .x()
+        .whileTrue(
+            Commands.run(
+                () ->
+                    intakePivotSub.setDesiredStateWithVoltage(
+                        IntakeSubsystem.DesiredState.FORWARD, 1.5)))
+        .onFalse(
+            Commands.runOnce(
+                () -> intakePivotSub.setDesiredState(IntakeSubsystem.DesiredState.STOPPED)));
+
     controller
         .y()
-        .onTrue(
+        .whileTrue(
+            Commands.run(
+                () ->
+                    intakePivotSub.setDesiredStateWithVoltage(
+                        IntakeSubsystem.DesiredState.REVERSE, 1)))
+        .onFalse(
             Commands.runOnce(
-                () -> intakePivotSub.setDesiredState(IntakeSubsystem.DesiredState.TEST)));
+                () -> intakePivotSub.setDesiredState(IntakeSubsystem.DesiredState.STOPPED)));
   }
 
   public void configureAuto() {

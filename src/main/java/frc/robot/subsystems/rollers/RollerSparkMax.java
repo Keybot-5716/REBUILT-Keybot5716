@@ -18,8 +18,8 @@ public class RollerSparkMax implements RollerIO {
   private double appliedVolts;
   private double tempCelsius;
 
-  public RollerSparkMax() {
-    motor = new SparkMax(22, MotorType.kBrushless);
+  public RollerSparkMax(int deviceID) {
+    motor = new SparkMax(deviceID, MotorType.kBrushless);
 
     config.smartCurrentLimit(40).idleMode(IdleMode.kBrake);
 

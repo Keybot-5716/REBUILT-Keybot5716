@@ -3,7 +3,6 @@ package frc.robot.subsystems.intake;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.lib.team6328.LoggedTunableNumber;
 import org.littletonrobotics.junction.Logger;
 
 public class IntakeSubsystem extends SubsystemBase {
@@ -11,8 +10,8 @@ public class IntakeSubsystem extends SubsystemBase {
 
   private final IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
 
-  private static final LoggedTunableNumber rollerVolts =
-      new LoggedTunableNumber("Intake/Rollers/RollerVolts", 7.0);
+  // private static final LoggedTunableNumber rollerVolts = new
+  // LoggedTunableNumber("Intake/Rollers/RollerVolts", 7.0);
 
   // Creamos un objeto TrapezoidProfile que tenga velocidad y aceleración máximas
   private TrapezoidProfile.Constraints profile = new TrapezoidProfile.Constraints(2.0, 2.0);
@@ -33,8 +32,7 @@ public class IntakeSubsystem extends SubsystemBase {
     FORWARD,
     REVERSE,
     IN,
-    OUT,
-    TEST
+    OUT
   }
 
   private enum IntakeState {
@@ -42,8 +40,7 @@ public class IntakeSubsystem extends SubsystemBase {
     FORWARDING,
     REVERSING,
     INING,
-    OUTING,
-    TESTING
+    OUTING
   }
 
   public IntakeSubsystem(IntakeIO io) {
@@ -72,7 +69,6 @@ public class IntakeSubsystem extends SubsystemBase {
       case REVERSE -> IntakeState.REVERSING;
       case IN -> IntakeState.INING;
       case OUT -> IntakeState.OUTING;
-      case TEST -> IntakeState.TESTING;
     };
   }
 
@@ -80,26 +76,22 @@ public class IntakeSubsystem extends SubsystemBase {
     io.stopRollers();
   }
 
-  public void setVoltageRollers(double voltage) {
-    io.setVoltage(voltage);
-  }
-
-  public void setVoltageIntakeTesters(double voltage) {
+  public void setVoltage(double voltage) {
     io.setVoltage(voltage);
   }
 
   private void applyStates() {
     switch (intakeState) {
       case FORWARDING:
-        setVoltageRollers(rollerVolts.get());
+        setVoltage(desiredVoltage);
         break;
 
       case REVERSING:
-        setVoltageRollers(-rollerVolts.get());
+        setVoltage(-desiredVoltage);
         break;
 
       case STOPPING:
-        setVoltageRollers(0);
+        stop();
         break;
 
       case INING:
@@ -108,10 +100,6 @@ public class IntakeSubsystem extends SubsystemBase {
 
       case OUTING:
         setPosition(IntakeIOConstants.Out);
-        break;
-
-      case TESTING:
-        setVoltageIntakeTesters(desiredVoltage);
         break;
     }
   }

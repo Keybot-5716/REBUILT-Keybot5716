@@ -1,11 +1,10 @@
 package frc.robot.subsystems.shooter;
 
-import org.littletonrobotics.junction.Logger;
-
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.team6328.LoggedTunableNumber;
+import org.littletonrobotics.junction.Logger;
 
 public class ShooterRollerIOSubsystem extends SubsystemBase {
   private final ShooterRollerIO io;
@@ -59,7 +58,7 @@ public class ShooterRollerIOSubsystem extends SubsystemBase {
     }
       */
 
-    Logger.processInputs("intakeInputs", inputs);
+    Logger.processInputs("IntakeInputs", inputs);
     io.updateInputs(inputs);
 
     intakeState = setStateTransition();

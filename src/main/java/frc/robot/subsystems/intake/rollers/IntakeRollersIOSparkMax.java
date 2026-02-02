@@ -1,4 +1,4 @@
-package frc.robot.subsystems.intake;
+package frc.robot.subsystems.intake.rollers;
 
 import com.revrobotics.PersistMode;
 import com.revrobotics.ResetMode;
@@ -7,10 +7,8 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.math.MathUtil;
-import frc.robot.subsystems.superstructure.*;
 
-public class IntakeIOSparkMax implements IntakeIO {
-
+public class IntakeRollersIOSparkMax implements IntakeRollersIO {
   private SparkMax motor;
 
   private SparkMaxConfig config = new SparkMaxConfig();
@@ -19,8 +17,8 @@ public class IntakeIOSparkMax implements IntakeIO {
   private double appliedVolts;
   private double tempCelsius;
 
-  public IntakeIOSparkMax() {
-    motor = new SparkMax(SuperstructureIDs.sparkIntakeRollers, MotorType.kBrushless);
+  public IntakeRollersIOSparkMax() {
+    motor = new SparkMax(1, MotorType.kBrushless);
 
     config.smartCurrentLimit(40).idleMode(IdleMode.kBrake);
 
@@ -28,11 +26,10 @@ public class IntakeIOSparkMax implements IntakeIO {
   }
 
   @Override
-  public void updateInputs(IntakeIOInputs inputs) {
+  public void updateInputs(IntakeRollersIOInputs inputs) {
     inputs.motorConnected = true;
     inputs.appliedVolts = motor.getAppliedOutput();
     inputs.tempCelcius = motor.getMotorTemperature();
-    inputs.positionIntake = motor.getEncoder().getPosition();
   }
 
   @Override

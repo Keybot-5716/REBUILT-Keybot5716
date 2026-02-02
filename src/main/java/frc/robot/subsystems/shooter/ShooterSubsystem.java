@@ -4,12 +4,16 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.team6328.LoggedTunableNumber;
-import org.littletonrobotics.junction.Logger;
+import frc.robot.subsystems.shooter.hood.ShooterHoodIO;
+import frc.robot.subsystems.shooter.rollers.ShooterRollersIO;
+import frc.robot.subsystems.shooter.transferRollers.TransferIO;
 
-public class ShooterRollerIOSubsystem extends SubsystemBase {
-  private final ShooterRollerIO io;
+public class ShooterSubsystem extends SubsystemBase {
+  private final ShooterRollersIO rollersIO;
+  private final ShooterHoodIO hoodIO;
+  private final TransferIO transferIO;
 
-  private final ShooterRollerIOInputsAutoLogged inputs = new ShooterRollerIOInputsAutoLogged();
+  // private final ShooterRollerIOInputsAutoLogged inputs = new ShooterRollerIOInputsAutoLogged();
 
   private static final LoggedTunableNumber rollerVolts =
       new LoggedTunableNumber("Intake/Rollers/RollerVolts", 7.0);
@@ -46,8 +50,10 @@ public class ShooterRollerIOSubsystem extends SubsystemBase {
     TESTING
   }
 
-  public ShooterRollerIOSubsystem(ShooterRollerIO io) {
-    this.io = io;
+  public ShooterSubsystem(ShooterRollersIO rollersIO, ShooterHoodIO hoodIO, TransferIO transferIO) {
+    this.rollersIO = rollersIO;
+    this.hoodIO = hoodIO;
+    this.transferIO = transferIO;
   }
 
   @Override
@@ -58,8 +64,8 @@ public class ShooterRollerIOSubsystem extends SubsystemBase {
     }
       */
 
-    Logger.processInputs("IntakeInputs", inputs);
-    io.updateInputs(inputs);
+    // Logger.processInputs("IntakeInputs", inputs);
+    // io.updateInputs(inputs);
 
     intakeState = setStateTransition();
     applyStates();
@@ -77,15 +83,15 @@ public class ShooterRollerIOSubsystem extends SubsystemBase {
   }
 
   public void stop() {
-    io.stopRollers();
+    // io.stopRollers();
   }
 
   public void setVoltageRollers(double voltage) {
-    io.setVoltage(voltage);
+    // io.setVoltage(voltage);
   }
 
   public void setVoltageIntakeTesters(double voltage) {
-    io.setVoltage(voltage);
+    // io.setVoltage(voltage);
   }
 
   private void applyStates() {
@@ -103,11 +109,11 @@ public class ShooterRollerIOSubsystem extends SubsystemBase {
         break;
 
       case INING:
-        setPosition(ShooterRollerIOConstants.In);
+        setPosition(ShooterConstants.In);
         break;
 
       case OUTING:
-        setPosition(ShooterRollerIOConstants.Out);
+        setPosition(ShooterConstants.Out);
         break;
 
       case TESTING:
@@ -118,7 +124,7 @@ public class ShooterRollerIOSubsystem extends SubsystemBase {
 
   public void setPosition(double position) {
     goal.position = position;
-    io.setVoltage(controller.calculate(inputs.positionIntake, goal.position));
+    // io.setVoltage(controller.calculate(inputs.positionIntake, goal.position));
   }
 
   public void setDesiredState(DesiredState desiredState) {

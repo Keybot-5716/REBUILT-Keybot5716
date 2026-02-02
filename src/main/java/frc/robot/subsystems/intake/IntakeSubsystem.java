@@ -3,12 +3,14 @@ package frc.robot.subsystems.intake;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import org.littletonrobotics.junction.Logger;
+import frc.robot.subsystems.intake.pivot.IntakePivotIO;
+import frc.robot.subsystems.intake.rollers.IntakeRollersIO;
 
 public class IntakeSubsystem extends SubsystemBase {
-  private final IntakeIO io;
+  private final IntakePivotIO pivotIO;
+  private final IntakeRollersIO rollersIO;
 
-  private final IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
+  // private final IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
 
   // private static final LoggedTunableNumber rollerVolts = new
   // LoggedTunableNumber("Intake/Rollers/RollerVolts", 7.0);
@@ -43,8 +45,9 @@ public class IntakeSubsystem extends SubsystemBase {
     OUTING
   }
 
-  public IntakeSubsystem(IntakeIO io) {
-    this.io = io;
+  public IntakeSubsystem(IntakePivotIO pivotIO, IntakeRollersIO rollersIO) {
+    this.pivotIO = pivotIO;
+    this.rollersIO = rollersIO;
   }
 
   @Override
@@ -55,8 +58,8 @@ public class IntakeSubsystem extends SubsystemBase {
     }
       */
 
-    Logger.processInputs("intakeInputs", inputs);
-    io.updateInputs(inputs);
+    // Logger.processInputs("intakeInputs", inputs);
+    // pivotIO.updateInputs(inputs);
 
     intakeState = setStateTransition();
     applyStates();
@@ -73,11 +76,11 @@ public class IntakeSubsystem extends SubsystemBase {
   }
 
   public void stop() {
-    io.stopRollers();
+    // io.stopRollers();
   }
 
   public void setVoltage(double voltage) {
-    io.setVoltage(voltage);
+    // io.setVoltage(voltage);
   }
 
   private void applyStates() {
@@ -106,7 +109,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
   public void setPosition(double position) {
     goal.position = position;
-    io.setVoltage(controller.calculate(inputs.positionIntake, goal.position));
+    // io.setVoltage(controller.calculate(inputs.positionIntake, goal.position));
   }
 
   public void setDesiredState(DesiredState desiredState) {

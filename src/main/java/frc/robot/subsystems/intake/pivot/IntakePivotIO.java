@@ -1,18 +1,17 @@
-package frc.robot.subsystems.intake;
+package frc.robot.subsystems.intake.pivot;
 
 import org.littletonrobotics.junction.AutoLog;
 
-public interface IntakeIO {
-
+public interface IntakePivotIO {
   @AutoLog
-  public class IntakeIOInputs {
+  public class IntakePivotIOInputs {
     public boolean motorConnected;
     public double appliedVolts;
     public double tempCelcius;
     public double positionIntake;
   }
 
-  void updateInputs(IntakeIOInputs inputs);
+  void updateInputs(IntakePivotIOInputs inputs);
 
   void setVoltage(double voltage);
 

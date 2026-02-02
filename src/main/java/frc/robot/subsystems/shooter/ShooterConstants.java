@@ -1,6 +1,6 @@
 package frc.robot.subsystems.shooter;
 
-public class ShooterRollerIOConstants {
+public class ShooterConstants {
   public static final int talonId = 17;
   // CAMBIAAAAAR!!!!!!!!!!!!
   public static final int sparkId = 0;

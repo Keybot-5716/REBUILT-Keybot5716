@@ -27,8 +27,6 @@ import frc.robot.subsystems.drive.DriveIOSim;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.drive.DriveSubsystem.DesiredState;
 import frc.robot.subsystems.drive.TunerConstants;
-import frc.robot.subsystems.intake.IntakeIOTalonFx;
-import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.rollers.RollerSparkMax;
 import frc.robot.subsystems.rollers.RollerSubsystem;
 import frc.robot.subsystems.rollers.RolllerIOTalonFx;
@@ -77,11 +75,6 @@ public class RobotContainer {
     return new RollerSubsystem(new RollerSparkMax(21));
   }
 
-  // -- Intake Pivot
-  private IntakeSubsystem buildIntakePivotSubsystem() {
-    return new IntakeSubsystem(new IntakeIOTalonFx());
-  }
-
   // -- Controller
   private final CommandXboxController DRIVE_CONTROLLER = new CommandXboxController(0);
 
@@ -103,7 +96,7 @@ public class RobotContainer {
   private final RollerSubsystem rollerSub = buildRollerSubsystem();
   private final RollerSubsystem intakeRollerSub = buildIntakeRoller();
   private final RollerSubsystem transferRoller = buildTransfer();
-  private final IntakeSubsystem intakePivotSub = buildIntakePivotSubsystem();
+  // private final IntakeSubsystem intakePivotSub = buildIntakePivotSubsystem();
 
   // -- AutoChooser
   private final LoggedDashboardChooser<AutoBuilder> autoChooser =
@@ -244,28 +237,6 @@ public class RobotContainer {
         .onFalse(
             Commands.runOnce(
                 () -> transferRoller.setDesiredState(RollerSubsystem.DesiredState.STOPPED)));
-
-    controller
-        .x()
-        .whileTrue(
-            Commands.run(
-                () ->
-                    intakePivotSub.setDesiredStateWithVoltage(
-                        IntakeSubsystem.DesiredState.FORWARD, 1.5)))
-        .onFalse(
-            Commands.runOnce(
-                () -> intakePivotSub.setDesiredState(IntakeSubsystem.DesiredState.STOPPED)));
-
-    controller
-        .y()
-        .whileTrue(
-            Commands.run(
-                () ->
-                    intakePivotSub.setDesiredStateWithVoltage(
-                        IntakeSubsystem.DesiredState.REVERSE, 1)))
-        .onFalse(
-            Commands.runOnce(
-                () -> intakePivotSub.setDesiredState(IntakeSubsystem.DesiredState.STOPPED)));
   }
 
   public void configureAuto() {

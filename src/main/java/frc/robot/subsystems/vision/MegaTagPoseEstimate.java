@@ -104,6 +104,7 @@ public record MegaTagPoseEstimate(
       bb.putDouble(value.avgTagArea());
       bb.putDouble(value.quality());
     }
+    // regresa pose 2d
 
     @Override
     public String getTypeName() {

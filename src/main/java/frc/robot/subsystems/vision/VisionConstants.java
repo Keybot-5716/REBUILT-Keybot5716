@@ -1,3 +1,41 @@
 package frc.robot.subsystems.vision;
 
-public class VisionConstants {}
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.util.Units;
+
+public class VisionConstants {
+
+  public static final double kLargeVariance = 1e6;
+
+  public static final int kMegatag1XStdDevIndex = 0;
+  public static final int kMegatag1YStdDevIndex = 1;
+  public static final int kMegatag1YawStdDevIndex = 5;
+
+  public static final int kMegatag2XStdDevIndex = 6;
+  public static final int kMegatag2YStdDevIndex = 7;
+  public static final int kMegatag2YawStdDevIndex = 11;
+  public static final int kExpectedStdDevArrayLength = 12;
+
+  public static final int kMinFiducialCount = 1;
+
+  public static final double kCameraAPitchDegrees = 20.0;
+  public static final double kCameraAPitchRads = Units.degreesToRadians(kCameraAPitchDegrees);
+  public static final double kCameraAHeightOffGroundMeters = Units.inchesToMeters(8.3787);
+  public static final String kLimelightATableName = "limelight-left";
+  public static final double kRobotToCameraAForward = Units.inchesToMeters(7.8757);
+  public static final double kRobotToCameraASide = Units.inchesToMeters(-11.9269);
+  public static final Rotation2d kCameraAYawOffset = Rotation2d.fromDegrees(0.0);
+  public static final Transform2d kRobotToCameraA =
+      new Transform2d(
+          new Translation2d(kRobotToCameraAForward, kRobotToCameraASide), kCameraAYawOffset);
+
+  public static final double kDefaultAmbiguityThreshold = 0.19;
+  public static final double kDefaultYawDiffThreshold = 5.0;
+  public static final double kTagAreaThresholdForYawCheck = 2.0;
+  public static final double kTagMinAreaForSingleTagMegatag = 1.0;
+  public static final double kDefaultZThreshold = 0.2;
+  public static final double kDefaultNormThreshold = 1.0;
+  public static final double kMinAmbiguityToFlip = 0.08;
+}

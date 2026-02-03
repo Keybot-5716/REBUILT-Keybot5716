@@ -103,6 +103,10 @@ public class RobotState {
     return fieldToRobot.getLatest();
   }
 
+  public Optional<Pose2d> getFieldToRobot(double timestamp) {
+    return fieldToRobot.getSample(timestamp);
+  }
+
   public ChassisSpeeds getLatestRobotRelativeChassisSpeeds() {
     return measuredRobotRelativeChassisSpeeds.get();
   }

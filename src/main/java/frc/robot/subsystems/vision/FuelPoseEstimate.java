@@ -37,9 +37,9 @@ public record FuelPoseEstimate(
         fieldToRobot, poseEstimate.timestampSeconds, poseEstimate.latency, poseEstimate.avgTagArea);
   }
 
-  public static final MegatagPoseEstimateStruct struct = new MegatagPoseEstimateStruct();
+  public static final FuelPoseEstimateStruct struct = new FuelPoseEstimateStruct();
 
-  public static class MegatagPoseEstimateStruct implements Struct<FuelPoseEstimate> {
+  public static class FuelPoseEstimateStruct implements Struct<FuelPoseEstimate> {
 
     @Override
     public Class<FuelPoseEstimate> getTypeClass() {
@@ -48,7 +48,7 @@ public record FuelPoseEstimate(
 
     @Override
     public String getTypeString() {
-      return "record:MegatagPoseEstimate";
+      return "record:FuelPoseEstimate";
     }
 
     @Override
@@ -85,7 +85,7 @@ public record FuelPoseEstimate(
 
     @Override
     public String getTypeName() {
-      return "MegatagPoseEstimate";
+      return "FuelPoseEstimate";
     }
   }
 }

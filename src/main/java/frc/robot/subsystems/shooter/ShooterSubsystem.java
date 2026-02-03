@@ -1,19 +1,22 @@
-package frc.robot.subsystems.intake;
+package frc.robot.subsystems.shooter;
 
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.subsystems.intake.pivot.IntakePivotIO;
-import frc.robot.subsystems.intake.rollers.IntakeRollersIO;
+import frc.lib.team6328.LoggedTunableNumber;
+import frc.robot.subsystems.shooter.hood.ShooterHoodIO;
+import frc.robot.subsystems.shooter.rollers.ShooterRollersIO;
+import frc.robot.subsystems.shooter.transferRollers.TransferIO;
 
-public class IntakeSubsystem extends SubsystemBase {
-  private final IntakePivotIO pivotIO;
-  private final IntakeRollersIO rollersIO;
+public class ShooterSubsystem extends SubsystemBase {
+  private final ShooterRollersIO rollersIO;
+  private final ShooterHoodIO hoodIO;
+  private final TransferIO transferIO;
 
-  // private final IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
+  // private final ShooterRollerIOInputsAutoLogged inputs = new ShooterRollerIOInputsAutoLogged();
 
-  // private static final LoggedTunableNumber rollerVolts = new
-  // LoggedTunableNumber("Intake/Rollers/RollerVolts", 7.0);
+  private static final LoggedTunableNumber rollerVolts =
+      new LoggedTunableNumber("Intake/Rollers/RollerVolts", 7.0);
 
   // Creamos un objeto TrapezoidProfile que tenga velocidad y aceleración máximas
   private TrapezoidProfile.Constraints profile = new TrapezoidProfile.Constraints(2.0, 2.0);
@@ -34,7 +37,8 @@ public class IntakeSubsystem extends SubsystemBase {
     FORWARD,
     REVERSE,
     IN,
-    OUT
+    OUT,
+    TEST
   }
 
   private enum IntakeState {
@@ -42,12 +46,14 @@ public class IntakeSubsystem extends SubsystemBase {
     FORWARDING,
     REVERSING,
     INING,
-    OUTING
+    OUTING,
+    TESTING
   }
 
-  public IntakeSubsystem(IntakePivotIO pivotIO, IntakeRollersIO rollersIO) {
-    this.pivotIO = pivotIO;
+  public ShooterSubsystem(ShooterRollersIO rollersIO, ShooterHoodIO hoodIO, TransferIO transferIO) {
     this.rollersIO = rollersIO;
+    this.hoodIO = hoodIO;
+    this.transferIO = transferIO;
   }
 
   @Override
@@ -58,8 +64,8 @@ public class IntakeSubsystem extends SubsystemBase {
     }
       */
 
-    // Logger.processInputs("intakeInputs", inputs);
-    // pivotIO.updateInputs(inputs);
+    // Logger.processInputs("IntakeInputs", inputs);
+    // io.updateInputs(inputs);
 
     intakeState = setStateTransition();
     applyStates();
@@ -72,6 +78,7 @@ public class IntakeSubsystem extends SubsystemBase {
       case REVERSE -> IntakeState.REVERSING;
       case IN -> IntakeState.INING;
       case OUT -> IntakeState.OUTING;
+      case TEST -> IntakeState.TESTING;
     };
   }
 
@@ -79,30 +86,38 @@ public class IntakeSubsystem extends SubsystemBase {
     // io.stopRollers();
   }
 
-  public void setVoltage(double voltage) {
+  public void setVoltageRollers(double voltage) {
+    // io.setVoltage(voltage);
+  }
+
+  public void setVoltageIntakeTesters(double voltage) {
     // io.setVoltage(voltage);
   }
 
   private void applyStates() {
     switch (intakeState) {
       case FORWARDING:
-        setVoltage(desiredVoltage);
+        setVoltageRollers(rollerVolts.get());
         break;
 
       case REVERSING:
-        setVoltage(-desiredVoltage);
+        setVoltageRollers(-rollerVolts.get());
         break;
 
       case STOPPING:
-        stop();
+        setVoltageRollers(0);
         break;
 
       case INING:
-        setPosition(IntakeIOConstants.In);
+        setPosition(ShooterConstants.In);
         break;
 
       case OUTING:
-        setPosition(IntakeIOConstants.Out);
+        setPosition(ShooterConstants.Out);
+        break;
+
+      case TESTING:
+        setVoltageIntakeTesters(desiredVoltage);
         break;
     }
   }

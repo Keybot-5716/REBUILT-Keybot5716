@@ -1,14 +1,15 @@
-package frc.robot.subsystems.intake;
+package frc.robot.subsystems.intake.pivot;
 
 import static edu.wpi.first.units.Units.Meters;
 
 import org.ironmaple.simulation.IntakeSimulation;
 import org.ironmaple.simulation.drivesims.AbstractDriveTrainSimulation;
 
-public class IntakeIOSim implements IntakeIO {
+public class IntakePivotIOSim implements IntakePivotIO {
+
   private final IntakeSimulation intakeSimulation;
 
-  public IntakeIOSim(AbstractDriveTrainSimulation driveTrain) {
+  public IntakePivotIOSim(AbstractDriveTrainSimulation driveTrain) {
     this.intakeSimulation =
         IntakeSimulation.OverTheBumperIntake(
             // Este es el tipo de objeto que el intake va a recoger
@@ -50,8 +51,11 @@ public class IntakeIOSim implements IntakeIO {
   }
 
   @Override
-  public void updateInputs(IntakeIOInputs inputs) {}
+  public void updateInputs(IntakePivotIOInputs inputs) {}
 
   @Override
   public void setVoltage(double voltage) {}
+
+  @Override
+  public void stopRollers() {}
 }

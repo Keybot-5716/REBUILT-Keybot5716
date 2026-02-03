@@ -1,4 +1,4 @@
-package frc.robot.subsystems.rollers;
+package frc.robot.subsystems.shooter.transferRollers;
 
 import com.revrobotics.PersistMode;
 import com.revrobotics.ResetMode;
@@ -7,9 +7,9 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.math.MathUtil;
+import frc.robot.subsystems.intake.rollers.IntakeRollersIO;
 
-public class RollerSparkMax implements RollerIO {
-
+public class TransferIOSparkMax implements IntakeRollersIO {
   private SparkMax motor;
 
   private SparkMaxConfig config = new SparkMaxConfig();
@@ -18,8 +18,8 @@ public class RollerSparkMax implements RollerIO {
   private double appliedVolts;
   private double tempCelsius;
 
-  public RollerSparkMax(int deviceID) {
-    motor = new SparkMax(deviceID, MotorType.kBrushless);
+  public TransferIOSparkMax() {
+    motor = new SparkMax(1, MotorType.kBrushless);
 
     config.smartCurrentLimit(40).idleMode(IdleMode.kBrake);
 
@@ -27,9 +27,8 @@ public class RollerSparkMax implements RollerIO {
   }
 
   @Override
-  public void updateInputs(RollerIOInputs inputs) {
+  public void updateInputs(IntakeRollersIOInputs inputs) {
     inputs.motorConnected = true;
-    inputs.acceleration = motor.getAppliedOutput();
     inputs.appliedVolts = motor.getAppliedOutput();
     inputs.tempCelcius = motor.getMotorTemperature();
   }
@@ -41,7 +40,7 @@ public class RollerSparkMax implements RollerIO {
   }
 
   @Override
-  public void stopRoller() {
+  public void stopRollers() {
     motor.stopMotor();
   }
 }

@@ -44,9 +44,6 @@ public class DriveSubsystem extends SubsystemBase {
   private Pose2d desiredPoseToAutoAllign = new Pose2d();
   private Translation2d desiredPoint = new Translation2d();
 
-  private final ApplyRobotSpeeds stopRequest =
-      new ApplyRobotSpeeds().withDriveRequestType(DriveRequestType.OpenLoopVoltage);
-
   private final ApplyRobotSpeeds pathplannerRequest =
       new ApplyRobotSpeeds()
           .withDriveRequestType(DriveRequestType.Velocity)

@@ -31,7 +31,7 @@ public class RolllerIOTalonFx implements RollerIO {
   public RolllerIOTalonFx() {
 
     // motor = new TalonFX(RollerConstants.talon1Id);
-    motor2 = new TalonFX(RollerConstants.talon1Id);
+    motor2 = new TalonFX(17);
 
     /*
     config.MotorOutput.NeutralMode = NeutralModeValue.Brake;

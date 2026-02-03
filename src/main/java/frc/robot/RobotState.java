@@ -57,6 +57,9 @@ public class RobotState {
 
   private final AtomicInteger iteration = new AtomicInteger(0);
 
+  private double megatagTimestamp = 0;
+  private Pose2d megatagPose = Pose2d.kZero;
+
   public void addOdometryTimeMeasurement(double timestamp, Pose2d pose) {
     fieldToRobot.addSample(timestamp, pose);
   }
@@ -194,6 +197,16 @@ public class RobotState {
   }
 
   public void updateMegatagEstimate(VisionPoseEstimateInField megatag) {
+    megatagTimestamp = megatag.getTimestamp();
+    megatagPose = megatag.getRobotPose();
     fieldEstimation.accept(megatag);
+  }
+
+  public double lastMegatagTimestamp() {
+    return megatagTimestamp;
+  }
+
+  public Pose2d lastMegatagPose() {
+    return megatagPose;
   }
 }

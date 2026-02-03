@@ -1,16 +1,22 @@
 package frc.robot.subsystems.intake;
 
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.intake.pivot.IntakePivotIO;
+import frc.robot.subsystems.intake.pivot.IntakePivotIOInputsAutoLogged;
 import frc.robot.subsystems.intake.rollers.IntakeRollersIO;
+import frc.robot.subsystems.intake.rollers.IntakeRollersIOInputsAutoLogged;
 
 public class IntakeSubsystem extends SubsystemBase {
   private final IntakePivotIO pivotIO;
   private final IntakeRollersIO rollersIO;
 
   // private final IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
+  private final IntakePivotIOInputsAutoLogged pivotInputs = new IntakePivotIOInputsAutoLogged();
+  private final IntakeRollersIOInputsAutoLogged rollersInputs = new IntakeRollersIOInputsAutoLogged();
 
   // private static final LoggedTunableNumber rollerVolts = new
   // LoggedTunableNumber("Intake/Rollers/RollerVolts", 7.0);
@@ -27,20 +33,25 @@ public class IntakeSubsystem extends SubsystemBase {
   private DesiredState desiredState = DesiredState.STOPPED;
   private IntakeState intakeState = IntakeState.STOPPING;
 
-  private double desiredVoltage;
+  private double desiredRollersVoltage;
+  private double desiredPivotVoltageForOpenLoop;
 
   public enum DesiredState {
     STOPPED,
-    FORWARD,
-    REVERSE,
+    FORWARD_ROLLERS,
+    REVERSE_ROLLERS,
+    FORWARD_PIVOT,
+    REVERSE_PIVOT,
     IN,
     OUT
   }
 
   private enum IntakeState {
     STOPPING,
-    FORWARDING,
-    REVERSING,
+    FORWARDING_ROLLERS,
+    REVERSING_ROLLERS,
+    FORWARDING_PIVOT,
+    REVERSING_PIVOT,
     INING,
     OUTING
   }
@@ -57,9 +68,11 @@ public class IntakeSubsystem extends SubsystemBase {
       controller.reset(inputs.positionIntake);
     }
       */
+    Logger.processInputs("Intake/IntakePivotInputs", pivotInputs);
+    Logger.processInputs("Intake/IntakeRollersInputs", rollersInputs);
 
-    // Logger.processInputs("intakeInputs", inputs);
-    // pivotIO.updateInputs(inputs);
+    pivotIO.updateInputs(pivotInputs);
+    rollersIO.updateInputs(rollersInputs);
 
     intakeState = setStateTransition();
     applyStates();
@@ -68,29 +81,23 @@ public class IntakeSubsystem extends SubsystemBase {
   private IntakeState setStateTransition() {
     return switch (desiredState) {
       case STOPPED -> IntakeState.STOPPING;
-      case FORWARD -> IntakeState.FORWARDING;
-      case REVERSE -> IntakeState.REVERSING;
+      case FORWARD_ROLLERS -> IntakeState.FORWARDING_ROLLERS;
+      case REVERSE_ROLLERS -> IntakeState.REVERSING_ROLLERS;
+      case FORWARD_PIVOT -> IntakeState.FORWARDING_PIVOT;
+      case REVERSE_PIVOT -> IntakeState.REVERSING_PIVOT;
       case IN -> IntakeState.INING;
       case OUT -> IntakeState.OUTING;
     };
   }
 
-  public void stop() {
-    // io.stopRollers();
-  }
-
-  public void setVoltage(double voltage) {
-    // io.setVoltage(voltage);
-  }
-
   private void applyStates() {
     switch (intakeState) {
-      case FORWARDING:
-        setVoltage(desiredVoltage);
+      case FORWARDING_ROLLERS:
+        setVoltage(desiredRollersVoltage);
         break;
 
-      case REVERSING:
-        setVoltage(-desiredVoltage);
+      case REVERSING_ROLLERS:
+        setVoltage(-desiredRollersVoltage);
         break;
 
       case STOPPING:
@@ -104,12 +111,33 @@ public class IntakeSubsystem extends SubsystemBase {
       case OUTING:
         setPosition(IntakeIOConstants.Out);
         break;
+
+      case FORWARDING_PIVOT:
+        runPivotOL(desiredPivotVoltageForOpenLoop);
+        break;
+      
+      case REVERSING_PIVOT:
+        runPivotOL(-desiredPivotVoltageForOpenLoop);
+        break;
     }
   }
 
   public void setPosition(double position) {
     goal.position = position;
-    // io.setVoltage(controller.calculate(inputs.positionIntake, goal.position));
+    pivotIO.setVoltage(controller.calculate(pivotInputs.positionIntake, goal.position));
+  }
+
+  public void stop() {
+    pivotIO.stopMotor();
+    rollersIO.stopRollers();
+  }
+
+  public void setVoltage(double voltage) {
+    rollersIO.setVoltage(voltage);
+  }
+
+  public void runPivotOL(double voltage) {
+    pivotIO.setVoltage(voltage);
   }
 
   public void setDesiredState(DesiredState desiredState) {
@@ -118,6 +146,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
   public void setDesiredStateWithVoltage(DesiredState desiredState, double desiredVoltage) {
     this.desiredState = desiredState;
-    this.desiredVoltage = desiredVoltage;
+    this.desiredRollersVoltage = desiredVoltage;
   }
+
 }

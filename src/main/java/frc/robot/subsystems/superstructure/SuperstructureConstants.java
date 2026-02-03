@@ -14,7 +14,6 @@ public class SuperstructureConstants {
 
     // -- CLIMBER
     public static final int CLIMBER_ID = 0;
-
   }
 
   public static class IntakeConstants {}

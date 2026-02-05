@@ -182,6 +182,9 @@ public class RobotState {
     Logger.recordOutput("RobotState/isRedAlliance", isRedAlliance());
   }
 
+  private final AtomicReference<Optional<Integer>> exclusiveTag =
+      new AtomicReference<>(Optional.empty());
+
   public double getDrivePitchRads() {
     if (this.drivePitchRads.getInternalBuffer().lastEntry() != null) {
       return drivePitchRads.getInternalBuffer().lastEntry().getValue();
@@ -208,5 +211,25 @@ public class RobotState {
 
   public Pose2d lastMegatagPose() {
     return megatagPose;
+  }
+
+  public Optional<Integer> getExclusiveTag() {
+    return exclusiveTag.get();
+  }
+
+  public Optional<Double> getMaxAbsDriveYawAngularVelocityInRange(double minTime, double maxTime) {
+    // Gyro yaw rate not set in sim.
+    if (Robot.isReal()) return getMaxAbsValueInRange(driveYawAngularVelocity, minTime, maxTime);
+    return Optional.of(measuredRobotRelativeChassisSpeeds.get().omegaRadiansPerSecond);
+  }
+
+  private Optional<Double> getMaxAbsValueInRange(
+      ConcurrentTimeInterpolatableBuffer<Double> buffer, double minTime, double maxTime) {
+    var submap = buffer.getInternalBuffer().subMap(minTime, maxTime).values();
+    var max = submap.stream().max(Double::compare);
+    var min = submap.stream().min(Double::compare);
+    if (max.isEmpty() || min.isEmpty()) return Optional.empty();
+    if (Math.abs(max.get()) >= Math.abs(min.get())) return max;
+    else return min;
   }
 }

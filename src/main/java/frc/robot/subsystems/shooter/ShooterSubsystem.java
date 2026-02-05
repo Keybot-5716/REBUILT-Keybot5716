@@ -1,7 +1,5 @@
 package frc.robot.subsystems.shooter;
 
-import org.littletonrobotics.junction.Logger;
-
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -9,20 +7,18 @@ import frc.lib.team6328.LoggedTunableNumber;
 import frc.robot.subsystems.shooter.hood.ShooterHoodIO;
 import frc.robot.subsystems.shooter.rollers.ShooterRollersIO;
 import frc.robot.subsystems.shooter.rollers.ShooterRollersIOInputsAutoLogged;
-import frc.robot.subsystems.shooter.transferRollers.TransferIO;
 import frc.robot.subsystems.shooter.transferRollers.TransferIOInputsAutoLogged;
+import org.littletonrobotics.junction.Logger;
 
 public class ShooterSubsystem extends SubsystemBase {
   private final ShooterRollersIO rollersIO;
   private final ShooterHoodIO hoodIO;
-  private final TransferIO transferIO;
 
   // private final ShooterRollerIOInputsAutoLogged inputs = new ShooterRollerIOInputsAutoLogged();
   private final ShooterRollersIOInputsAutoLogged rollersInputs =
       new ShooterRollersIOInputsAutoLogged();
 
-  private final TransferIOInputsAutoLogged transferInputs = 
-      new TransferIOInputsAutoLogged();
+  private final TransferIOInputsAutoLogged transferInputs = new TransferIOInputsAutoLogged();
 
   private static final LoggedTunableNumber rollerVolts =
       new LoggedTunableNumber("Intake/Rollers/RollerVolts", 7.0);
@@ -59,10 +55,9 @@ public class ShooterSubsystem extends SubsystemBase {
     TESTING
   }
 
-  public ShooterSubsystem(ShooterRollersIO rollersIO, ShooterHoodIO hoodIO, TransferIO transferIO) {
+  public ShooterSubsystem(ShooterRollersIO rollersIO, ShooterHoodIO hoodIO) {
     this.rollersIO = rollersIO;
     this.hoodIO = hoodIO;
-    this.transferIO = transferIO;
   }
 
   @Override
@@ -75,9 +70,6 @@ public class ShooterSubsystem extends SubsystemBase {
 
     Logger.processInputs("ShooterInputs/RollerInputs", rollersInputs);
     rollersIO.updateInputs(rollersInputs);
-
-    Logger.processInputs("ShooterInputs/TransferInputs", transferInputs);
-    transferIO.updateInputs(transferInputs);
 
     shooterState = setStateTransition();
     applyStates();
@@ -96,7 +88,6 @@ public class ShooterSubsystem extends SubsystemBase {
 
   public void stop() {
     rollersIO.stopRollers();
-    transferIO.stopRollers();
   }
 
   public void setVoltageRollers(double voltage) {

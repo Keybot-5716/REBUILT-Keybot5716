@@ -1,0 +1,49 @@
+package frc.robot.subsystems.transfer;
+
+import org.littletonrobotics.junction.Logger;
+
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
+public class TransferSubsystem extends SubsystemBase {
+    TransferIO transferIO;
+
+    private final TransferIOInputsAutoLogged transferInputs =
+        new TransferIOInputsAutoLogged();
+    
+    private DesiredState desiredState = DesiredState.STOPPED;
+    private TransferState shooterState = TransferState.STOPPING;
+
+    public enum DesiredState {
+        STOPPED,
+        FORWARD,
+        REVERSE,
+        IN,
+        OUT,
+        TEST
+    }
+
+    private enum TransferState {
+        STOPPING,
+        FORWARDING,
+        REVERSING,
+        INING,
+        OUTING,
+        TESTING
+    }
+
+    public TransferSubsystem(TransferIO transferIO) {
+        this.transferIO = transferIO;
+    }
+
+    @Override
+    public void periodic() {
+        Logger.processInputs("TransferSubsystem", transferInputs);
+        transferIO.updateInputs(transferInputs);
+    }
+
+    public void stop(){
+        transferIO.stopRollers();
+    }
+
+
+}

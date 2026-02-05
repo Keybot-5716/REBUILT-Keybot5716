@@ -5,13 +5,13 @@ import org.littletonrobotics.junction.AutoLog;
 public interface TransferIO {
 
   @AutoLog
-  public class ShooterRollersIOInputs {
+  public class TransferIOInputs {
     public boolean motorConnected;
     public double appliedVolts;
     public double tempCelcius;
   }
 
-  void updateInputs(ShooterRollersIOInputs inputs);
+  void updateInputs(TransferIOInputs inputs);
 
   void setVoltage(double voltage);
 

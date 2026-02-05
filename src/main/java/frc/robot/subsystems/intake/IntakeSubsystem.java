@@ -1,7 +1,5 @@
 package frc.robot.subsystems.intake;
 
-import org.littletonrobotics.junction.Logger;
-
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -9,6 +7,7 @@ import frc.robot.subsystems.intake.pivot.IntakePivotIO;
 import frc.robot.subsystems.intake.pivot.IntakePivotIOInputsAutoLogged;
 import frc.robot.subsystems.intake.rollers.IntakeRollersIO;
 import frc.robot.subsystems.intake.rollers.IntakeRollersIOInputsAutoLogged;
+import org.littletonrobotics.junction.Logger;
 
 public class IntakeSubsystem extends SubsystemBase {
   private final IntakePivotIO pivotIO;
@@ -16,7 +15,8 @@ public class IntakeSubsystem extends SubsystemBase {
 
   // private final IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
   private final IntakePivotIOInputsAutoLogged pivotInputs = new IntakePivotIOInputsAutoLogged();
-  private final IntakeRollersIOInputsAutoLogged rollersInputs = new IntakeRollersIOInputsAutoLogged();
+  private final IntakeRollersIOInputsAutoLogged rollersInputs =
+      new IntakeRollersIOInputsAutoLogged();
 
   // private static final LoggedTunableNumber rollerVolts = new
   // LoggedTunableNumber("Intake/Rollers/RollerVolts", 7.0);
@@ -68,8 +68,8 @@ public class IntakeSubsystem extends SubsystemBase {
       controller.reset(inputs.positionIntake);
     }
       */
-    Logger.processInputs("Intake/IntakePivotInputs", pivotInputs);
-    Logger.processInputs("Intake/IntakeRollersInputs", rollersInputs);
+    Logger.processInputs("IntakeInputs/IntakePivotInputs", pivotInputs);
+    Logger.processInputs("IntakeInputs/IntakeRollersInputs", rollersInputs);
 
     pivotIO.updateInputs(pivotInputs);
     rollersIO.updateInputs(rollersInputs);
@@ -115,7 +115,7 @@ public class IntakeSubsystem extends SubsystemBase {
       case FORWARDING_PIVOT:
         runPivotOL(desiredPivotVoltageForOpenLoop);
         break;
-      
+
       case REVERSING_PIVOT:
         runPivotOL(-desiredPivotVoltageForOpenLoop);
         break;
@@ -148,5 +148,4 @@ public class IntakeSubsystem extends SubsystemBase {
     this.desiredState = desiredState;
     this.desiredRollersVoltage = desiredVoltage;
   }
-
 }

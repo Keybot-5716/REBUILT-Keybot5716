@@ -222,7 +222,7 @@ public class RobotContainer {
             Commands.run(
                 () ->
                     transferRoller.setDesiredStateWithVoltage(
-                        RollerSubsystem.DesiredState.FORWARD, 5)))
+                        RollerSubsystem.DesiredState.FORWARD, 7)))
         .onFalse(
             Commands.runOnce(
                 () -> transferRoller.setDesiredState(RollerSubsystem.DesiredState.STOPPED)));
@@ -233,7 +233,7 @@ public class RobotContainer {
             Commands.run(
                 () ->
                     transferRoller.setDesiredStateWithVoltage(
-                        RollerSubsystem.DesiredState.REVERSE, 5)))
+                        RollerSubsystem.DesiredState.REVERSE, 7)))
         .onFalse(
             Commands.runOnce(
                 () -> transferRoller.setDesiredState(RollerSubsystem.DesiredState.STOPPED)));

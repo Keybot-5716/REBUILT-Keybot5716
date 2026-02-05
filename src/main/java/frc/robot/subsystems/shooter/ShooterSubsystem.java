@@ -1,12 +1,16 @@
 package frc.robot.subsystems.shooter;
 
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.team6328.LoggedTunableNumber;
 import frc.robot.subsystems.shooter.hood.ShooterHoodIO;
 import frc.robot.subsystems.shooter.rollers.ShooterRollersIO;
+import frc.robot.subsystems.shooter.rollers.ShooterRollersIOInputsAutoLogged;
 import frc.robot.subsystems.shooter.transferRollers.TransferIO;
+import frc.robot.subsystems.shooter.transferRollers.TransferIOInputsAutoLogged;
 
 public class ShooterSubsystem extends SubsystemBase {
   private final ShooterRollersIO rollersIO;
@@ -14,6 +18,11 @@ public class ShooterSubsystem extends SubsystemBase {
   private final TransferIO transferIO;
 
   // private final ShooterRollerIOInputsAutoLogged inputs = new ShooterRollerIOInputsAutoLogged();
+  private final ShooterRollersIOInputsAutoLogged rollersInputs =
+      new ShooterRollersIOInputsAutoLogged();
+
+  private final TransferIOInputsAutoLogged transferInputs = 
+      new TransferIOInputsAutoLogged();
 
   private static final LoggedTunableNumber rollerVolts =
       new LoggedTunableNumber("Intake/Rollers/RollerVolts", 7.0);
@@ -28,7 +37,7 @@ public class ShooterSubsystem extends SubsystemBase {
   private static TrapezoidProfile.State goal = new TrapezoidProfile.State(0, 0);
 
   private DesiredState desiredState = DesiredState.STOPPED;
-  private IntakeState intakeState = IntakeState.STOPPING;
+  private ShooterState shooterState = ShooterState.STOPPING;
 
   private double desiredVoltage;
 
@@ -41,7 +50,7 @@ public class ShooterSubsystem extends SubsystemBase {
     TEST
   }
 
-  private enum IntakeState {
+  private enum ShooterState {
     STOPPING,
     FORWARDING,
     REVERSING,
@@ -64,30 +73,34 @@ public class ShooterSubsystem extends SubsystemBase {
     }
       */
 
-    // Logger.processInputs("IntakeInputs", inputs);
-    // io.updateInputs(inputs);
+    Logger.processInputs("ShooterInputs/RollerInputs", rollersInputs);
+    rollersIO.updateInputs(rollersInputs);
 
-    intakeState = setStateTransition();
+    Logger.processInputs("ShooterInputs/TransferInputs", transferInputs);
+    transferIO.updateInputs(transferInputs);
+
+    shooterState = setStateTransition();
     applyStates();
   }
 
-  private IntakeState setStateTransition() {
+  private ShooterState setStateTransition() {
     return switch (desiredState) {
-      case STOPPED -> IntakeState.STOPPING;
-      case FORWARD -> IntakeState.FORWARDING;
-      case REVERSE -> IntakeState.REVERSING;
-      case IN -> IntakeState.INING;
-      case OUT -> IntakeState.OUTING;
-      case TEST -> IntakeState.TESTING;
+      case STOPPED -> ShooterState.STOPPING;
+      case FORWARD -> ShooterState.FORWARDING;
+      case REVERSE -> ShooterState.REVERSING;
+      case IN -> ShooterState.INING;
+      case OUT -> ShooterState.OUTING;
+      case TEST -> ShooterState.TESTING;
     };
   }
 
   public void stop() {
-    // io.stopRollers();
+    rollersIO.stopRollers();
+    transferIO.stopRollers();
   }
 
   public void setVoltageRollers(double voltage) {
-    // io.setVoltage(voltage);
+    rollersIO.setVoltage(voltage);
   }
 
   public void setVoltageIntakeTesters(double voltage) {
@@ -95,7 +108,7 @@ public class ShooterSubsystem extends SubsystemBase {
   }
 
   private void applyStates() {
-    switch (intakeState) {
+    switch (shooterState) {
       case FORWARDING:
         setVoltageRollers(rollerVolts.get());
         break;

@@ -57,5 +57,5 @@ public class IntakePivotIOSim implements IntakePivotIO {
   public void setVoltage(double voltage) {}
 
   @Override
-  public void stopRollers() {}
+  public void stopMotor() {}
 }

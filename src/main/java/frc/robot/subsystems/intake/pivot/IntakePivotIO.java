@@ -15,5 +15,5 @@ public interface IntakePivotIO {
 
   void setVoltage(double voltage);
 
-  void stopRollers();
+  void stopMotor();
 }

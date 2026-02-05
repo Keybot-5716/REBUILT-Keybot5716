@@ -52,7 +52,7 @@ public class IntakePivotIOTalonFX implements IntakePivotIO {
   }
 
   @Override
-  public void stopRollers() {
+  public void stopMotor() {
     motor.stopMotor();
   }
 

@@ -1,8 +1,8 @@
 package frc.robot.subsystems.vision;
 
 import edu.wpi.first.networktables.*;
-import edu.wpi.first.wpilibj.RobotState;
 import frc.lib.limelight.LimelightHelpers;
+import frc.robot.RobotState;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class VisionIOLimelight implements VisionIO {

@@ -30,7 +30,9 @@ import frc.robot.subsystems.drive.TunerConstants;
 import frc.robot.subsystems.rollers.RollerSparkMax;
 import frc.robot.subsystems.rollers.RollerSubsystem;
 import frc.robot.subsystems.rollers.RolllerIOTalonFx;
+import frc.robot.subsystems.vision.VisionIOLimelight;
 import frc.robot.subsystems.vision.VisionPoseEstimateInField;
+import frc.robot.subsystems.vision.VisionSubsystem;
 import java.util.function.Consumer;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
@@ -75,6 +77,10 @@ public class RobotContainer {
     return new RollerSubsystem(new RollerSparkMax(21));
   }
 
+  private VisionSubsystem buildVisionSubsystem() {
+    return new VisionSubsystem(new VisionIOLimelight(robotState), robotState);
+  }
+
   // -- Controller
   private final CommandXboxController DRIVE_CONTROLLER = new CommandXboxController(0);
 
@@ -96,6 +102,7 @@ public class RobotContainer {
   private final RollerSubsystem rollerSub = buildRollerSubsystem();
   private final RollerSubsystem intakeRollerSub = buildIntakeRoller();
   private final RollerSubsystem transferRoller = buildTransfer();
+  private final VisionSubsystem visionSub = buildVisionSubsystem();
   // private final IntakeSubsystem intakePivotSub = buildIntakePivotSubsystem();
 
   // -- AutoChooser

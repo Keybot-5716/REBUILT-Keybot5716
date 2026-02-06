@@ -1,4 +1,5 @@
 package frc.robot.subsystems.vision;
+
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -21,7 +22,8 @@ public class VisionConstants {
 
   public static final int kMinFiducialCount = 1;
 
-  public static final AprilTagFieldLayout kAprilTagLayout = AprilTagFieldLayout.loadField(AprilTagFields.);
+  public static final AprilTagFieldLayout kAprilTagLayout =
+      AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltAndymark);
 
   public static final double kCameraAPitchDegrees = 20.0;
   public static final double kCameraAPitchRads = Units.degreesToRadians(kCameraAPitchDegrees);

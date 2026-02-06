@@ -88,6 +88,7 @@ public class VisionSubsystem extends SubsystemBase {
     Logger.recordOutput("Vision/usingVision", true);
 
     Optional<VisionPoseEstimateInField> accepted = Optional.empty();
+    accepted = Optional.of(cameraPoseEstimate(maybeMTA.get()));
     if (maybeMTA.isPresent()) {
       accepted = maybeMTA;
     }

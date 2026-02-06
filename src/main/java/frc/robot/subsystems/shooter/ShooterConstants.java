@@ -2,6 +2,7 @@ package frc.robot.subsystems.shooter;
 
 public class ShooterConstants {
   public static final int talonId = 17;
+  public static final int hoodId = 0;
   // CAMBIAAAAAR!!!!!!!!!!!!
   public static final int sparkId = 0;
   public static final double In = 0.0;

@@ -81,9 +81,6 @@ public class RobotContainer {
     return new VisionSubsystem(new VisionIOLimelight(robotState), robotState);
   }
 
-  // -- Controller
-  private final CommandXboxController DRIVE_CONTROLLER = new CommandXboxController(0);
-
   private final Consumer<VisionPoseEstimateInField> visionFieldEstimate =
       new Consumer<VisionPoseEstimateInField>() {
         @Override
@@ -91,6 +88,8 @@ public class RobotContainer {
           driveSub.addVisionMeasurement(estimation);
         }
       };
+
+  private final CommandXboxController DRIVE_CONTROLLER = new CommandXboxController(0);
 
   private final RobotState robotState = new RobotState(visionFieldEstimate);
 
@@ -102,8 +101,8 @@ public class RobotContainer {
   private final RollerSubsystem rollerSub = buildRollerSubsystem();
   private final RollerSubsystem intakeRollerSub = buildIntakeRoller();
   private final RollerSubsystem transferRoller = buildTransfer();
-  private final VisionSubsystem visionSub = buildVisionSubsystem();
   // private final IntakeSubsystem intakePivotSub = buildIntakePivotSubsystem();
+  private final VisionSubsystem visionSub = buildVisionSubsystem();
 
   // -- AutoChooser
   private final LoggedDashboardChooser<AutoBuilder> autoChooser =
@@ -273,6 +272,10 @@ public class RobotContainer {
 
   public DriveSubsystem getDriveSubsystem() {
     return driveSub;
+  }
+
+  public VisionSubsystem getVisionSubsystem() {
+    return visionSub;
   }
 
   public RobotState getRobotState() {

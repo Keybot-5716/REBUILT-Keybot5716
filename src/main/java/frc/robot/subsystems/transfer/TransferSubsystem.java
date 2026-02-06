@@ -1,49 +1,45 @@
 package frc.robot.subsystems.transfer;
 
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.littletonrobotics.junction.Logger;
 
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
 public class TransferSubsystem extends SubsystemBase {
-    TransferIO transferIO;
+  TransferIO transferIO;
 
-    private final TransferIOInputsAutoLogged transferInputs =
-        new TransferIOInputsAutoLogged();
-    
-    private DesiredState desiredState = DesiredState.STOPPED;
-    private TransferState shooterState = TransferState.STOPPING;
+  private final TransferIOInputsAutoLogged transferInputs = new TransferIOInputsAutoLogged();
 
-    public enum DesiredState {
-        STOPPED,
-        FORWARD,
-        REVERSE,
-        IN,
-        OUT,
-        TEST
-    }
+  private DesiredState desiredState = DesiredState.STOPPED;
+  private TransferState shooterState = TransferState.STOPPING;
 
-    private enum TransferState {
-        STOPPING,
-        FORWARDING,
-        REVERSING,
-        INING,
-        OUTING,
-        TESTING
-    }
+  public enum DesiredState {
+    STOPPED,
+    FORWARD,
+    REVERSE,
+    IN,
+    OUT,
+    TEST
+  }
 
-    public TransferSubsystem(TransferIO transferIO) {
-        this.transferIO = transferIO;
-    }
+  private enum TransferState {
+    STOPPING,
+    FORWARDING,
+    REVERSING,
+    INING,
+    OUTING,
+    TESTING
+  }
 
-    @Override
-    public void periodic() {
-        Logger.processInputs("TransferSubsystem", transferInputs);
-        transferIO.updateInputs(transferInputs);
-    }
+  public TransferSubsystem(TransferIO transferIO) {
+    this.transferIO = transferIO;
+  }
 
-    public void stop(){
-        transferIO.stopRollers();
-    }
+  @Override
+  public void periodic() {
+    Logger.processInputs("TransferSubsystem", transferInputs);
+    transferIO.updateInputs(transferInputs);
+  }
 
-
+  public void stop() {
+    transferIO.stopRollers();
+  }
 }

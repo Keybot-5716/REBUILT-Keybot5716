@@ -1,4 +1,4 @@
-package frc.robot.subsystems.intake.pivot;
+/*package frc.robot.subsystems.intake.pivot;
 
 import static edu.wpi.first.units.Units.Meters;
 
@@ -59,3 +59,4 @@ public class IntakePivotIOSim implements IntakePivotIO {
   @Override
   public void stopMotor() {}
 }
+*/

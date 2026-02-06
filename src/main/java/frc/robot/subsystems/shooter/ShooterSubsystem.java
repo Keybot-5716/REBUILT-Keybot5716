@@ -7,7 +7,6 @@ import frc.lib.team6328.LoggedTunableNumber;
 import frc.robot.subsystems.shooter.hood.ShooterHoodIO;
 import frc.robot.subsystems.shooter.rollers.ShooterRollersIO;
 import frc.robot.subsystems.shooter.rollers.ShooterRollersIOInputsAutoLogged;
-import frc.robot.subsystems.shooter.transferRollers.TransferIOInputsAutoLogged;
 import org.littletonrobotics.junction.Logger;
 
 public class ShooterSubsystem extends SubsystemBase {
@@ -17,8 +16,6 @@ public class ShooterSubsystem extends SubsystemBase {
   // private final ShooterRollerIOInputsAutoLogged inputs = new ShooterRollerIOInputsAutoLogged();
   private final ShooterRollersIOInputsAutoLogged rollersInputs =
       new ShooterRollersIOInputsAutoLogged();
-
-  private final TransferIOInputsAutoLogged transferInputs = new TransferIOInputsAutoLogged();
 
   private static final LoggedTunableNumber rollerVolts =
       new LoggedTunableNumber("Intake/Rollers/RollerVolts", 7.0);

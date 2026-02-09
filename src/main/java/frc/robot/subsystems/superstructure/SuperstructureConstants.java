@@ -16,7 +16,11 @@ public class SuperstructureConstants {
     public static final int CLIMBER_ID = 0;
   }
 
-  public static class IntakeConstants {}
+  public static class IntakeConstants {
+    public static final double ZERO_RVOLTAGE = 0.0;
+    public static final double FORWARD_RVOLTAGE = 8.0;
+    public static final double REVERSE_RVOLTAGE = 8.0;
+  }
 
   public static class ShooterConstants {}
 

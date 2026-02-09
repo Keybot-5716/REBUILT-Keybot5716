@@ -7,6 +7,7 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.math.MathUtil;
+import frc.robot.subsystems.superstructure.SuperstructureConstants.IDs;
 
 public class IntakeRollersIOSparkMax implements IntakeRollersIO {
   private SparkMax motor;
@@ -18,7 +19,7 @@ public class IntakeRollersIOSparkMax implements IntakeRollersIO {
   private double tempCelsius;
 
   public IntakeRollersIOSparkMax() {
-    motor = new SparkMax(1, MotorType.kBrushless);
+    motor = new SparkMax(IDs.INTAKE_ROLLER_ID, MotorType.kBrushless);
 
     config.smartCurrentLimit(40).idleMode(IdleMode.kBrake);
 

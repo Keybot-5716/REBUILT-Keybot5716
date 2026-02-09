@@ -102,7 +102,7 @@ public class RobotContainer {
   private final RollerSubsystem intakeRollerSub = buildIntakeRoller();
   private final RollerSubsystem transferRoller = buildTransfer();
   // private final IntakeSubsystem intakePivotSub = buildIntakePivotSubsystem();
-  private final VisionSubsystem visionSub = buildVisionSubsystem();
+  // private final VisionSubsystem visionSub = buildVisionSubsystem();
 
   // -- AutoChooser
   private final LoggedDashboardChooser<AutoBuilder> autoChooser =
@@ -274,9 +274,9 @@ public class RobotContainer {
     return driveSub;
   }
 
-  public VisionSubsystem getVisionSubsystem() {
-    return visionSub;
-  }
+  // public VisionSubsystem getVisionSubsystem() {
+  // return visionSub;
+  // }
 
   public RobotState getRobotState() {
     return robotState;

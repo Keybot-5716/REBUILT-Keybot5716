@@ -14,7 +14,7 @@ public class AutoForwardTest extends AutoBuilder {
   public AutoForwardTest() {
     test = loadPath("TestForward");
 
-    addCommands(Commands.deadline(new PathPlannerAuto("TestAuto")));
+    addCommands(Commands.deadline(new PathPlannerAuto("AutoForward")));
   }
 
   @Override

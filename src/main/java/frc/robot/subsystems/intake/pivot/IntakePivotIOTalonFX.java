@@ -11,6 +11,7 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
+import frc.robot.subsystems.superstructure.SuperstructureConstants.IDs;
 
 public class IntakePivotIOTalonFX implements IntakePivotIO {
 
@@ -25,7 +26,7 @@ public class IntakePivotIOTalonFX implements IntakePivotIO {
 
   public IntakePivotIOTalonFX() {
     // Cambiar el ID del motor
-    motor = new TalonFX(16);
+    motor = new TalonFX(IDs.INTAKE_PIVOT_ID);
 
     /*config.Slot0.kP = 5;
     config.Slot0.kI = 0;

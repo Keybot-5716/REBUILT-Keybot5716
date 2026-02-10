@@ -14,19 +14,13 @@ public class TransferSubsystem extends SubsystemBase {
   public enum DesiredState {
     STOPPED,
     FORWARD,
-    REVERSE,
-    IN,
-    OUT,
-    TEST
+    REVERSE
   }
 
   private enum TransferState {
     STOPPING,
     FORWARDING,
-    REVERSING,
-    INING,
-    OUTING,
-    TESTING
+    REVERSING
   }
 
   public TransferSubsystem(TransferIO transferIO) {

@@ -18,7 +18,6 @@ import java.util.Optional;
 import org.littletonrobotics.junction.Logger;
 
 public class VisionSubsystem extends SubsystemBase {
-
   private final VisionIO io;
   private final RobotState state;
   private final VisionIO.VisionIOInputs inputs = new VisionIO.VisionIOInputs();
@@ -87,11 +86,14 @@ public class VisionSubsystem extends SubsystemBase {
 
     Logger.recordOutput("Vision/usingVision", true);
 
+    /*
     Optional<VisionPoseEstimateInField> accepted = Optional.empty();
     accepted = Optional.of(cameraPoseEstimate(maybeMTA.get()));
     if (maybeMTA.isPresent()) {
-      accepted = maybeMTA;
-    }
+      accepted = maybeMTA.map(this::cameraPoseEstimate).flatMap(Optional::ofNullable);
+    }*/
+    Optional<VisionPoseEstimateInField> accepted =
+        maybeMTA.map(this::cameraPoseEstimate).flatMap(Optional::ofNullable);
     accepted.ifPresent(
         est -> {
           Logger.recordOutput("Vision/fusedAccepted", est.getRobotPose());
@@ -100,6 +102,9 @@ public class VisionSubsystem extends SubsystemBase {
 
     Logger.recordOutput("Vision/exclusiveTagId", state.getExclusiveTag().orElse(-1));
     Logger.recordOutput("Vision/latencyPeriodicSec", Timer.getFPGATimestamp() - startTime);
+
+    Logger.recordOutput("Vision/HasMaybeMTA", maybeMTA.isPresent());
+    Logger.recordOutput("Vision/HasAccepted", accepted.isPresent());
   }
 
   private void logCameraInputs(String prefix, VisionIO.VisionIOInputs.CameraInputs cam) {
@@ -240,6 +245,9 @@ public class VisionSubsystem extends SubsystemBase {
 
     // Single‑tag extra checks
     if (poseEstimate.fiducialIds().length < 2) {
+
+      if (cam.fiducialAprilTagObservation == null) return Optional.empty();
+
       for (var fiducial : cam.fiducialAprilTagObservation) {
         if (fiducial.ambiguity() > VisionConstants.kDefaultAmbiguityThreshold) {
           return Optional.empty();
@@ -270,7 +278,7 @@ public class VisionSubsystem extends SubsystemBase {
       return Optional.empty();
     }
 
-    if (Math.abs(cam.pose3d.getZ()) > VisionConstants.kDefaultZThreshold) {
+    if (cam.pose3d == null || Math.abs(cam.pose3d.getZ()) > VisionConstants.kDefaultZThreshold) {
       return Optional.empty();
     }
 
@@ -292,7 +300,8 @@ public class VisionSubsystem extends SubsystemBase {
 
     Pose2d estimatePose = poseEstimate.fieldToRobot();
 
-    double scaleFactor = 1.0 / poseEstimate.quality();
+    double quality = Math.max(poseEstimate.quality(), 0.001);
+    double scaleFactor = 1.0 / quality;
     double xStd = cam.standardDeviations[VisionConstants.kMegatag1XStdDevIndex] * scaleFactor;
     double yStd = cam.standardDeviations[VisionConstants.kMegatag1YStdDevIndex] * scaleFactor;
     double rotStd = cam.standardDeviations[VisionConstants.kMegatag1YawStdDevIndex] * scaleFactor;

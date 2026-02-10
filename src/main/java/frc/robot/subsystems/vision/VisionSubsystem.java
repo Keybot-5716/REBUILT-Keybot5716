@@ -38,7 +38,7 @@ public class VisionSubsystem extends SubsystemBase {
     }
 
     // Extraer datos existentes
-    Pose2d pose2d = camera.pose();
+    Pose2d pose2d = camera.getRobotPose();
     double timestampSeconds = camera.getTimestamp();
     Matrix<N3, N1> stdDevs = camera.getVisionMeasurementStdDevs();
 

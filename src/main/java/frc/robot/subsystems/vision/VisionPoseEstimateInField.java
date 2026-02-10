@@ -36,9 +36,4 @@ public class VisionPoseEstimateInField {
   public int getNumTags() {
     return numTags;
   }
-
-  public Pose2d pose() {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'pose'");
-  }
 }

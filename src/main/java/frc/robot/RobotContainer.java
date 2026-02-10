@@ -85,14 +85,22 @@ public class RobotContainer {
       new Consumer<VisionPoseEstimateInField>() {
         @Override
         public void accept(VisionPoseEstimateInField estimation) {
-
-          if (driveSub == null) return;
-          if (estimation == null || estimation.getRobotPose() == null) return;
-          Pose2d p = estimation.getRobotPose();
-          if (Double.isNaN(p.getX()) || Double.isNaN(p.getY())) return;
           driveSub.addVisionMeasurement(estimation);
         }
       };
+
+  /*private final Consumer<VisionPoseEstimateInField> visionFieldEstimate =
+  new Consumer<VisionPoseEstimateInField>() {
+    @Override
+    public void accept(VisionPoseEstimateInField estimation) {
+
+      if (driveSub == null) return;
+      if (estimation == null || estimation.getRobotPose() == null) return;
+      Pose2d p = estimation.getRobotPose();
+      if (Double.isNaN(p.getX()) || Double.isNaN(p.getY())) return;
+      driveSub.addVisionMeasurement(estimation);
+    }
+  }; */
 
   private final CommandXboxController DRIVE_CONTROLLER = new CommandXboxController(0);
 

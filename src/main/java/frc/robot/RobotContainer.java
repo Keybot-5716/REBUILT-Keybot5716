@@ -85,6 +85,11 @@ public class RobotContainer {
       new Consumer<VisionPoseEstimateInField>() {
         @Override
         public void accept(VisionPoseEstimateInField estimation) {
+
+          if (driveSub == null) return;
+          if (estimation == null || estimation.getRobotPose() == null) return;
+          Pose2d p = estimation.getRobotPose();
+          if (Double.isNaN(p.getX()) || Double.isNaN(p.getY())) return;
           driveSub.addVisionMeasurement(estimation);
         }
       };
@@ -102,7 +107,7 @@ public class RobotContainer {
   private final RollerSubsystem intakeRollerSub = buildIntakeRoller();
   private final RollerSubsystem transferRoller = buildTransfer();
   // private final IntakeSubsystem intakePivotSub = buildIntakePivotSubsystem();
-  // private final VisionSubsystem visionSub = buildVisionSubsystem();
+  private final VisionSubsystem visionSub = buildVisionSubsystem();
 
   // -- AutoChooser
   private final LoggedDashboardChooser<AutoBuilder> autoChooser =
@@ -274,9 +279,9 @@ public class RobotContainer {
     return driveSub;
   }
 
-  // public VisionSubsystem getVisionSubsystem() {
-  // return visionSub;
-  // }
+  public VisionSubsystem getVisionSubsystem() {
+    return visionSub;
+  }
 
   public RobotState getRobotState() {
     return robotState;

@@ -27,14 +27,25 @@ public class VisionConstants {
 
   public static final double kCameraAPitchDegrees = 20.0;
   public static final double kCameraAPitchRads = Units.degreesToRadians(kCameraAPitchDegrees);
-  public static final double kCameraAHeightOffGroundMeters = Units.inchesToMeters(8.3787);
+  public static final double kCameraAHeightOffGroundMeters = 0.0;
   public static final String kLimelightATableName = "limelight-uno";
-  public static final double kRobotToCameraAForward = Units.inchesToMeters(7.8757);
-  public static final double kRobotToCameraASide = Units.inchesToMeters(-11.9269);
+  public static final double kRobotToCameraAForward =0.0;
+  public static final double kRobotToCameraASide = 0.0;
   public static final Rotation2d kCameraAYawOffset = Rotation2d.fromDegrees(0.0);
   public static final Transform2d kRobotToCameraA =
       new Transform2d(
           new Translation2d(kRobotToCameraAForward, kRobotToCameraASide), kCameraAYawOffset);
+
+  public static final double kCameraBPitchDegrees = 20.0;
+  public static final double kCameraBPitchRads = Units.degreesToRadians(kCameraAPitchDegrees);
+  public static final double kCameraBHeightOffGroundMeters =0.0;
+  public static final String kLimelightBTableName = "limelight-dos";
+  public static final double kRobotToCameraBForward = 0.0;
+  public static final double kRobotToCameraBSide = 0.0;
+  public static final Rotation2d kCameraBYawOffset = Rotation2d.fromDegrees(0.0);
+  public static final Transform2d kRobotToCameraB =
+      new Transform2d(
+          new Translation2d(kRobotToCameraBForward, kRobotToCameraBSide), kCameraBYawOffset);
 
   public static final double kDefaultAmbiguityThreshold = 0.19;
   public static final double kDefaultYawDiffThreshold = 5.0;

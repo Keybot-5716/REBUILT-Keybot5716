@@ -12,7 +12,7 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
 
-public class ShooterRollersTalonFX implements ShooterRollersIO {
+public class ShooterRollersIOTalonFX implements ShooterRollersIO {
   protected TalonFX motor;
   private final VoltageOut voltageOut = new VoltageOut(Volts.zero());
 
@@ -23,7 +23,7 @@ public class ShooterRollersTalonFX implements ShooterRollersIO {
   private final StatusSignal<AngularVelocity> velocity;
   private final StatusSignal<AngularAcceleration> acceleration;
 
-  public ShooterRollersTalonFX() {
+  public ShooterRollersIOTalonFX() {
     // Cambiar el ID del motor
     motor = new TalonFX(17);
 

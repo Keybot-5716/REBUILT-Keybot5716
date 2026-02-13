@@ -1,4 +1,4 @@
-/*package frc.robot.subsystems.intake.pivot;
+package frc.robot.subsystems.intake.pivot;
 
 import static edu.wpi.first.units.Units.Meters;
 
@@ -23,7 +23,7 @@ public class IntakePivotIOSim implements IntakePivotIO {
             // The intake is mounted on the front? side of the chassis
             IntakeSimulation.IntakeSide.FRONT,
             // The intake can hold up to ? balls?
-            100);
+            20);
   }
 
   public void setRunning(boolean runIntake) {
@@ -37,7 +37,7 @@ public class IntakePivotIOSim implements IntakePivotIO {
     // collection
   }
 
-  public boolean isAnyFuelInsideIntake() {
+  public boolean isFuelInsideIntake() {
     return intakeSimulation.getGamePiecesAmount()
         != 0; // True if there is a game piece in the intake
   }
@@ -46,7 +46,7 @@ public class IntakePivotIOSim implements IntakePivotIO {
     // if there is a fuel in the intake, it will be removed and return true; otherwise, returns
     // false
     if (intakeSimulation.obtainGamePieceFromIntake()) {}
-    // ShooterIOSim.launchNote(); //notify the simulated flywheels to launch a fuel (We need the
+    // ShooterIOSim.launchFuel(); //notify the simulated flywheels to launch a fuel (We need the
     // shooter to be aware of this)
   }
 
@@ -59,4 +59,3 @@ public class IntakePivotIOSim implements IntakePivotIO {
   @Override
   public void stopMotor() {}
 }
-*/

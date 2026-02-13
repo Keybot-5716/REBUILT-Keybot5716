@@ -242,6 +242,10 @@ public class DriveSubsystem extends SubsystemBase {
             .withTargetDirection(delta.getAngle()));
   }
 
+  public Translation2d getDesiredPoint() {
+    return inputs.Pose.getTranslation();
+  }
+
   private void rotatedToAngle() {
     io.setRequest(
         rotationLocked

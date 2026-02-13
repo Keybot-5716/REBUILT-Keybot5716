@@ -36,8 +36,8 @@ public class ShooterSubsystem extends SubsystemBase {
 
   public enum DesiredState {
     STOPPED,
-    FORWARD,
-    REVERSE,
+    FORWARD_ROLLERS,
+    REVERSE_ROLLERS,
     IN,
     OUT,
     TEST
@@ -45,8 +45,8 @@ public class ShooterSubsystem extends SubsystemBase {
 
   private enum ShooterState {
     STOPPING,
-    FORWARDING,
-    REVERSING,
+    FORWARDING_ROLLERS,
+    REVERSING_ROLLERS,
     INING,
     OUTING,
     TESTING
@@ -75,8 +75,8 @@ public class ShooterSubsystem extends SubsystemBase {
   private ShooterState setStateTransition() {
     return switch (desiredState) {
       case STOPPED -> ShooterState.STOPPING;
-      case FORWARD -> ShooterState.FORWARDING;
-      case REVERSE -> ShooterState.REVERSING;
+      case FORWARD_ROLLERS -> ShooterState.FORWARDING_ROLLERS;
+      case REVERSE_ROLLERS -> ShooterState.REVERSING_ROLLERS;
       case IN -> ShooterState.INING;
       case OUT -> ShooterState.OUTING;
       case TEST -> ShooterState.TESTING;
@@ -97,11 +97,11 @@ public class ShooterSubsystem extends SubsystemBase {
 
   private void applyStates() {
     switch (shooterState) {
-      case FORWARDING:
+      case FORWARDING_ROLLERS:
         setVoltageRollers(rollerVolts.get());
         break;
 
-      case REVERSING:
+      case REVERSING_ROLLERS:
         setVoltageRollers(-rollerVolts.get());
         break;
 

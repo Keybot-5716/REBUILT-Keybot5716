@@ -9,7 +9,7 @@ public class TransferSubsystem extends SubsystemBase {
   private final TransferIOInputsAutoLogged transferInputs = new TransferIOInputsAutoLogged();
 
   private DesiredState desiredState = DesiredState.STOPPED;
-  private TransferState shooterState = TransferState.STOPPING;
+  private TransferState transferState = TransferState.STOPPING;
 
   public enum DesiredState {
     STOPPED,

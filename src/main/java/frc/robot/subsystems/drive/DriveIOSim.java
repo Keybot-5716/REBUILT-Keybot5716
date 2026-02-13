@@ -62,6 +62,11 @@ public class DriveIOSim extends DriveIOCTRE {
   public void updateInputs(DriveIOInputs inputs) {
     super.updateInputs(inputs);
 
+    if (Constants.useMapleSim && simSwerve != null) {
+      Pose2d p = simSwerve.mapleSimDrive.getSimulatedDriveTrainPose();
+      inputs.Pose = p;
+    }
+
     var pose = simRobotState.getLatestFieldToRobot();
     if (pose != null) {
       Logger.recordOutput("Drive/Sim/SimPose", simRobotState.getLatestFieldToRobot());

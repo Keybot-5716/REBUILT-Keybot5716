@@ -7,6 +7,7 @@ import com.pathplanner.lib.commands.PathfindingCommand;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -198,6 +199,13 @@ public class RobotContainer {
                 () -> intakePivotSub.setDesiredState(IntakeSubsystem.DesiredState.OUT)));
 
      */
+    controller
+        .start()
+        .whileTrue(
+            Commands.run(() -> driveSub.setDesiredPointToLock(new Translation2d(4.626, 4.033))))
+        .onFalse(
+            Commands.runOnce(
+                () -> driveSub.setState(DriveSubsystem.DesiredState.MANUAL_FIELD_DRIVE)));
     controller
         .leftTrigger()
         .whileTrue(

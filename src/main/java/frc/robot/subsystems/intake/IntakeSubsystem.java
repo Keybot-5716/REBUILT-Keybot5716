@@ -147,5 +147,6 @@ public class IntakeSubsystem extends SubsystemBase {
   public void setDesiredStateWithVoltage(DesiredState desiredState, double desiredVoltage) {
     this.desiredState = desiredState;
     this.desiredRollersVoltage = desiredVoltage;
+    this.desiredPivotVoltageForOpenLoop = desiredVoltage;
   }
 }

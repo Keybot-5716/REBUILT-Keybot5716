@@ -183,10 +183,14 @@ public class VisionSubsystem extends SubsystemBase {
     }
 
     // Use Megatag directly when 2 or more tags are visible
+    /*
     if (poseEstimate.fiducialIds().length > 1) {
       return Optional.empty();
+    }*/
+    int[] ids = poseEstimate.fiducialIds();
+    if (ids == null || ids.length != 1) {
+      return Optional.empty();
     }
-
     // Reject if the robot is yawing rapidly (time‑sync unreliable)
     final double kHighYawLookbackS = 0.3;
     final double kHighYawVelocityRadS = 5.0;
@@ -205,7 +209,7 @@ public class VisionSubsystem extends SubsystemBase {
       return Optional.empty();
     }
 
-    var maybeFieldToTag = VisionConstants.kAprilTagLayout.getTagPose(poseEstimate.fiducialIds()[0]);
+    var maybeFieldToTag = VisionConstants.kAprilTagLayout.getTagPose(ids[0]);
     if (maybeFieldToTag.isEmpty()) {
       return Optional.empty();
     }
@@ -244,7 +248,8 @@ public class VisionSubsystem extends SubsystemBase {
     }
 
     // Single‑tag extra checks
-    if (poseEstimate.fiducialIds().length < 2) {
+    int[] ids = poseEstimate.fiducialIds();
+    if (ids != null && ids.length == 1) {
 
       if (cam.fiducialAprilTagObservation == null) return Optional.empty();
 

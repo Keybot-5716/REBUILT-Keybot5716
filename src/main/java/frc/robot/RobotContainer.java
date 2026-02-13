@@ -27,6 +27,9 @@ import frc.robot.subsystems.drive.DriveIOSim;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.drive.DriveSubsystem.DesiredState;
 import frc.robot.subsystems.drive.TunerConstants;
+import frc.robot.subsystems.intake.IntakeSubsystem;
+import frc.robot.subsystems.intake.pivot.IntakePivotIOTalonFX;
+import frc.robot.subsystems.intake.rollers.IntakeRollersIOSparkMax;
 import frc.robot.subsystems.rollers.RollerSparkMax;
 import frc.robot.subsystems.rollers.RollerSubsystem;
 import frc.robot.subsystems.rollers.RolllerIOTalonFx;
@@ -68,13 +71,12 @@ public class RobotContainer {
     return new RollerSubsystem(new RolllerIOTalonFx());
   }
 
-  // -- Intake Rollers
-  private RollerSubsystem buildIntakeRoller() {
-    return new RollerSubsystem(new RollerSparkMax(20));
-  }
-
   private RollerSubsystem buildTransfer() {
     return new RollerSubsystem(new RollerSparkMax(21));
+  }
+
+  private IntakeSubsystem buildIntake() {
+    return new IntakeSubsystem(new IntakePivotIOTalonFX(), new IntakeRollersIOSparkMax());
   }
 
   private VisionSubsystem buildVisionSubsystem() {
@@ -112,10 +114,11 @@ public class RobotContainer {
   // -- Subsystems
   private final DriveSubsystem driveSub = buildDriveSubsystem();
   private final RollerSubsystem rollerSub = buildRollerSubsystem();
-  private final RollerSubsystem intakeRollerSub = buildIntakeRoller();
+  // private final RollerSubsystem intakeRollerSub = buildIntakeRoller();
   private final RollerSubsystem transferRoller = buildTransfer();
+  private final IntakeSubsystem intakeSub = buildIntake();
   // private final IntakeSubsystem intakePivotSub = buildIntakePivotSubsystem();
-  private final VisionSubsystem visionSub = buildVisionSubsystem();
+  // private final VisionSubsystem visionSub = buildVisionSubsystem();
 
   // -- AutoChooser
   private final LoggedDashboardChooser<AutoBuilder> autoChooser =
@@ -213,27 +216,26 @@ public class RobotContainer {
         .onFalse(
             Commands.runOnce(
                 () -> rollerSub.setDesiredState(RollerSubsystem.DesiredState.STOPPED)));
-
     controller
         .leftBumper()
         .whileTrue(
             Commands.run(
                 () ->
-                    intakeRollerSub.setDesiredStateWithVoltage(
-                        RollerSubsystem.DesiredState.FORWARD, 7)))
+                    intakeSub.setDesiredStateWithVoltage(
+                        IntakeSubsystem.DesiredState.FORWARD_PIVOT, 1)))
         .onFalse(
             Commands.runOnce(
-                () -> intakeRollerSub.setDesiredState(RollerSubsystem.DesiredState.STOPPED)));
+                () -> intakeSub.setDesiredState(IntakeSubsystem.DesiredState.STOPPED)));
     controller
         .rightBumper()
         .whileTrue(
             Commands.run(
                 () ->
-                    intakeRollerSub.setDesiredStateWithVoltage(
-                        RollerSubsystem.DesiredState.REVERSE, 7)))
+                    intakeSub.setDesiredStateWithVoltage(
+                        IntakeSubsystem.DesiredState.REVERSE_PIVOT, 1)))
         .onFalse(
             Commands.runOnce(
-                () -> intakeRollerSub.setDesiredState(RollerSubsystem.DesiredState.STOPPED)));
+                () -> intakeSub.setDesiredState(IntakeSubsystem.DesiredState.STOPPED)));
 
     controller
         .a()
@@ -287,9 +289,9 @@ public class RobotContainer {
     return driveSub;
   }
 
-  public VisionSubsystem getVisionSubsystem() {
-    return visionSub;
-  }
+  // public VisionSubsystem getVisionSubsystem() {
+  // return visionSub;
+  // }
 
   public RobotState getRobotState() {
     return robotState;

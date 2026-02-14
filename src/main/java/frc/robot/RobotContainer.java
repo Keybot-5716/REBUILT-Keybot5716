@@ -312,10 +312,10 @@ public class RobotContainer {
         .rightTrigger()
         .whileTrue(
             Commands.run(() -> driveSub.setDesiredPointToLock(new Translation2d(4.626, 4.033)))
-                .withTimeout(0.5)
+                .withTimeout(0.7)
                 .andThen(
                     Commands.repeatingSequence(
-                        Commands.runOnce(() -> generateFuel()), Commands.waitSeconds(0.2))))
+                        Commands.runOnce(() -> generateFuel()), Commands.waitSeconds(0.1))))
         .onFalse(
             Commands.runOnce(
                 () -> driveSub.setState(DriveSubsystem.DesiredState.MANUAL_FIELD_DRIVE)));

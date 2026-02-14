@@ -180,6 +180,7 @@ public class RobotState {
         "RobotState/FusedChassisSpeedFieldFrame", getLatestFusedFieldRelativeChassisSpeeds());
 
     Logger.recordOutput("RobotState/isRedAlliance", isRedAlliance());
+    Logger.recordOutput("RobotState/PassedTrench", passedTrench());
   }
 
   private final AtomicReference<Optional<Integer>> exclusiveTag =
@@ -231,5 +232,14 @@ public class RobotState {
     if (max.isEmpty() || min.isEmpty()) return Optional.empty();
     if (Math.abs(max.get()) >= Math.abs(min.get())) return max;
     else return min;
+  }
+
+  public static boolean passedTrench(boolean isRedAlliance, Pose2d pose) {
+    return (isRedAlliance && pose.getTranslation().getX() < 11.8)
+        || (!isRedAlliance && pose.getTranslation().getX() > 4.8);
+  }
+
+  public boolean passedTrench() {
+    return passedTrench(this.isRedAlliance(), this.getLatestFieldToRobot().getValue());
   }
 }

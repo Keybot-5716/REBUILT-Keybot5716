@@ -10,6 +10,7 @@ import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.units.measure.Angle;
@@ -162,10 +163,10 @@ public class RobotContainer {
       this.simulatedRobotState.init();
       configureButtonBindingsSim(DRIVE_CONTROLLER);
     } else {
-      driveSub.setState(DesiredState.MANUAL_FIELD_DRIVE);
       configureButtonBindings(DRIVE_CONTROLLER);
     }
     configureAuto();
+    driveSub.setState(DesiredState.MANUAL_FIELD_DRIVE);
   }
 
   public void configureButtonBindings(CommandXboxController controller) {
@@ -311,17 +312,28 @@ public class RobotContainer {
     controller
         .rightTrigger()
         .whileTrue(
-            Commands.run(() -> driveSub.setDesiredPointToLock(new Translation2d(4.626, 4.033)))
-                .withTimeout(0.7)
-                .andThen(
-                    Commands.repeatingSequence(
-                        Commands.runOnce(() -> generateFuel()), Commands.waitSeconds(0.1))))
+            Commands.sequence(
+                Commands.either(
+                        Commands.run(
+                            () -> driveSub.setDesiredPointToLock(new Translation2d(4.626, 4.033))),
+                        Commands.run(
+                            () ->
+                                driveSub.setDesiredRotationToLock(
+                                    new Rotation2d(robotState.isRedAlliance() ? 0 : Math.PI))),
+                        () -> !robotState.passedTrench())
+                    .withTimeout(0.7),
+                Commands.repeatingSequence(
+                    Commands.either(
+                        Commands.runOnce(() -> generateFuel()),
+                        Commands.runOnce(() -> generateFuelTaxi()),
+                        () -> !robotState.passedTrench()),
+                    Commands.waitSeconds(0.2))))
         .onFalse(
             Commands.runOnce(
                 () -> driveSub.setState(DriveSubsystem.DesiredState.MANUAL_FIELD_DRIVE)));
   }
 
-  public void generateFuel() {
+  private void generateFuel() {
     RebuiltFuelOnFly fuelOnFly =
         new RebuiltFuelOnFly(
             // Specify the position of the chassis when the note is launched
@@ -343,6 +355,55 @@ public class RobotContainer {
             LinearVelocity.ofRelativeUnits(7, MetersPerSecond),
             // The angle at which the fuel is launched
             Angle.ofRelativeUnits(36, Degrees));
+
+    fuelOnFly
+        // Set the target center to the Rebbuilt Hub of the current alliance
+        .withTargetPosition(
+            () -> FieldMirroringUtils.toCurrentAllianceTranslation(new Translation3d(4.6, 4, 2.3)))
+        // Set the tolerance: x: ±0.5m, y: ±1.2m, z: ±0.3m (this is the size of the speaker's
+        // "mouth")
+        .withTargetTolerance(new Translation3d(0.5, 1.2, 0.3))
+        // Set a callback to run when the fuel hits the target
+        .withHitTargetCallBack(() -> System.out.println("Hit hub, +1 point!"));
+
+    fuelOnFly
+        // Configure callbacks to visualize the flight trajectory of the projectile
+        .withProjectileTrajectoryDisplayCallBack(
+        // Callback for when the fuel will eventually hit the target (if configured)
+        (pose3ds) ->
+            Logger.recordOutput(
+                "Flywheel/FuelProjectileSuccessfulShot", pose3ds.toArray(Pose3d[]::new)),
+        // Callback for when the fuel will eventually miss the target, or if no target is configured
+        (pose3ds) ->
+            Logger.recordOutput(
+                "Flywheel/FuelProjectileUnsuccessfulShot", pose3ds.toArray(Pose3d[]::new)));
+
+    // Add the projectile to the simulated arena
+    SimulatedArena.getInstance().addGamePieceProjectile(fuelOnFly);
+  }
+
+  private void generateFuelTaxi() {
+    RebuiltFuelOnFly fuelOnFly =
+        new RebuiltFuelOnFly(
+            // Specify the position of the chassis when the note is launched
+            driveSub.getDesiredPoint(),
+            // Specify the translation of the shooter from the robot center (in the shooter’s
+            // reference frame)
+            new Translation2d(0.2, 0),
+            // Specify the field-relative speed of the chassis, adding it to the initial velocity of
+            // the projectile
+            robotState.getLatestFusedFieldRelativeChassisSpeeds(),
+            // The shooter facing direction is the same as the robot’s facing direction
+            robotState.getLatestFieldToRobot().getValue().getRotation(),
+            // Add the shooter’s rotation
+            // + shooterRotation,
+            // Initial height of the flying note
+            Distance.ofRelativeUnits(1, Meters),
+            // The launch speed is proportional to the RPM; assumed to be 16 meters/second at 6000
+            // RPM
+            LinearVelocity.ofRelativeUnits(7, MetersPerSecond),
+            // The angle at which the fuel is launched
+            Angle.ofRelativeUnits(3, Degrees));
 
     fuelOnFly
         // Set the target center to the Rebbuilt Hub of the current alliance

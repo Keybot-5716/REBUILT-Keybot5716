@@ -63,6 +63,7 @@ public class VisionIOLimelight implements VisionIO {
 
     // Si NO ve target, limpiar datos y salir
     if (!camera.seesTarget) {
+      camera.aprilTagInputs 
       camera.megatagPoseEstimate = null;
       camera.fiducialAprilTagObservation = null;
       camera.pose3d = null;

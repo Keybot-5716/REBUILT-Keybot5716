@@ -3,6 +3,8 @@ package frc.robot.subsystems.vision;
 import edu.wpi.first.networktables.*;
 import frc.lib.limelight.LimelightHelpers;
 import frc.robot.RobotState;
+
+import java.security.cert.X509CRL;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class VisionIOLimelight implements VisionIO {
@@ -61,14 +63,15 @@ public class VisionIOLimelight implements VisionIO {
 
     camera.seesTarget = table.getEntry("tv").getDouble(0) == 1.0;
 
-    // Si NO ve target, limpiar datos y salir
     if (!camera.seesTarget) {
-      camera.aprilTagInputs 
-      camera.megatagPoseEstimate = null;
+      camera.aprilTags.megatagPoseEstimate = null;
       camera.fiducialAprilTagObservation = null;
-      camera.pose3d = null;
-      camera.megatagcount = 0;
-      camera.standardDeviations = DEFAULT_STDDEVS;
+      camera.aprilTags.pose3d = null;
+      camera.aprilTags.megatagcount = 0;
+      camera.aprilTags.standardDeviations = DEFAULT_STDDEVS;
+      camera.objFuels.count = 0;
+      camera.objFuels.fuelPoseEstimate = null;
+      camera.objFuels.pose3d = null;
       return;
     }
 
@@ -78,8 +81,8 @@ public class VisionIOLimelight implements VisionIO {
           LimelightHelpers.toPose3D(LimelightHelpers.getBotPose_wpiBlue(limelightName));
 
       if (megatag != null) {
-        camera.megatagPoseEstimate = MegaTagPoseEstimate.fromLimelight(megatag);
-        camera.megatagcount = megatag.tagCount;
+        camera.aprilTags.megatagPoseEstimate = MegaTagPoseEstimate.fromLimelight(megatag);
+        camera.aprilTags.megatagcount = megatag.tagCount;
 
         // Protección contra null
         if (megatag.rawFiducials != null) {
@@ -89,28 +92,31 @@ public class VisionIOLimelight implements VisionIO {
           camera.fiducialAprilTagObservation = null;
         }
       } else {
-        camera.megatagPoseEstimate = null;
+        camera.aprilTags.megatagPoseEstimate = null;
         camera.fiducialAprilTagObservation = null;
-        camera.megatagcount = 0;
+        camera.aprilTags.megatagcount = 0;
       }
 
       if (robotPose3d != null) {
-        camera.pose3d = robotPose3d;
+        camera.aprilTags.pose3d = robotPose3d;
+        camera.objFuels.pose3d = robotPose3d;
       } else {
-        camera.pose3d = null;
+        camera.aprilTags.pose3d = null;
+        camera.objFuels.pose3d = null;
       }
 
-      camera.standardDeviations = table.getEntry("stddevs").getDoubleArray(DEFAULT_STDDEVS);
+      camera.aprilTags.standardDeviations = table.getEntry("stddevs").getDoubleArray(DEFAULT_STDDEVS);
 
     } catch (Exception e) {
       System.err.println("Error processing Limelight data: " + e.getMessage());
 
       // En caso de error, limpiar datos
-      camera.megatagPoseEstimate = null;
+      camera.aprilTags.megatagPoseEstimate = null;
       camera.fiducialAprilTagObservation = null;
-      camera.pose3d = null;
-      camera.megatagcount = 0;
-      camera.standardDeviations = DEFAULT_STDDEVS;
+      camera.aprilTags.pose3d = null;
+      camera.aprilTags.megatagcount = 0;
+      camera.aprilTags.standardDeviations = DEFAULT_STDDEVS;
     }
+  
   }
 }

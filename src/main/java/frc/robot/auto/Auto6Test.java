@@ -7,30 +7,30 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Commands;
 import java.util.List;
 
-public class Auto3Test extends AutoBuilder {
+public class Auto6Test extends AutoBuilder {
 
-  private final PathPlannerPath test5;
-  private final PathPlannerPath test6;
-  private final PathPlannerPath test7;
+  private final PathPlannerPath test14;
+  private final PathPlannerPath test15;
+  private final PathPlannerPath test16;
 
-  public Auto3Test() {
+  public Auto6Test() {
 
-    test5 = loadPath("Testing5");
-    test6 = loadPath("Testing6");
-    test7 = loadPath("Testing7");
+    test14 = loadPath("Testing14");
+    test15 = loadPath("Testing15");
+    test16 = loadPath("Testing16");
 
     addCommands(Commands.deadline(new PathPlannerAuto("TestAuto")));
   }
 
   @Override
   public List<Pose2d> getPathPoses() {
-    return getPathPosesList(test5, test6, test7);
+    return getPathPosesList(test14, test15, test16);
   }
 
   @Override
   public Pose2d getStartingPose() {
-    if (test5 != null) {
-      return test5.getStartingDifferentialPose();
+    if (test14 != null) {
+      return test14.getStartingDifferentialPose();
     }
 
     DriverStation.reportError("Path is null", true);

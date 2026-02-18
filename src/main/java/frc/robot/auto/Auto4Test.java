@@ -9,37 +9,31 @@ import java.util.List;
 
 public class Auto4Test extends AutoBuilder {
 
-    private final PathPlannerPath test8;
-    private final PathPlannerPath test9;
-    private final PathPlannerPath test10;
+  private final PathPlannerPath test8;
+  private final PathPlannerPath test9;
+  private final PathPlannerPath test10;
 
-    public Auto4Test() {
+  public Auto4Test() {
 
-        test8 = loadPath("Testing8");
-        test9 = loadPath("Testing9");
-        test10 = loadPath("Testing10");
+    test8 = loadPath("Testing8");
+    test9 = loadPath("Testing9");
+    test10 = loadPath("Testing10");
 
-        addCommands(Commands.deadline(new PathPlannerAuto("TestAuto")));
+    addCommands(Commands.deadline(new PathPlannerAuto("TestAuto")));
+  }
+
+  @Override
+  public List<Pose2d> getPathPoses() {
+    return getPathPosesList(test8, test9, test10);
+  }
+
+  @Override
+  public Pose2d getStartingPose() {
+    if (test8 != null) {
+      return test8.getStartingDifferentialPose();
     }
 
-    @Override 
-    public List<Pose2d> getPathPoses() {
-
-        return getPathPosesList(test8, test9, test10);
-
-    }
- 
-    @Override
-    public List<Posed2d> getStartingPose() {
-
-        if (test8 != null) {
-
-            return getStartingDifferentialPose();
-
-        } 
-
-        DriverStation.reportError("Path is null", true);
-        return new Pose2d();
-
-    }
+    DriverStation.reportError("Path is null", true);
+    return new Pose2d();
+  }
 }

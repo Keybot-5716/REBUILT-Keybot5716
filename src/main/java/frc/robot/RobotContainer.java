@@ -170,6 +170,63 @@ public class RobotContainer {
   }
 
   public void configureButtonBindings(CommandXboxController controller) {
+    // Para el shooter (delante y pa' tras xd)
+    controller
+        .rightTrigger()
+        .whileTrue(
+            Commands.run(
+                () -> shooterSub.setDesiredState(ShooterSubsystem.DesiredState.FORWARD_ROLLERS)))
+        .whileFalse(
+            Commands.run(() -> shooterSub.setDesiredState(ShooterSubsystem.DesiredState.STOPPED)));
+
+    controller
+        .rightBumper()
+        .whileTrue(
+            Commands.run(
+                () -> shooterSub.setDesiredState(ShooterSubsystem.DesiredState.REVERSE_ROLLERS)))
+        .whileFalse(
+            Commands.run(() -> shooterSub.setDesiredState(ShooterSubsystem.DesiredState.STOPPED)));
+
+    // Para el intake
+
+    controller
+        .rightBumper()
+        .whileTrue(
+            Commands.run(
+                () -> intakeSub.setDesiredState(IntakeSubsystem.DesiredState.FORWARD_ROLLERS)))
+        .whileFalse(
+            Commands.run(
+                () -> intakeSub.setDesiredState(IntakeSubsystem.DesiredState.REVERSE_ROLLERS)));
+
+    controller
+        .leftBumper()
+        .whileTrue(
+            Commands.run(
+                () -> intakeSub.setDesiredState(IntakeSubsystem.DesiredState.REVERSE_ROLLERS)))
+        .whileFalse(
+            Commands.run(
+                () -> intakeSub.setDesiredState(IntakeSubsystem.DesiredState.REVERSE_ROLLERS)));
+
+    // Para probar el pivot del intake Con a de arriba y b de bajar
+    controller
+        .a()
+        .onTrue(
+            Commands.run(
+                () -> intakeSub.setDesiredState(IntakeSubsystem.DesiredState.FORWARD_PIVOT)));
+    controller
+        .b()
+        .onTrue(
+            Commands.run(
+                () -> intakeSub.setDesiredState(IntakeSubsystem.DesiredState.REVERSE_PIVOT)));
+
+    // Para probar el pivot del intake con posiciones predefinidas (x de arriba y y de abajo)
+    controller
+        .x()
+        .onTrue(Commands.run(() -> intakeSub.setDesiredState(IntakeSubsystem.DesiredState.IN)));
+    controller
+        .y()
+        .onTrue(Commands.run(() -> intakeSub.setDesiredState(IntakeSubsystem.DesiredState.OUT)));
+
     // Para el shooter
     /*
      * controller

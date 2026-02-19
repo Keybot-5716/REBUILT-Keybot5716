@@ -492,7 +492,7 @@ public class RobotContainer {
     autoChooser.addDefaultOption("None Auto", new NoneAuto());
     autoChooser.addOption("Testing Auto", new Auto1Test());
     autoChooser.addOption("Testing Auto 2", new Auto2Test());
-    autoChooser.addOption("Auto Forward", new AutoForwardTest());
+    autoChooser.addOption("Auto Forward", new AutoForwardTest());c
 
     autoChooser.onChange(
         auto -> {

@@ -26,6 +26,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.lib.team6328.LocalADStarAK;
 import frc.robot.auto.Auto1Test;
 import frc.robot.auto.Auto2Test;
+import frc.robot.auto.Auto3Test;
 import frc.robot.auto.AutoBuilder;
 import frc.robot.auto.AutoForwardTest;
 import frc.robot.auto.NoneAuto;
@@ -492,7 +493,8 @@ public class RobotContainer {
     autoChooser.addDefaultOption("None Auto", new NoneAuto());
     autoChooser.addOption("Testing Auto", new Auto1Test());
     autoChooser.addOption("Testing Auto 2", new Auto2Test());
-    autoChooser.addOption("Auto Forward", new AutoForwardTest());c
+    autoChooser.addOption("Auto Forward", new AutoForwardTest());
+    autoChooser.addOption("Testing Auto 3", new Auto3Test());
 
     autoChooser.onChange(
         auto -> {

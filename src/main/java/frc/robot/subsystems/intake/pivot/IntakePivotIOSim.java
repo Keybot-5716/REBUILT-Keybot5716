@@ -9,6 +9,11 @@ public class IntakePivotIOSim implements IntakePivotIO {
 
   private final IntakeSimulation intakeSimulation;
 
+  /**
+   * Este método sirve para configurar la especificaciones del intake que se va a mostrar simulado
+   *
+   * @param driveTrain Sirve para tener en cuenta en qué base estara este intake
+   */
   public IntakePivotIOSim(AbstractDriveTrainSimulation driveTrain) {
     this.intakeSimulation =
         IntakeSimulation.OverTheBumperIntake(
@@ -26,6 +31,11 @@ public class IntakePivotIOSim implements IntakePivotIO {
             20);
   }
 
+  /**
+   * Con esto podemos hacer que extienda o que retraiga el intake
+   *
+   * @param runIntake sirve si es que queremos que se extienda o se retraiga
+   */
   public void setRunning(boolean runIntake) {
     if (runIntake)
       intakeSimulation
@@ -37,11 +47,15 @@ public class IntakePivotIOSim implements IntakePivotIO {
     // collection
   }
 
+  /**
+   * @return si hay algun fuel en el intake
+   */
   public boolean isFuelInsideIntake() {
     return intakeSimulation.getGamePiecesAmount()
         != 0; // True if there is a game piece in the intake
   }
 
+  /** */
   public void launchFuel() {
     // if there is a fuel in the intake, it will be removed and return true; otherwise, returns
     // false

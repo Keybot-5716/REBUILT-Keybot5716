@@ -57,7 +57,6 @@ import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 public class RobotContainer {
-
   private DriveSubsystem buildDriveSubsystem() {
     if (RobotBase.isSimulation()) {
       return new DriveSubsystem(
@@ -122,15 +121,15 @@ public class RobotContainer {
 
   /*private final Consumer<VisionPoseEstimateInField> visionFieldEstimate =
   new Consumer<VisionPoseEstimateInField>() {
-    @Override
-    public void accept(VisionPoseEstimateInField estimation) {
+      @Override
+      public void accept(VisionPoseEstimateInField estimation) {
 
       if (driveSub == null) return;
       if (estimation == null || estimation.getRobotPose() == null) return;
       Pose2d p = estimation.getRobotPose();
       if (Double.isNaN(p.getX()) || Double.isNaN(p.getY())) return;
       driveSub.addVisionMeasurement(estimation);
-    }
+      }
   }; */
 
   private final CommandXboxController DRIVE_CONTROLLER = new CommandXboxController(0);
@@ -169,6 +168,11 @@ public class RobotContainer {
     driveSub.setState(DesiredState.MANUAL_FIELD_DRIVE);
   }
 
+  /**
+   * Este metodo configura los botones
+   *
+   * @param controller es un mando de xbox
+   */
   public void configureButtonBindings(CommandXboxController controller) {
     // Para el shooter (delante y pa' tras xd)
     controller
@@ -226,139 +230,14 @@ public class RobotContainer {
     controller
         .y()
         .onTrue(Commands.run(() -> intakeSub.setDesiredState(IntakeSubsystem.DesiredState.OUT)));
-
-    // Para el shooter
-    /*
-     * controller
-        .a()
-        .whileTrue(
-            Commands.run(() -> driveSub.setDesiredPointToLock(new Translation2d(4.626, 4.033))))
-        .onFalse(
-            Commands.runOnce(
-                () -> driveSub.setState(DriveSubsystem.DesiredState.MANUAL_FIELD_DRIVE)));
-
-    controller
-        .leftTrigger()
-        .whileTrue(
-            Commands.run(
-                () ->
-                    rollerSub.setDesiredStateWithVoltage(RollerSubsystem.DesiredState.FORWARD, 7)))
-        .onFalse(
-            Commands.runOnce(
-                () -> rollerSub.setDesiredState(RollerSubsystem.DesiredState.STOPPED)));
-    controller
-        .rightTrigger()
-        .whileTrue(
-            Commands.run(
-                () ->
-                    rollerSub.setDesiredStateWithVoltage(RollerSubsystem.DesiredState.REVERSE, 7)))
-        .onFalse(
-            Commands.runOnce(
-                () -> rollerSub.setDesiredState(RollerSubsystem.DesiredState.STOPPED)));
-    // Para los rollers
-    controller
-        .leftBumper()
-        .whileTrue(
-            Commands.run(
-                () ->
-                    intakeSub.setDesiredStateWithVoltage(IntakeSubsystem.DesiredState.FORWARD, 8)))
-        .onFalse(
-            Commands.runOnce(
-                () -> intakeSub.setDesiredState(IntakeSubsystem.DesiredState.STOPPED)));
-    controller
-        .rightBumper()
-        .whileTrue(
-            Commands.run(
-                () ->
-                    intakeSub.setDesiredStateWithVoltage(IntakeSubsystem.DesiredState.REVERSE, 8)))
-        .onFalse(
-            Commands.runOnce(
-                () -> intakeSub.setDesiredState(IntakeSubsystem.DesiredState.STOPPED)));
-
-    // Para el intake pivot
-    controller
-        .b()
-        .onTrue(
-            Commands.runOnce(
-                () -> intakePivotSub.setDesiredState(IntakeSubsystem.DesiredState.IN)));
-    controller
-        .x()
-        .onTrue(
-            Commands.runOnce(
-                () -> intakePivotSub.setDesiredState(IntakeSubsystem.DesiredState.OUT)));
-
-     */
-    controller
-        .start()
-        .whileTrue(
-            Commands.run(() -> driveSub.setDesiredPointToLock(new Translation2d(4.626, 4.033))))
-        .onFalse(
-            Commands.runOnce(
-                () -> driveSub.setState(DriveSubsystem.DesiredState.MANUAL_FIELD_DRIVE)));
-    controller
-        .leftTrigger()
-        .whileTrue(
-            Commands.run(
-                () ->
-                    rollerSub.setDesiredStateWithVoltage(RollerSubsystem.DesiredState.FORWARD, 7)))
-        .onFalse(
-            Commands.runOnce(
-                () -> rollerSub.setDesiredState(RollerSubsystem.DesiredState.STOPPED)));
-    controller
-        .rightTrigger()
-        .whileTrue(
-            Commands.run(
-                () ->
-                    rollerSub.setDesiredStateWithVoltage(RollerSubsystem.DesiredState.REVERSE, 7)))
-        .onFalse(
-            Commands.runOnce(
-                () -> rollerSub.setDesiredState(RollerSubsystem.DesiredState.STOPPED)));
-    controller
-        .leftBumper()
-        .whileTrue(
-            Commands.run(
-                () ->
-                    intakeSub.setDesiredStateWithVoltage(
-                        IntakeSubsystem.DesiredState.FORWARD_PIVOT, 1)))
-        .onFalse(
-            Commands.runOnce(
-                () -> intakeSub.setDesiredState(IntakeSubsystem.DesiredState.STOPPED)));
-    controller
-        .rightBumper()
-        .whileTrue(
-            Commands.run(
-                () ->
-                    intakeSub.setDesiredStateWithVoltage(
-                        IntakeSubsystem.DesiredState.REVERSE_PIVOT, 1)))
-        .onFalse(
-            Commands.runOnce(
-                () -> intakeSub.setDesiredState(IntakeSubsystem.DesiredState.STOPPED)));
-
-    controller
-        .a()
-        .whileTrue(
-            Commands.run(
-                () ->
-                    transferRoller.setDesiredStateWithVoltage(
-                        RollerSubsystem.DesiredState.FORWARD, 10)))
-        .onFalse(
-            Commands.runOnce(
-                () -> transferRoller.setDesiredState(RollerSubsystem.DesiredState.STOPPED)));
-
-    controller
-        .b()
-        .whileTrue(
-            Commands.run(
-                () ->
-                    transferRoller.setDesiredStateWithVoltage(
-                        RollerSubsystem.DesiredState.REVERSE, 10)))
-        .onFalse(
-            Commands.runOnce(
-                () -> transferRoller.setDesiredState(RollerSubsystem.DesiredState.STOPPED)));
   }
 
+  /**
+   * Este metodo configura los botones para el simulador
+   *
+   * @param controller es un mando de xbox
+   */
   public void configureButtonBindingsSim(CommandXboxController controller) {
-
     controller.a().onTrue(Commands.runOnce(() -> generateFuel()));
     controller.b().onTrue(Commands.runOnce(() -> intakePivotSub.setRunning(true)));
     controller.x().onTrue(Commands.runOnce(() -> intakePivotSub.setRunning(false)));
@@ -390,6 +269,11 @@ public class RobotContainer {
                 () -> driveSub.setState(DriveSubsystem.DesiredState.MANUAL_FIELD_DRIVE)));
   }
 
+  /**
+   * Este metodo genera los fuels dependiento de la posición del chasis, la velocidad incicial del
+   * fuel, la dirección en la cual se va a estar lanzando la velocidad y el ángulo al que será
+   * lanzado
+   */
   private void generateFuel() {
     RebuiltFuelOnFly fuelOnFly =
         new RebuiltFuelOnFly(
@@ -407,7 +291,7 @@ public class RobotContainer {
             // + shooterRotation,
             // Initial height of the flying note
             Distance.ofRelativeUnits(1, Meters),
-            // The launch speed is proportional to the RPM; assumed to be 16 meters/second at 6000
+            // The launch speed is proportional to the RPM
             // RPM
             LinearVelocity.ofRelativeUnits(7, MetersPerSecond),
             // The angle at which the fuel is launched
@@ -439,6 +323,7 @@ public class RobotContainer {
     SimulatedArena.getInstance().addGamePieceProjectile(fuelOnFly);
   }
 
+  // Preguntaaaaaa (Isju)
   private void generateFuelTaxi() {
     RebuiltFuelOnFly fuelOnFly =
         new RebuiltFuelOnFly(
@@ -488,6 +373,9 @@ public class RobotContainer {
     SimulatedArena.getInstance().addGamePieceProjectile(fuelOnFly);
   }
 
+  /*
+   * Configura las diferentes rutas que se pueden utilizar para el manejo en el auto
+   */
   public void configureAuto() {
     autoChooser.addDefaultOption("None Auto", new NoneAuto());
     autoChooser.addOption("Testing Auto", new Auto1Test());

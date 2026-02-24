@@ -48,6 +48,7 @@ import frc.robot.subsystems.shooter.*;
 import frc.robot.subsystems.shooter.hood.*;
 import frc.robot.subsystems.shooter.rollers.*;
 import frc.robot.subsystems.vision.VisionIOLimelight;
+import frc.robot.subsystems.vision.VisionIOSimPhotonVision;
 import frc.robot.subsystems.vision.VisionPoseEstimateInField;
 import frc.robot.subsystems.vision.VisionSubsystem;
 import java.util.function.Consumer;
@@ -109,7 +110,12 @@ public class RobotContainer {
   }
 
   private VisionSubsystem buildVisionSubsystem() {
-    return new VisionSubsystem(new VisionIOLimelight(robotState), robotState);
+    if (Robot.isSimulation()) {
+      return new VisionSubsystem(
+          new VisionIOSimPhotonVision(robotState, simulatedRobotState), robotState);
+    } else {
+      return new VisionSubsystem(new VisionIOLimelight(robotState), robotState);
+    }
   }
 
   private final Consumer<VisionPoseEstimateInField> visionFieldEstimate =

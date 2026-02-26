@@ -24,9 +24,7 @@ import org.photonvision.targeting.PhotonPipelineResult;
  */
 public class VisionIOSimPhotonVision extends VisionIOLimelight {
   private final PhotonCamera camera = new PhotonCamera("camera");
-  private final PhotonCamera cameraB = new PhotonCamera("cameraB");
   private PhotonCameraSim cameraSim;
-  private PhotonCameraSim cameraBSim;
   private final VisionSystemSim visionSim;
   private final SimulatedRobotState simRobotState;
 
@@ -51,8 +49,6 @@ public class VisionIOSimPhotonVision extends VisionIOLimelight {
 
     cameraSim = new PhotonCameraSim(camera, prop);
     cameraSim.setMinTargetAreaPixels(1000);
-    cameraBSim = new PhotonCameraSim(cameraB, prop);
-    cameraBSim.setMinTargetAreaPixels(1000);
 
     Transform3d robotToCameraA =
         new Transform3d(
@@ -71,9 +67,6 @@ public class VisionIOSimPhotonVision extends VisionIOLimelight {
     cameraSim.enableRawStream(true);
     cameraSim.enableProcessedStream(true);
     cameraSim.enableDrawWireframe(true);
-    cameraBSim.enableRawStream(true);
-    cameraBSim.enableProcessedStream(true);
-    cameraBSim.enableDrawWireframe(true);
   }
 
   @Override

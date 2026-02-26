@@ -10,6 +10,8 @@ public class VisionIOLimelight implements VisionIO {
             NetworkTableInstance.getDefault().getTable(VisionConstants.kLimelightATableName);
     NetworkTable tableB =
             NetworkTableInstance.getDefault().getTable(VisionConstants.kLimelightBTableName);
+    NetworkTable tableC = 
+            NetworkTableInstance.getDefault().getTable(VisionConstants.kLimelightCTableName);
     RobotState robotState;
     AtomicReference<VisionIOInputs> latestInputs = new AtomicReference<>(new VisionIOInputs());
     int imuMode = 1;
@@ -44,6 +46,18 @@ public class VisionIOLimelight implements VisionIO {
         };
 
         tableB.getEntry("camerapose_robotspace_set").setDoubleArray(cameraBPose);
+
+                double[] cameraCPose = {
+            VisionConstants.kRobotToCameraCForward,
+            VisionConstants.kRobotToCameraCSide,
+            VisionConstants.kCameraCHeightOffGroundMeters,
+            0.0,
+            VisionConstants.kCameraCPitchDegrees,
+            VisionConstants.kCameraCYawOffset.getDegrees()
+        };
+
+        tableC.getEntry("camerapose_robotspace_set").setDoubleArray(cameraCPose);
+    
     }
 
     @Override

@@ -8,7 +8,6 @@ import org.ironmaple.simulation.drivesims.AbstractDriveTrainSimulation;
 public class IntakePivotIOSim implements IntakePivotIO {
 
   private final IntakeSimulation intakeSimulation;
-
   /**
    * Este método sirve para configurar la especificaciones del intake que se va a mostrar simulado
    *

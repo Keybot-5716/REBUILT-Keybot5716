@@ -175,7 +175,7 @@ public class RobotContainer {
    * @param controller es un mando de xbox
    */
   public void configureButtonBindings(CommandXboxController controller) {
-    // Para el shooter (delante y pa' tras xd)
+    // -- SHOOTER
     controller
         .rightTrigger()
         .whileTrue(
@@ -192,7 +192,7 @@ public class RobotContainer {
         .whileFalse(
             Commands.run(() -> shooterSub.setDesiredState(ShooterSubsystem.DesiredState.STOPPED)));
 
-    // Para el intake
+    // -- INTAKE ROLLERS
 
     controller
         .rightBumper()
@@ -212,7 +212,7 @@ public class RobotContainer {
             Commands.run(
                 () -> intakeSub.setDesiredState(IntakeSubsystem.DesiredState.REVERSE_ROLLERS)));
 
-    // Para probar el pivot del intake Con a de arriba y b de bajar
+    // -- INTAKE PIVOT OPEN LOOP
     controller
         .a()
         .onTrue(
@@ -224,7 +224,7 @@ public class RobotContainer {
             Commands.run(
                 () -> intakeSub.setDesiredState(IntakeSubsystem.DesiredState.REVERSE_PIVOT)));
 
-    // Para probar el pivot del intake con posiciones predefinidas (x de arriba y y de abajo)
+    // INTAKE PIVOT CLOSED LOOP
     controller
         .x()
         .onTrue(Commands.run(() -> intakeSub.setDesiredState(IntakeSubsystem.DesiredState.IN)));

@@ -231,15 +231,13 @@ public class RobotContainer {
 
             /*
     // -- INTAKE ROLLERS
-
     controller
-        .rightBumper()
+        .leftTrigger()
         .whileTrue(
             Commands.run(
                 () -> intakeSub.setDesiredState(IntakeSubsystem.DesiredState.FORWARD_ROLLERS)))
         .whileFalse(
-            Commands.run(
-                () -> intakeSub.setDesiredState(IntakeSubsystem.DesiredState.REVERSE_ROLLERS)));
+            Commands.run(() -> intakeSub.setDesiredState(IntakeSubsystem.DesiredState.STOPPED)));
 
     controller
         .leftBumper()
@@ -247,8 +245,7 @@ public class RobotContainer {
             Commands.run(
                 () -> intakeSub.setDesiredState(IntakeSubsystem.DesiredState.REVERSE_ROLLERS)))
         .whileFalse(
-            Commands.run(
-                () -> intakeSub.setDesiredState(IntakeSubsystem.DesiredState.REVERSE_ROLLERS)));
+            Commands.run(() -> intakeSub.setDesiredState(IntakeSubsystem.DesiredState.STOPPED)));
 
     // -- INTAKE PIVOT OPEN LOOP
     controller
@@ -266,6 +263,7 @@ public class RobotContainer {
     controller
         .x()
         .onTrue(Commands.run(() -> intakeSub.setDesiredState(IntakeSubsystem.DesiredState.IN)));
+
     controller
         .y()
         .onTrue(Commands.run(() -> intakeSub.setDesiredState(IntakeSubsystem.DesiredState.OUT)));*/

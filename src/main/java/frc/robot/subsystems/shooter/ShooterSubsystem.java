@@ -4,21 +4,19 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.team6328.LoggedTunableNumber;
-import frc.robot.subsystems.shooter.hood.ShooterHoodIO;
 import frc.robot.subsystems.shooter.rollers.ShooterRollersIO;
 import frc.robot.subsystems.shooter.rollers.ShooterRollersIOInputsAutoLogged;
 import org.littletonrobotics.junction.Logger;
 
 public class ShooterSubsystem extends SubsystemBase {
   private final ShooterRollersIO rollersIO;
-  private final ShooterHoodIO hoodIO;
 
   // private final ShooterRollerIOInputsAutoLogged inputs = new ShooterRollerIOInputsAutoLogged();
   private final ShooterRollersIOInputsAutoLogged rollersInputs =
       new ShooterRollersIOInputsAutoLogged();
 
   private static final LoggedTunableNumber rollerVolts =
-      new LoggedTunableNumber("Intake/Rollers/RollerVolts", 7.0);
+      new LoggedTunableNumber("Shooter/Rollers/RollerVolts", 1.0);
 
   // Creamos un objeto TrapezoidProfile que tenga velocidad y aceleración máximas
   private TrapezoidProfile.Constraints profile = new TrapezoidProfile.Constraints(2.0, 2.0);
@@ -32,7 +30,8 @@ public class ShooterSubsystem extends SubsystemBase {
   private DesiredState desiredState = DesiredState.STOPPED;
   private ShooterState shooterState = ShooterState.STOPPING;
 
-  private double desiredVoltage;
+  private double desiredVoltage = 0;
+  private double desiredVelocity = 0;
 
   public enum DesiredState {
     STOPPED,
@@ -52,9 +51,8 @@ public class ShooterSubsystem extends SubsystemBase {
     TESTING
   }
 
-  public ShooterSubsystem(ShooterRollersIO rollersIO, ShooterHoodIO hoodIO) {
+  public ShooterSubsystem(ShooterRollersIO rollersIO) {
     this.rollersIO = rollersIO;
-    this.hoodIO = hoodIO;
   }
 
   @Override
@@ -91,18 +89,18 @@ public class ShooterSubsystem extends SubsystemBase {
     rollersIO.setVoltage(voltage);
   }
 
-  public void setVoltageIntakeTesters(double voltage) {
-    // io.setVoltage(voltage);
+  public void setVelocityRollers(double rps) {
+    rollersIO.setVelocity(rps);
   }
 
   private void applyStates() {
     switch (shooterState) {
       case FORWARDING_ROLLERS:
-        setVoltageRollers(rollerVolts.get());
+        setVoltageRollers(desiredVoltage);
         break;
 
       case REVERSING_ROLLERS:
-        setVoltageRollers(-rollerVolts.get());
+        setVoltageRollers(-desiredVoltage);
         break;
 
       case STOPPING:
@@ -118,7 +116,7 @@ public class ShooterSubsystem extends SubsystemBase {
         break;
 
       case TESTING:
-        setVoltageIntakeTesters(desiredVoltage);
+        setVelocityRollers(desiredVelocity);
         break;
     }
   }
@@ -135,5 +133,10 @@ public class ShooterSubsystem extends SubsystemBase {
   public void setDesiredStateWithVoltage(DesiredState desiredState, double desiredVoltage) {
     this.desiredState = desiredState;
     this.desiredVoltage = desiredVoltage;
+  }
+
+  public void setDesiredStateWithVelocity(DesiredState desiredState, double rps) {
+    this.desiredState = desiredState;
+    this.desiredVelocity = rps;
   }
 }

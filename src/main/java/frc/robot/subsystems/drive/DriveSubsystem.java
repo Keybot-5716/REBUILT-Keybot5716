@@ -239,7 +239,7 @@ public class DriveSubsystem extends SubsystemBase {
         rotationLocked
             .withVelocityX(calculateSpeedsBasedOnJoystickInputs().vxMetersPerSecond)
             .withVelocityY(calculateSpeedsBasedOnJoystickInputs().vyMetersPerSecond)
-            .withTargetDirection(delta.getAngle()));
+            .withTargetDirection(delta.getAngle().plus(new Rotation2d((Math.PI / 2)))));
   }
 
   public Translation2d getDesiredPoint() {

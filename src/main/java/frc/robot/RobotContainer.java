@@ -37,20 +37,10 @@ import frc.robot.subsystems.drive.DriveIOSim;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.drive.DriveSubsystem.DesiredState;
 import frc.robot.subsystems.drive.TunerConstants;
-import frc.robot.subsystems.intake.IntakeSubsystem;
-import frc.robot.subsystems.intake.pivot.IntakePivotIOSim;
-import frc.robot.subsystems.intake.pivot.IntakePivotIOTalonFX;
-import frc.robot.subsystems.intake.rollers.IntakeRollersIOSparkMax;
-import frc.robot.subsystems.rollers.RollerSparkMax;
-import frc.robot.subsystems.rollers.RollerSubsystem;
-import frc.robot.subsystems.rollers.RolllerIOTalonFx;
 import frc.robot.subsystems.shooter.*;
 import frc.robot.subsystems.shooter.hood.*;
 import frc.robot.subsystems.shooter.rollers.*;
-import frc.robot.subsystems.vision.VisionIOLimelight;
-import frc.robot.subsystems.vision.VisionIOSimPhotonVision;
 import frc.robot.subsystems.vision.VisionPoseEstimateInField;
-import frc.robot.subsystems.vision.VisionSubsystem;
 import java.util.function.Consumer;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.seasonspecific.rebuilt2026.RebuiltFuelOnFly;
@@ -85,11 +75,10 @@ public class RobotContainer {
   }
 
   // -- Rollers genéricos
-  private RollerSubsystem buildRollerSubsystem() {
-    return new RollerSubsystem(new RolllerIOTalonFx());
-  }
+  // private RollerSubsystem buildRollerSubsystem() {return new RollerSubsystem(new
+  // RolllerIOTalonFx());}
 
-  // -- Intake
+  /*  -- Intake
   private IntakeSubsystem buildIntake() {
     if (RobotBase.isSimulation()) {
       return new IntakeSubsystem(
@@ -98,17 +87,16 @@ public class RobotContainer {
     } else {
       return new IntakeSubsystem(new IntakePivotIOTalonFX(), new IntakeRollersIOSparkMax());
     }
-  }
+  }*/
 
   // -- Shooter
   private ShooterSubsystem buildShooter() {
-    return new ShooterSubsystem(new ShooterRollersIOTalonFX(), new ShooterHoodIOTalonFX());
+    return new ShooterSubsystem(new ShooterRollersIOTalonFX());
   }
 
-  private RollerSubsystem buildTransfer() {
-    return new RollerSubsystem(new RollerSparkMax(21));
-  }
+  // private RollerSubsystem buildTransfer() {return new RollerSubsystem(new RollerSparkMax(21));}
 
+  /*
   private VisionSubsystem buildVisionSubsystem() {
     if (Robot.isSimulation()) {
       return new VisionSubsystem(
@@ -116,7 +104,7 @@ public class RobotContainer {
     } else {
       return new VisionSubsystem(new VisionIOLimelight(robotState), robotState);
     }
-  }
+  } */
 
   private final Consumer<VisionPoseEstimateInField> visionFieldEstimate =
       new Consumer<VisionPoseEstimateInField>() {
@@ -148,15 +136,15 @@ public class RobotContainer {
 
   // -- Subsystems
   private final DriveSubsystem driveSub = buildDriveSubsystem();
-  private final RollerSubsystem rollerSub = buildRollerSubsystem();
+  // private final RollerSubsystem rollerSub = buildRollerSubsystem();
   // private final RollerSubsystem intakeRollerSub = buildIntakeRoller();
   private final ShooterSubsystem shooterSub = buildShooter();
-  private final IntakeSubsystem intakeSub = buildIntake();
-  private final RollerSubsystem transferRoller = buildTransfer();
+  // private final IntakeSubsystem intakeSub = buildIntake();
+  // private final RollerSubsystem transferRoller = buildTransfer();
   // private final IntakeSubsystem intakePivotSub = buildIntakePivotSubsystem();
-  private final VisionSubsystem visionSub = buildVisionSubsystem();
-  private final IntakePivotIOSim intakePivotSub =
-      new IntakePivotIOSim(driveSub.getMapleSimDrive().mapleSimDrive);
+  // private final VisionSubsystem visionSub = buildVisionSubsystem();
+  // private final IntakePivotIOSim intakePivotSub = new
+  // IntakePivotIOSim(driveSub.getMapleSimDrive().mapleSimDrive);
 
   // -- AutoChooser
   private final LoggedDashboardChooser<AutoBuilder> autoChooser =
@@ -167,7 +155,7 @@ public class RobotContainer {
     if (RobotBase.isSimulation()) {
       assert this.simulatedRobotState != null;
       this.simulatedRobotState.init();
-      configureButtonBindingsSim(DRIVE_CONTROLLER);
+      // configureButtonBindingsSim(DRIVE_CONTROLLER);
     } else {
       configureButtonBindings(DRIVE_CONTROLLER);
     }
@@ -181,7 +169,50 @@ public class RobotContainer {
    * @param controller es un mando de xbox
    */
   public void configureButtonBindings(CommandXboxController controller) {
-    // -- SHOOTER
+    controller.start().onTrue(Commands.runOnce(() -> driveSub.resetOdometry()));
+    controller
+        .start()
+        .onTrue(
+            Commands.runOnce(() -> driveSub.resetOdometry(new Pose2d(3.1, 4, new Rotation2d()))));
+    controller
+        .rightBumper()
+        .whileTrue(
+            Commands.run(() -> driveSub.setDesiredPointToLock(new Translation2d(4.778, 4.293))))
+        .onFalse(
+            Commands.runOnce(
+                () -> driveSub.setState(DriveSubsystem.DesiredState.MANUAL_FIELD_DRIVE)));
+    controller
+        .rightTrigger()
+        .whileTrue(
+            Commands.run(
+                () ->
+                    shooterSub.setDesiredStateWithVoltage(
+                        ShooterSubsystem.DesiredState.FORWARD_ROLLERS, 6.0)))
+        .onFalse(
+            Commands.runOnce(
+                () -> shooterSub.setDesiredState(ShooterSubsystem.DesiredState.STOPPED)));
+    controller
+        .leftTrigger()
+        .whileTrue(
+            Commands.run(
+                () ->
+                    shooterSub.setDesiredStateWithVoltage(
+                        ShooterSubsystem.DesiredState.REVERSE_ROLLERS, 6.0)))
+        .onFalse(
+            Commands.runOnce(
+                () -> shooterSub.setDesiredState(ShooterSubsystem.DesiredState.STOPPED)));
+
+    controller
+        .a()
+        .whileTrue(
+            Commands.run(
+                () ->
+                    shooterSub.setDesiredStateWithVelocity(
+                        ShooterSubsystem.DesiredState.TEST, 52.0)))
+        .onFalse(
+            Commands.runOnce(
+                () -> shooterSub.setDesiredState(ShooterSubsystem.DesiredState.STOPPED)));
+    /*  -- SHOOTER
     controller
         .rightTrigger()
         .whileTrue(
@@ -198,6 +229,7 @@ public class RobotContainer {
         .whileFalse(
             Commands.run(() -> shooterSub.setDesiredState(ShooterSubsystem.DesiredState.STOPPED)));
 
+            /*
     // -- INTAKE ROLLERS
 
     controller
@@ -236,50 +268,29 @@ public class RobotContainer {
         .onTrue(Commands.run(() -> intakeSub.setDesiredState(IntakeSubsystem.DesiredState.IN)));
     controller
         .y()
-        .onTrue(Commands.run(() -> intakeSub.setDesiredState(IntakeSubsystem.DesiredState.OUT)));
+        .onTrue(Commands.run(() -> intakeSub.setDesiredState(IntakeSubsystem.DesiredState.OUT)));*/
   }
 
   /**
    * Este metodo configura los botones para el simulador
    *
    * @param controller es un mando de xbox
-   */
-  public void configureButtonBindingsSim(CommandXboxController controller) {
-    controller.a().onTrue(Commands.runOnce(() -> generateFuel()));
-    controller.b().onTrue(Commands.runOnce(() -> intakePivotSub.setRunning(true)));
-    controller.x().onTrue(Commands.runOnce(() -> intakePivotSub.setRunning(false)));
-    controller
-        .start()
-        .onTrue(Commands.runOnce(() -> SimulatedArena.getInstance().resetFieldForAuto()));
-
-    controller
-        .rightTrigger()
-        .whileTrue(
-            Commands.sequence(
-                Commands.either(
-                        Commands.run(
-                            () -> driveSub.setDesiredPointToLock(new Translation2d(4.626, 4.033))),
-                        Commands.run(
-                            () ->
-                                driveSub.setDesiredRotationToLock(
-                                    new Rotation2d(robotState.isRedAlliance() ? 0 : Math.PI))),
-                        () -> !robotState.passedTrench())
-                    .withTimeout(0.7),
-                Commands.repeatingSequence(
-                    Commands.either(
-                        Commands.runOnce(() -> generateFuel()),
-                        Commands.runOnce(() -> generateFuelTaxi()),
-                        () -> !robotState.passedTrench()),
-                    Commands.waitSeconds(0.2))))
-        .onFalse(
-            Commands.runOnce(
-                () -> driveSub.setState(DriveSubsystem.DesiredState.MANUAL_FIELD_DRIVE)));
-  }
-
-  /**
-   * Este metodo genera los fuels dependiento de la posición del chasis, la velocidad incicial del
-   * fuel, la dirección en la cual se va a estar lanzando la velocidad y el ángulo al que será
-   * lanzado
+   *     <p>public void configureButtonBindingsSim(CommandXboxController controller) {
+   *     controller.a().onTrue(Commands.runOnce(() -> generateFuel()));
+   *     controller.b().onTrue(Commands.runOnce(() -> intakePivotSub.setRunning(true)));
+   *     controller.x().onTrue(Commands.runOnce(() -> intakePivotSub.setRunning(false))); controller
+   *     .start() .onTrue(Commands.runOnce(() -> SimulatedArena.getInstance().resetFieldForAuto()));
+   *     <p>controller .rightTrigger() .whileTrue( Commands.sequence( Commands.either( Commands.run(
+   *     () -> driveSub.setDesiredPointToLock(new Translation2d(4.626, 4.033))), Commands.run( () ->
+   *     driveSub.setDesiredRotationToLock( new Rotation2d(robotState.isRedAlliance() ? 0 :
+   *     Math.PI))), () -> !robotState.passedTrench()) .withTimeout(0.7),
+   *     Commands.repeatingSequence( Commands.either( Commands.runOnce(() -> generateFuel()),
+   *     Commands.runOnce(() -> generateFuelTaxi()), () -> !robotState.passedTrench()),
+   *     Commands.waitSeconds(0.2)))) .onFalse( Commands.runOnce( () ->
+   *     driveSub.setState(DriveSubsystem.DesiredState.MANUAL_FIELD_DRIVE))); }
+   *     <p>/** Este metodo genera los fuels dependiento de la posición del chasis, la velocidad
+   *     incicial del fuel, la dirección en la cual se va a estar lanzando la velocidad y el ángulo
+   *     al que será lanzado
    */
   private void generateFuel() {
     RebuiltFuelOnFly fuelOnFly =

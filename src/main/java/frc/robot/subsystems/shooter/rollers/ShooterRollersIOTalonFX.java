@@ -3,10 +3,13 @@ package frc.robot.subsystems.shooter.rollers;
 import static edu.wpi.first.units.Units.Volts;
 
 import com.ctre.phoenix6.BaseStatusSignal;
+import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Temperature;
@@ -15,6 +18,7 @@ import edu.wpi.first.units.measure.Voltage;
 public class ShooterRollersIOTalonFX implements ShooterRollersIO {
   protected TalonFX motor;
   private final VoltageOut voltageOut = new VoltageOut(Volts.zero());
+  private final VelocityVoltage velocityRequest = new VelocityVoltage(0);
 
   private final TalonFXConfiguration config = new TalonFXConfiguration();
 
@@ -25,11 +29,14 @@ public class ShooterRollersIOTalonFX implements ShooterRollersIO {
 
   public ShooterRollersIOTalonFX() {
     // Cambiar el ID del motor
-    motor = new TalonFX(17);
+    motor = new TalonFX(31, new CANBus("canivore"));
+    config.Slot0.kP = 0.12;
+    config.Slot0.kI = 0.0;
+    config.Slot0.kD = 0.0;
+    config.Slot0.kV = 0.12;
 
-    config.Slot0.kP = 5;
-    config.Slot0.kI = 0;
-    config.Slot0.kD = 0;
+    config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
+    motor.getConfigurator().apply(config);
 
     appliedVolts = motor.getMotorVoltage();
     tempCelsius = motor.getDeviceTemp();
@@ -49,6 +56,11 @@ public class ShooterRollersIOTalonFX implements ShooterRollersIO {
   @Override
   public void setVoltage(double voltage) {
     motor.setControl(voltageOut.withOutput(voltage));
+  }
+
+  @Override
+  public void setVelocity(double rps) {
+    motor.setControl(velocityRequest.withVelocity(rps));
   }
 
   @Override

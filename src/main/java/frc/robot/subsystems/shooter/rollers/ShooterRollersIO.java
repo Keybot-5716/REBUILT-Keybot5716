@@ -17,5 +17,7 @@ public interface ShooterRollersIO {
 
   void setVoltage(double voltage);
 
+  void setVelocity(double voltage);
+
   void stopRollers();
 }

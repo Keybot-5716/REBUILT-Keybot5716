@@ -45,8 +45,8 @@ public class RolllerIOTalonFx implements RollerIO {
     config2.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     // config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
     config2.CurrentLimits.SupplyCurrentLimitEnable = true;
-    config2.CurrentLimits.SupplyCurrentLimit = 60;
-    config2.CurrentLimits.SupplyCurrentLowerLimit = 30;
+    config2.CurrentLimits.SupplyCurrentLimit = 40;
+    config2.CurrentLimits.SupplyCurrentLowerLimit = 20;
     config2.CurrentLimits.SupplyCurrentLowerTime = 1.0;
     motor2.getConfigurator().apply(config2);
 

@@ -30,6 +30,11 @@ public interface DriveIO {
     }
   }
 
+  /**
+   * Update the SwerveStates data
+   *
+   * @param inputs
+   */
   void updateInputs(DriveIOInputs inputs);
 
   void getModuleStates(SwerveDriveState state);

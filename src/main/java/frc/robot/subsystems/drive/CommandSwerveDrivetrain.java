@@ -20,10 +20,16 @@ public class CommandSwerveDrivetrain {
     }
   }
 
+  /**
+   * @return The constraints for the Swerve Drivetrain
+   */
   public SwerveDrivetrainConstants getDrivetrainConstants() {
     return drivetrainConstants;
   }
 
+  /**
+   * @return The constants for each module
+   */
   public SwerveModuleConstants<?, ?, ?>[] getModuleConstants() {
     return moduleConstants;
   }

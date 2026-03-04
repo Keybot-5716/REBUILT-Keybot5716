@@ -27,6 +27,7 @@ import frc.lib.team6328.LocalADStarAK;
 import frc.robot.auto.Auto1Test;
 import frc.robot.auto.Auto2Test;
 import frc.robot.auto.Auto3Test;
+import frc.robot.auto.Auto4Test;
 import frc.robot.auto.AutoBuilder;
 import frc.robot.auto.AutoForwardTest;
 import frc.robot.auto.NoneAuto;
@@ -495,6 +496,7 @@ public class RobotContainer {
     autoChooser.addOption("Testing Auto 2", new Auto2Test());
     autoChooser.addOption("Auto Forward", new AutoForwardTest());
     autoChooser.addOption("Testing Auto 3", new Auto3Test());
+    autoChooser.addOption("Testing Auto 4", new Auto4Test());
 
     autoChooser.onChange(
         auto -> {

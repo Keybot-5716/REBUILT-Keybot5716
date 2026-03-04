@@ -5,7 +5,7 @@ import frc.lib.team6328.LoggedTunableNumber;
 import org.littletonrobotics.junction.Logger;
 
 public class TransferSubsystem extends SubsystemBase {
-  TransferIO transferIO;
+  private final TransferIO transferIO;
 
   private final TransferIOInputsAutoLogged transferInputs = new TransferIOInputsAutoLogged();
 

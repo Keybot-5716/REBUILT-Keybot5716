@@ -40,6 +40,8 @@ import frc.robot.subsystems.drive.TunerConstants;
 import frc.robot.subsystems.shooter.*;
 import frc.robot.subsystems.shooter.hood.*;
 import frc.robot.subsystems.shooter.rollers.*;
+import frc.robot.subsystems.transfer.TransferIOSparkMax;
+import frc.robot.subsystems.transfer.TransferSubsystem;
 import frc.robot.subsystems.vision.VisionPoseEstimateInField;
 import java.util.function.Consumer;
 import org.ironmaple.simulation.SimulatedArena;
@@ -94,6 +96,11 @@ public class RobotContainer {
     return new ShooterSubsystem(new ShooterRollersIOTalonFX());
   }
 
+  // -- Transfer
+  private TransferSubsystem buildTransfer() {
+    return new TransferSubsystem(new TransferIOSparkMax());
+  }
+
   // private RollerSubsystem buildTransfer() {return new RollerSubsystem(new RollerSparkMax(21));}
 
   /*
@@ -139,6 +146,7 @@ public class RobotContainer {
   // private final RollerSubsystem rollerSub = buildRollerSubsystem();
   // private final RollerSubsystem intakeRollerSub = buildIntakeRoller();
   private final ShooterSubsystem shooterSub = buildShooter();
+  private final TransferSubsystem transferSub = buildTransfer();
   // private final IntakeSubsystem intakeSub = buildIntake();
   // private final RollerSubsystem transferRoller = buildTransfer();
   // private final IntakeSubsystem intakePivotSub = buildIntakePivotSubsystem();
@@ -181,6 +189,7 @@ public class RobotContainer {
         .onFalse(
             Commands.runOnce(
                 () -> driveSub.setState(DriveSubsystem.DesiredState.MANUAL_FIELD_DRIVE)));
+
     controller
         .rightTrigger()
         .whileTrue(
@@ -212,6 +221,26 @@ public class RobotContainer {
         .onFalse(
             Commands.runOnce(
                 () -> shooterSub.setDesiredState(ShooterSubsystem.DesiredState.STOPPED)));
+    
+    controller
+        .b()
+        .whileTrue(
+            Commands.run(
+                () ->
+                    transferSub.setDesiredStateWithVoltage(TransferSubsystem.DesiredState.FORWARD, 6.0)))
+        .onFalse(
+            Commands.runOnce(
+                () -> transferSub.setDesiredState(TransferSubsystem.DesiredState.STOPPED)));
+    
+     controller
+        .x()
+        .whileTrue(
+            Commands.run(
+                () ->
+                    transferSub.setDesiredStateWithVoltage(TransferSubsystem.DesiredState.REVERSE, 6.0)))
+        .onFalse(
+            Commands.runOnce(
+                () -> transferSub.setDesiredState(TransferSubsystem.DesiredState.STOPPED)));
     /*  -- SHOOTER
     controller
         .rightTrigger()

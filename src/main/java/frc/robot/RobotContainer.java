@@ -221,23 +221,25 @@ public class RobotContainer {
         .onFalse(
             Commands.runOnce(
                 () -> shooterSub.setDesiredState(ShooterSubsystem.DesiredState.STOPPED)));
-    
+
     controller
         .b()
         .whileTrue(
             Commands.run(
                 () ->
-                    transferSub.setDesiredStateWithVoltage(TransferSubsystem.DesiredState.FORWARD, 6.0)))
+                    transferSub.setDesiredStateWithVoltage(
+                        TransferSubsystem.DesiredState.FORWARD, 6.0)))
         .onFalse(
             Commands.runOnce(
                 () -> transferSub.setDesiredState(TransferSubsystem.DesiredState.STOPPED)));
-    
-     controller
+
+    controller
         .x()
         .whileTrue(
             Commands.run(
                 () ->
-                    transferSub.setDesiredStateWithVoltage(TransferSubsystem.DesiredState.REVERSE, 6.0)))
+                    transferSub.setDesiredStateWithVoltage(
+                        TransferSubsystem.DesiredState.REVERSE, 6.0)))
         .onFalse(
             Commands.runOnce(
                 () -> transferSub.setDesiredState(TransferSubsystem.DesiredState.STOPPED)));

@@ -3,8 +3,6 @@ package frc.robot.subsystems.vision;
 import edu.wpi.first.networktables.*;
 import frc.lib.limelight.LimelightHelpers;
 import frc.robot.RobotState;
-
-import java.security.cert.X509CRL;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class VisionIOLimelight implements VisionIO {
@@ -105,7 +103,8 @@ public class VisionIOLimelight implements VisionIO {
         camera.objFuels.pose3d = null;
       }
 
-      camera.aprilTags.standardDeviations = table.getEntry("stddevs").getDoubleArray(DEFAULT_STDDEVS);
+      camera.aprilTags.standardDeviations =
+          table.getEntry("stddevs").getDoubleArray(DEFAULT_STDDEVS);
 
     } catch (Exception e) {
       System.err.println("Error processing Limelight data: " + e.getMessage());
@@ -117,6 +116,5 @@ public class VisionIOLimelight implements VisionIO {
       camera.aprilTags.megatagcount = 0;
       camera.aprilTags.standardDeviations = DEFAULT_STDDEVS;
     }
-  
   }
 }

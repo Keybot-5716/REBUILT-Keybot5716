@@ -4,16 +4,21 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.team6328.LoggedTunableNumber;
+import frc.robot.subsystems.shooter.hood.HoodIOInputsAutoLogged;
+import frc.robot.subsystems.shooter.hood.ShooterHoodIO;
 import frc.robot.subsystems.shooter.rollers.ShooterRollersIO;
 import frc.robot.subsystems.shooter.rollers.ShooterRollersIOInputsAutoLogged;
 import org.littletonrobotics.junction.Logger;
 
 public class ShooterSubsystem extends SubsystemBase {
   private final ShooterRollersIO rollersIO;
+  private final ShooterHoodIO hoodIO;
 
   // private final ShooterRollerIOInputsAutoLogged inputs = new ShooterRollerIOInputsAutoLogged();
   private final ShooterRollersIOInputsAutoLogged rollersInputs =
       new ShooterRollersIOInputsAutoLogged();
+
+  private final HoodIOInputsAutoLogged hoodInputs = new HoodIOInputsAutoLogged();
 
   private static final LoggedTunableNumber rollerVolts =
       new LoggedTunableNumber("Shooter/Rollers/RollerVolts", 1.0);
@@ -33,13 +38,18 @@ public class ShooterSubsystem extends SubsystemBase {
   private double desiredVoltage = 0;
   private double desiredVelocity = 0;
 
+  private static final LoggedTunableNumber desiredVelocityTunable =
+      new LoggedTunableNumber("Shooter/Rollers/RollerVelocity", 50.0);
+
   public enum DesiredState {
     STOPPED,
     FORWARD_ROLLERS,
     REVERSE_ROLLERS,
     IN,
     OUT,
-    TEST
+    TEST,
+    SCORE,
+    TAXI
   }
 
   private enum ShooterState {
@@ -48,11 +58,14 @@ public class ShooterSubsystem extends SubsystemBase {
     REVERSING_ROLLERS,
     INING,
     OUTING,
-    TESTING
+    TESTING,
+    SCORING,
+    TAXIING
   }
 
-  public ShooterSubsystem(ShooterRollersIO rollersIO) {
+  public ShooterSubsystem(ShooterRollersIO rollersIO, ShooterHoodIO hoodIO) {
     this.rollersIO = rollersIO;
+    this.hoodIO = hoodIO;
   }
 
   @Override
@@ -63,7 +76,7 @@ public class ShooterSubsystem extends SubsystemBase {
     }
       */
 
-    Logger.processInputs("ShooterInputs/RollerInputs", rollersInputs);
+    Logger.processInputs("RollerInputs", rollersInputs);
     rollersIO.updateInputs(rollersInputs);
 
     shooterState = setStateTransition();
@@ -78,11 +91,17 @@ public class ShooterSubsystem extends SubsystemBase {
       case IN -> ShooterState.INING;
       case OUT -> ShooterState.OUTING;
       case TEST -> ShooterState.TESTING;
+      case SCORE -> ShooterState.SCORING;
+      case TAXI -> ShooterState.TAXIING;
     };
   }
 
   public void stop() {
     rollersIO.stopRollers();
+  }
+
+  public void stopHood() {
+    hoodIO.stop();
   }
 
   public void setVoltageRollers(double voltage) {
@@ -105,6 +124,7 @@ public class ShooterSubsystem extends SubsystemBase {
 
       case STOPPING:
         setVoltageRollers(0);
+        // setPosition(0.0);
         break;
 
       case INING:
@@ -116,13 +136,23 @@ public class ShooterSubsystem extends SubsystemBase {
         break;
 
       case TESTING:
-        setVelocityRollers(desiredVelocity);
+        setVelocityRollers(desiredVelocityTunable.get());
+        // setPosition(ShooterConstants.hoodScore);
+        break;
+
+      case SCORING:
+        setPosition(ShooterConstants.hoodScore);
+        break;
+
+      case TAXIING:
+        setPosition(ShooterConstants.hoodTaxi);
         break;
     }
   }
 
   public void setPosition(double position) {
     goal.position = position;
+    hoodIO.setPosition(position);
     // io.setVoltage(controller.calculate(inputs.positionIntake, goal.position));
   }
 

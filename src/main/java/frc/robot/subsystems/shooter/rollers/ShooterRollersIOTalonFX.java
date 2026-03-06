@@ -30,10 +30,11 @@ public class ShooterRollersIOTalonFX implements ShooterRollersIO {
   public ShooterRollersIOTalonFX() {
     // Cambiar el ID del motor
     motor = new TalonFX(31, new CANBus("canivore"));
-    config.Slot0.kP = 0.12;
+    config.Slot0.kP = 0.2; // 0.12
     config.Slot0.kI = 0.0;
     config.Slot0.kD = 0.0;
-    config.Slot0.kV = 0.12;
+    config.Slot0.kV = 0.12; // 0.12
+    config.Slot0.kS = 0.25;
 
     config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
     motor.getConfigurator().apply(config);

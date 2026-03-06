@@ -38,6 +38,8 @@ import frc.robot.subsystems.drive.DriveIOSim;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.drive.DriveSubsystem.DesiredState;
 import frc.robot.subsystems.drive.TunerConstants;
+import frc.robot.subsystems.intake.IntakeSubsystem;
+import frc.robot.subsystems.intake.rollers.IntakeRollersIOSparkMax;
 import frc.robot.subsystems.shooter.*;
 import frc.robot.subsystems.shooter.hood.*;
 import frc.robot.subsystems.shooter.rollers.*;
@@ -81,28 +83,20 @@ public class RobotContainer {
   // private RollerSubsystem buildRollerSubsystem() {return new RollerSubsystem(new
   // RolllerIOTalonFx());}
 
-  /*  -- Intake
+  //  -- Intake
   private IntakeSubsystem buildIntake() {
-    if (RobotBase.isSimulation()) {
-      return new IntakeSubsystem(
-          new IntakePivotIOSim(driveSub.getMapleSimDrive().mapleSimDrive),
-          new IntakeRollersIOSparkMax());
-    } else {
-      return new IntakeSubsystem(new IntakePivotIOTalonFX(), new IntakeRollersIOSparkMax());
-    }
-  }*/
+    return new IntakeSubsystem(new IntakeRollersIOSparkMax());
+  }
 
   // -- Shooter
   private ShooterSubsystem buildShooter() {
-    return new ShooterSubsystem(new ShooterRollersIOTalonFX());
+    return new ShooterSubsystem(new ShooterRollersIOTalonFX(), new ShooterHoodIOTalonFX());
   }
 
   // -- Transfer
   private TransferSubsystem buildTransfer() {
     return new TransferSubsystem(new TransferIOSparkMax());
   }
-
-  // private RollerSubsystem buildTransfer() {return new RollerSubsystem(new RollerSparkMax(21));}
 
   /*
   private VisionSubsystem buildVisionSubsystem() {
@@ -148,7 +142,7 @@ public class RobotContainer {
   // private final RollerSubsystem intakeRollerSub = buildIntakeRoller();
   private final ShooterSubsystem shooterSub = buildShooter();
   private final TransferSubsystem transferSub = buildTransfer();
-  // private final IntakeSubsystem intakeSub = buildIntake();
+  private final IntakeSubsystem intakeSub = buildIntake();
   // private final RollerSubsystem transferRoller = buildTransfer();
   // private final IntakeSubsystem intakePivotSub = buildIntakePivotSubsystem();
   // private final VisionSubsystem visionSub = buildVisionSubsystem();
@@ -194,20 +188,14 @@ public class RobotContainer {
     controller
         .rightTrigger()
         .whileTrue(
-            Commands.run(
-                () ->
-                    shooterSub.setDesiredStateWithVoltage(
-                        ShooterSubsystem.DesiredState.FORWARD_ROLLERS, 6.0)))
+            Commands.run(() -> shooterSub.setDesiredState(ShooterSubsystem.DesiredState.TEST)))
         .onFalse(
             Commands.runOnce(
                 () -> shooterSub.setDesiredState(ShooterSubsystem.DesiredState.STOPPED)));
     controller
         .leftTrigger()
         .whileTrue(
-            Commands.run(
-                () ->
-                    shooterSub.setDesiredStateWithVoltage(
-                        ShooterSubsystem.DesiredState.REVERSE_ROLLERS, 6.0)))
+            Commands.run(() -> shooterSub.setDesiredState(ShooterSubsystem.DesiredState.TEST)))
         .onFalse(
             Commands.runOnce(
                 () -> shooterSub.setDesiredState(ShooterSubsystem.DesiredState.STOPPED)));
@@ -226,10 +214,7 @@ public class RobotContainer {
     controller
         .b()
         .whileTrue(
-            Commands.run(
-                () ->
-                    transferSub.setDesiredStateWithVoltage(
-                        TransferSubsystem.DesiredState.FORWARD, 6.0)))
+            Commands.run(() -> transferSub.setDesiredState(TransferSubsystem.DesiredState.FORWARD)))
         .onFalse(
             Commands.runOnce(
                 () -> transferSub.setDesiredState(TransferSubsystem.DesiredState.STOPPED)));
@@ -238,12 +223,19 @@ public class RobotContainer {
         .x()
         .whileTrue(
             Commands.run(
-                () ->
-                    transferSub.setDesiredStateWithVoltage(
-                        TransferSubsystem.DesiredState.REVERSE, 6.0)))
+                () -> intakeSub.setDesiredState(IntakeSubsystem.DesiredState.FORWARD_ROLLERS)))
         .onFalse(
             Commands.runOnce(
-                () -> transferSub.setDesiredState(TransferSubsystem.DesiredState.STOPPED)));
+                () -> intakeSub.setDesiredState(IntakeSubsystem.DesiredState.STOPPED)));
+
+    controller
+        .y()
+        .whileTrue(
+            Commands.run(
+                () -> intakeSub.setDesiredState(IntakeSubsystem.DesiredState.REVERSE_ROLLERS)))
+        .onFalse(
+            Commands.runOnce(
+                () -> intakeSub.setDesiredState(IntakeSubsystem.DesiredState.STOPPED)));
     /*  -- SHOOTER
     controller
         .rightTrigger()

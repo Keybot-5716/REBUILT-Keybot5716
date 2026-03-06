@@ -4,22 +4,18 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.team6328.LoggedTunableNumber;
-import frc.robot.Constants;
-import frc.robot.subsystems.intake.pivot.IntakePivotIO;
-import frc.robot.subsystems.intake.pivot.IntakePivotIOInputsAutoLogged;
 import frc.robot.subsystems.intake.rollers.IntakeRollersIO;
 import frc.robot.subsystems.intake.rollers.IntakeRollersIOInputsAutoLogged;
 import org.littletonrobotics.junction.Logger;
 
 public class IntakeSubsystem extends SubsystemBase {
-  private final IntakePivotIO pivotIO;
+  // private final IntakePivotIO pivotIO;
   private final IntakeRollersIO rollersIO;
 
   // private final IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
-  private final IntakePivotIOInputsAutoLogged pivotInputs = new IntakePivotIOInputsAutoLogged();
+  // private final IntakePivotIOInputsAutoLogged pivotInputs = new IntakePivotIOInputsAutoLogged();
   private final IntakeRollersIOInputsAutoLogged rollersInputs =
       new IntakeRollersIOInputsAutoLogged();
 
@@ -29,14 +25,15 @@ public class IntakeSubsystem extends SubsystemBase {
   private static TrapezoidProfile.State goal = new TrapezoidProfile.State(0, 0);
 
   private static final LoggedTunableNumber rollerVolts =
-      new LoggedTunableNumber("Intake/Rollers/RollerVolts", 7.0);
+      new LoggedTunableNumber("Intake/Rollers/RollerVoltsIntake", 5.0);
 
-  private static final LoggedTunableNumber pivotVolts =
-      new LoggedTunableNumber("Intake/Pivot/PivotVolts", 1);
+  // private static final LoggedTunableNumber pivotVolts = new
+  // LoggedTunableNumber("Intake/Pivot/PivotVolts", 1);
 
-  private static final LoggedTunableNumber pivotP = new LoggedTunableNumber("Intake/Pivot/kP");
-  private static final LoggedTunableNumber pivotD = new LoggedTunableNumber("Intake/Pivot/kD");
+  // private static final LoggedTunableNumber pivotP = new LoggedTunableNumber("Intake/Pivot/kP");
+  // private static final LoggedTunableNumber pivotD = new LoggedTunableNumber("Intake/Pivot/kD");
 
+  /*
   static {
     switch (Constants.currentMode) {
       case REAL -> {
@@ -48,11 +45,11 @@ public class IntakeSubsystem extends SubsystemBase {
         pivotD.initDefault(0.01);
       }
     }
-  }
+  }*/
 
   private final Debouncer pivotDebouncer = new Debouncer(0.5, DebounceType.kFalling);
-  private final Alert pivotDisconnected =
-      new Alert("Pivot disconnected :(", Alert.AlertType.kWarning);
+  // private final Alert pivotDisconnected = new Alert("Pivot disconnected :(",
+  // Alert.AlertType.kWarning);
 
   private DesiredState desiredState = DesiredState.STOPPED;
   private IntakeState intakeState = IntakeState.STOPPING;
@@ -80,8 +77,8 @@ public class IntakeSubsystem extends SubsystemBase {
     OUTING
   }
 
-  public IntakeSubsystem(IntakePivotIO pivotIO, IntakeRollersIO rollersIO) {
-    this.pivotIO = pivotIO;
+  public IntakeSubsystem(IntakeRollersIO rollersIO) {
+    // this.pivotIO = pivotIO;
     this.rollersIO = rollersIO;
   }
 
@@ -92,13 +89,13 @@ public class IntakeSubsystem extends SubsystemBase {
       controller.reset(inputs.positionIntake);
     }
       */
-    Logger.processInputs("IntakeInputs/IntakePivotInputs", pivotInputs);
+    // Logger.processInputs("IntakeInputs/IntakePivotInputs", pivotInputs);
     Logger.processInputs("IntakeInputs/IntakeRollersInputs", rollersInputs);
 
-    pivotIO.updateInputs(pivotInputs);
+    // pivotIO.updateInputs(pivotInputs);
     rollersIO.updateInputs(rollersInputs);
 
-    pivotDisconnected.set(!pivotDebouncer.calculate(pivotInputs.motorConnected));
+    // pivotDisconnected.set(!pivotDebouncer.calculate(pivotInputs.motorConnected));
 
     intakeState = setStateTransition();
     applyStates();
@@ -139,22 +136,22 @@ public class IntakeSubsystem extends SubsystemBase {
         break;
 
       case FORWARDING_PIVOT:
-        runPivotOL(pivotVolts.get());
+        // runPivotOL(pivotVolts.get());
         break;
 
       case REVERSING_PIVOT:
-        runPivotOL(-pivotVolts.get());
+        // runPivotOL(-pivotVolts.get());
         break;
     }
   }
 
   public void setPosition(double position) {
-    goal.position = position;
-    pivotIO.setVoltage(controller.calculate(pivotInputs.positionIntake, goal.position));
+    // goal.position = position;
+    // pivotIO.setVoltage(controller.calculate(pivotInputs.positionIntake, goal.position));
   }
 
   public void stop() {
-    pivotIO.stopMotor();
+    // pivotIO.stopMotor();
     rollersIO.stopRollers();
   }
 
@@ -163,7 +160,7 @@ public class IntakeSubsystem extends SubsystemBase {
   }
 
   public void runPivotOL(double voltage) {
-    pivotIO.setVoltage(voltage);
+    // pivotIO.setVoltage(voltage);
   }
 
   public void setDesiredState(DesiredState desiredState) {

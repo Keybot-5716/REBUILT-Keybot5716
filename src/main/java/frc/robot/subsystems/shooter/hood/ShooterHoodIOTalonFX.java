@@ -1,12 +1,13 @@
 package frc.robot.subsystems.shooter.hood;
 
 import com.ctre.phoenix6.BaseStatusSignal;
+import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.MotionMagicExpoVoltage;
+import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
@@ -16,41 +17,29 @@ public class ShooterHoodIOTalonFX implements ShooterHoodIO {
   private TalonFXConfiguration config = new TalonFXConfiguration();
 
   private final VoltageOut voltageOutRequest = new VoltageOut(0);
+  private final PositionVoltage positionRequest = new PositionVoltage(0);
   private final MotionMagicExpoVoltage motionMagicEVRequest = new MotionMagicExpoVoltage(0);
 
   public ShooterHoodIOTalonFX() {
 
-    motor = new TalonFX(0);
+    motor = new TalonFX(30, new CANBus("canivore"));
 
     config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-    config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+    config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
-    config.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
+    config.SoftwareLimitSwitch.ForwardSoftLimitEnable = false;
     config.SoftwareLimitSwitch.ForwardSoftLimitThreshold = 90;
 
-    config.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
+    config.SoftwareLimitSwitch.ReverseSoftLimitEnable = false;
     config.SoftwareLimitSwitch.ReverseSoftLimitThreshold = 0;
-
-    config.Feedback.SensorToMechanismRatio = 0;
 
     config.CurrentLimits.SupplyCurrentLimitEnable = true;
     config.CurrentLimits.SupplyCurrentLowerLimit = 30;
     config.CurrentLimits.SupplyCurrentLowerTime = 1;
     config.CurrentLimits.SupplyCurrentLimit = 40;
-
-    config.MotionMagic.MotionMagicCruiseVelocity = 0; // Valor original: 80
-    config.MotionMagic.MotionMagicAcceleration = 0; // Valor original: 160
-    config.MotionMagic.MotionMagicExpo_kA = 0.005;
-    config.MotionMagic.MotionMagicExpo_kV = 0.01;
-
-    config.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
-    config.Slot0.kP = 1.5;
+    config.Slot0.kP = 7.0;
     config.Slot0.kI = 0.0;
     config.Slot0.kD = 0.0;
-
-    config.Slot0.kG = 0.2;
-    config.Slot0.kS = 0.3;
-    config.Slot0.kV = 0.001;
 
     motor.getConfigurator().apply(config);
   }
@@ -89,7 +78,7 @@ public class ShooterHoodIOTalonFX implements ShooterHoodIO {
 
   @Override
   public void setPosition(double position) {
-    motor.setControl(motionMagicEVRequest.withPosition(position));
+    motor.setControl(positionRequest.withPosition(position));
   }
 
   @Override

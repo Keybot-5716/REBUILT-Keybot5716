@@ -1,4 +1,4 @@
-package frc.robot.subsystems.vision;
+package frc.robot.subsystems.vision.AprilTags;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Matrix;
@@ -14,6 +14,9 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotState;
+import frc.robot.subsystems.vision.VisionConstants;
+import frc.robot.subsystems.vision.VisionPoseEstimateInField;
+
 import java.util.Optional;
 import org.littletonrobotics.junction.Logger;
 
@@ -109,21 +112,21 @@ public class VisionSubsystem extends SubsystemBase {
 
   private void logCameraInputs(String prefix, VisionIO.VisionIOInputs.CameraInputs cam) {
     Logger.recordOutput(prefix + "/SeesTarget", cam.seesTarget);
-    Logger.recordOutput(prefix + "/MegatagCount", cam.megatagcount);
+    Logger.recordOutput(prefix + "/MegatagCount", cam.aprilTags.megatagcount);
 
     if (DriverStation.isDisabled()) {
       SmartDashboard.putBoolean(prefix + "/SeesTarget", cam.seesTarget);
-      SmartDashboard.putNumber(prefix + "/MegatagCount", cam.megatagcount);
+      SmartDashboard.putNumber(prefix + "/MegatagCount", cam.aprilTags.megatagcount);
     }
 
-    if (cam.pose3d != null) {
-      Logger.recordOutput(prefix + "/Pose3d", cam.pose3d);
+    if (cam.aprilTags.pose3d != null) {
+      Logger.recordOutput(prefix + "/Pose3d", cam.aprilTags.pose3d);
     }
 
-    if (cam.megatagPoseEstimate != null) {
-      Logger.recordOutput(prefix + "/MegatagPoseEstimate", cam.megatagPoseEstimate.fieldToRobot());
-      Logger.recordOutput(prefix + "/Quality", cam.megatagPoseEstimate.quality());
-      Logger.recordOutput(prefix + "/AvgTagArea", cam.megatagPoseEstimate.avgTagArea());
+    if (cam.aprilTags.megatagPoseEstimate != null) {
+      Logger.recordOutput(prefix + "/MegatagPoseEstimate", cam.aprilTags.megatagPoseEstimate.fieldToRobot());
+      Logger.recordOutput(prefix + "/Quality", cam.aprilTags.megatagPoseEstimate.quality());
+      Logger.recordOutput(prefix + "/AvgTagArea", cam.aprilTags.megatagPoseEstimate.avgTagArea());
     }
 
     if (cam.fiducialAprilTagObservation != null) {
@@ -142,15 +145,15 @@ public class VisionSubsystem extends SubsystemBase {
 
     Optional<VisionPoseEstimateInField> estimate = Optional.empty();
 
-    if (cam.megatagPoseEstimate != null) {
+    if (cam.aprilTags.megatagPoseEstimate != null) {
       Optional<VisionPoseEstimateInField> mtEstimate =
-          processMegatagPoseEstimate(cam.megatagPoseEstimate, cam, logPrefix);
+          processMegatagPoseEstimate(cam.aprilTags.megatagPoseEstimate, cam, logPrefix);
 
       mtEstimate.ifPresent(
           est -> Logger.recordOutput(logPrefix + "/AcceptedMegatagEstimate", est.getRobotPose()));
 
       Optional<VisionPoseEstimateInField> gyroEstimate =
-          fuseWithGyro(cam.megatagPoseEstimate, cam, logPrefix);
+          fuseWithGyro(cam.aprilTags.megatagPoseEstimate, cam, logPrefix);
 
       gyroEstimate.ifPresent(
           est -> Logger.recordOutput(logPrefix + "/FuseWithGyroEstimate", est.getRobotPose()));
@@ -222,8 +225,8 @@ public class VisionSubsystem extends SubsystemBase {
                 .minus(robotToTag.getTranslation().rotateBy(priorPose.get().getRotation())),
             priorPose.get().getRotation());
 
-    double xStd = cam.standardDeviations[VisionConstants.kMegatag1XStdDevIndex];
-    double yStd = cam.standardDeviations[VisionConstants.kMegatag1YStdDevIndex];
+    double xStd = cam.aprilTags.standardDeviations[VisionConstants.kMegatag1XStdDevIndex];
+    double yStd = cam.aprilTags.standardDeviations[VisionConstants.kMegatag1YStdDevIndex];
     double xyStd = Math.max(xStd, yStd);
 
     return Optional.of(
@@ -278,7 +281,7 @@ public class VisionSubsystem extends SubsystemBase {
       return Optional.empty();
     }
 
-    if (cam.pose3d == null || Math.abs(cam.pose3d.getZ()) > VisionConstants.kDefaultZThreshold) {
+    if (cam.aprilTags.pose3d == null || Math.abs(cam.aprilTags.pose3d.getZ()) > VisionConstants.kDefaultZThreshold) {
       return Optional.empty();
     }
 
@@ -302,9 +305,9 @@ public class VisionSubsystem extends SubsystemBase {
 
     double quality = Math.max(poseEstimate.quality(), 0.001);
     double scaleFactor = 1.0 / quality;
-    double xStd = cam.standardDeviations[VisionConstants.kMegatag1XStdDevIndex] * scaleFactor;
-    double yStd = cam.standardDeviations[VisionConstants.kMegatag1YStdDevIndex] * scaleFactor;
-    double rotStd = cam.standardDeviations[VisionConstants.kMegatag1YawStdDevIndex] * scaleFactor;
+    double xStd = cam.aprilTags.standardDeviations[VisionConstants.kMegatag1XStdDevIndex] * scaleFactor;
+    double yStd = cam.aprilTags.standardDeviations[VisionConstants.kMegatag1YStdDevIndex] * scaleFactor;
+    double rotStd = cam.aprilTags.standardDeviations[VisionConstants.kMegatag1YawStdDevIndex] * scaleFactor;
 
     double xyStd = Math.max(xStd, yStd);
     Matrix<N3, N1> visionStdDevs = VecBuilder.fill(xyStd, xyStd, rotStd);

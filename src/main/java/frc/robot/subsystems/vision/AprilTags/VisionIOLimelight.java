@@ -1,8 +1,10 @@
-package frc.robot.subsystems.vision;
+package frc.robot.subsystems.vision.AprilTags;
 
 import edu.wpi.first.networktables.*;
 import frc.lib.limelight.LimelightHelpers;
 import frc.robot.RobotState;
+import frc.robot.subsystems.vision.VisionConstants;
+
 import java.util.concurrent.atomic.AtomicReference;
 
 public class VisionIOLimelight implements VisionIO {
@@ -67,9 +69,6 @@ public class VisionIOLimelight implements VisionIO {
       camera.aprilTags.pose3d = null;
       camera.aprilTags.megatagcount = 0;
       camera.aprilTags.standardDeviations = DEFAULT_STDDEVS;
-      camera.objFuels.count = 0;
-      camera.objFuels.fuelPoseEstimate = null;
-      camera.objFuels.pose3d = null;
       return;
     }
 
@@ -97,10 +96,8 @@ public class VisionIOLimelight implements VisionIO {
 
       if (robotPose3d != null) {
         camera.aprilTags.pose3d = robotPose3d;
-        camera.objFuels.pose3d = robotPose3d;
       } else {
         camera.aprilTags.pose3d = null;
-        camera.objFuels.pose3d = null;
       }
 
       camera.aprilTags.standardDeviations =

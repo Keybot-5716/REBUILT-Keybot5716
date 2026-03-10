@@ -1,4 +1,4 @@
-package frc.robot.subsystems.vision;
+package frc.robot.subsystems.vision.AprilTags;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.util.struct.Struct;

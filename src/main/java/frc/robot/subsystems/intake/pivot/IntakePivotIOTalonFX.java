@@ -32,7 +32,7 @@ public class IntakePivotIOTalonFX implements IntakePivotIO {
     config.Slot0.kI = 0;
     config.Slot0.kD = 0; */
 
-    config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+    config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive; // Cambiar por si es al revés
 
     positionIntake = motor.getPosition();
     appliedVolts = motor.getMotorVoltage();

@@ -6,29 +6,31 @@ import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.team6328.LoggedTunableNumber;
+import frc.robot.subsystems.intake.pivot.IntakePivotIO;
+import frc.robot.subsystems.intake.pivot.IntakePivotIOInputsAutoLogged;
 import frc.robot.subsystems.intake.rollers.IntakeRollersIO;
 import frc.robot.subsystems.intake.rollers.IntakeRollersIOInputsAutoLogged;
 import org.littletonrobotics.junction.Logger;
 
 public class IntakeSubsystem extends SubsystemBase {
-  // private final IntakePivotIO pivotIO;
+  private final IntakePivotIO pivotIO;
   private final IntakeRollersIO rollersIO;
 
   // private final IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
-  // private final IntakePivotIOInputsAutoLogged pivotInputs = new IntakePivotIOInputsAutoLogged();
+  private final IntakePivotIOInputsAutoLogged pivotInputs = new IntakePivotIOInputsAutoLogged();
   private final IntakeRollersIOInputsAutoLogged rollersInputs =
       new IntakeRollersIOInputsAutoLogged();
 
   // Creamos un objeto TrapezoidProfile que tenga velocidad y aceleración máximas
   private TrapezoidProfile.Constraints profile = new TrapezoidProfile.Constraints(2.0, 2.0);
-  private ProfiledPIDController controller = new ProfiledPIDController(5, 0, 0, profile);
+  private ProfiledPIDController controller = new ProfiledPIDController(4, 0, 0.08, profile);
   private static TrapezoidProfile.State goal = new TrapezoidProfile.State(0, 0);
 
   private static final LoggedTunableNumber rollerVolts =
       new LoggedTunableNumber("Intake/Rollers/RollerVoltsIntake", 5.0);
 
-  // private static final LoggedTunableNumber pivotVolts = new
-  // LoggedTunableNumber("Intake/Pivot/PivotVolts", 1);
+  private static final LoggedTunableNumber pivotVolts =
+      new LoggedTunableNumber("Intake/Pivot/PivotVolts", 2.0);
 
   // private static final LoggedTunableNumber pivotP = new LoggedTunableNumber("Intake/Pivot/kP");
   // private static final LoggedTunableNumber pivotD = new LoggedTunableNumber("Intake/Pivot/kD");
@@ -63,6 +65,7 @@ public class IntakeSubsystem extends SubsystemBase {
     REVERSE_ROLLERS,
     FORWARD_PIVOT,
     REVERSE_PIVOT,
+    STOPPPED_PIVOT,
     IN,
     OUT
   }
@@ -73,13 +76,14 @@ public class IntakeSubsystem extends SubsystemBase {
     REVERSING_ROLLERS,
     FORWARDING_PIVOT,
     REVERSING_PIVOT,
+    STOPPING_PIVOT,
     INING,
     OUTING
   }
 
-  public IntakeSubsystem(IntakeRollersIO rollersIO) {
-    // this.pivotIO = pivotIO;
+  public IntakeSubsystem(IntakeRollersIO rollersIO, IntakePivotIO pivotIO) {
     this.rollersIO = rollersIO;
+    this.pivotIO = pivotIO;
   }
 
   @Override
@@ -91,6 +95,8 @@ public class IntakeSubsystem extends SubsystemBase {
       */
     // Logger.processInputs("IntakeInputs/IntakePivotInputs", pivotInputs);
     Logger.processInputs("IntakeInputs/IntakeRollersInputs", rollersInputs);
+
+    Logger.processInputs("IntakeInputs/IntakePivotInputs", pivotInputs);
 
     // pivotIO.updateInputs(pivotInputs);
     rollersIO.updateInputs(rollersInputs);
@@ -108,6 +114,7 @@ public class IntakeSubsystem extends SubsystemBase {
       case REVERSE_ROLLERS -> IntakeState.REVERSING_ROLLERS;
       case FORWARD_PIVOT -> IntakeState.FORWARDING_PIVOT;
       case REVERSE_PIVOT -> IntakeState.REVERSING_PIVOT;
+      case STOPPPED_PIVOT -> IntakeState.STOPPING_PIVOT;
       case IN -> IntakeState.INING;
       case OUT -> IntakeState.OUTING;
     };
@@ -136,18 +143,22 @@ public class IntakeSubsystem extends SubsystemBase {
         break;
 
       case FORWARDING_PIVOT:
-        // runPivotOL(pivotVolts.get());
+        runPivotOL(pivotVolts.get());
         break;
 
       case REVERSING_PIVOT:
-        // runPivotOL(-pivotVolts.get());
+        runPivotOL(-pivotVolts.get());
+        break;
+
+      case STOPPING_PIVOT:
+        stopPivot();
         break;
     }
   }
 
   public void setPosition(double position) {
-    // goal.position = position;
-    // pivotIO.setVoltage(controller.calculate(pivotInputs.positionIntake, goal.position));
+    goal.position = position;
+    pivotIO.setVoltage(controller.calculate(pivotInputs.positionIntake, goal.position));
   }
 
   public void stop() {
@@ -160,7 +171,11 @@ public class IntakeSubsystem extends SubsystemBase {
   }
 
   public void runPivotOL(double voltage) {
-    // pivotIO.setVoltage(voltage);
+    pivotIO.setVoltage(voltage);
+  }
+
+  public void stopPivot() {
+    pivotIO.stopMotor();
   }
 
   public void setDesiredState(DesiredState desiredState) {

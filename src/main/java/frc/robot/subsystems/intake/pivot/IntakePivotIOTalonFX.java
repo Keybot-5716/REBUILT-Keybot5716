@@ -3,6 +3,7 @@ package frc.robot.subsystems.intake.pivot;
 import static edu.wpi.first.units.Units.Volts;
 
 import com.ctre.phoenix6.BaseStatusSignal;
+import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.VoltageOut;
@@ -26,13 +27,26 @@ public class IntakePivotIOTalonFX implements IntakePivotIO {
 
   public IntakePivotIOTalonFX() {
     // Cambiar el ID del motor
-    motor = new TalonFX(IDs.INTAKE_PIVOT_ID);
+    motor = new TalonFX(IDs.INTAKE_PIVOT_ID, new CANBus("canivore"));
 
     /*config.Slot0.kP = 5;
     config.Slot0.kI = 0;
     config.Slot0.kD = 0; */
 
-    config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive; // Cambiar por si es al revés
+    config.MotorOutput.Inverted =
+        InvertedValue.CounterClockwise_Positive; // Cambiar por si es al revés
+    config.SoftwareLimitSwitch.ForwardSoftLimitEnable = false;
+    config.SoftwareLimitSwitch.ForwardSoftLimitThreshold = Math.PI;
+
+    config.SoftwareLimitSwitch.ReverseSoftLimitEnable = false;
+    config.SoftwareLimitSwitch.ReverseSoftLimitThreshold = 0;
+
+    config.CurrentLimits.SupplyCurrentLimitEnable = true;
+    config.CurrentLimits.SupplyCurrentLowerLimit = 30;
+    config.CurrentLimits.SupplyCurrentLowerTime = 1;
+    config.CurrentLimits.SupplyCurrentLimit = 40;
+
+    config.Feedback.SensorToMechanismRatio = 5;
 
     positionIntake = motor.getPosition();
     appliedVolts = motor.getMotorVoltage();
@@ -41,6 +55,7 @@ public class IntakePivotIOTalonFX implements IntakePivotIO {
     BaseStatusSignal.setUpdateFrequencyForAll(100.0, positionIntake, appliedVolts, tempCelsius);
 
     motor.optimizeBusUtilization();
+    motor.setPosition(0.0);
   }
 
   public void setPosition(double position) {

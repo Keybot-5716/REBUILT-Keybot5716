@@ -47,7 +47,6 @@ import frc.robot.subsystems.shooter.rollers.*;
 import frc.robot.subsystems.transfer.TransferIOSparkMax;
 import frc.robot.subsystems.transfer.TransferSubsystem;
 import frc.robot.subsystems.vision.VisionPoseEstimateInField;
-import frc.robot.subsystems.visualizers.RobotVisualizer;
 import java.util.function.Consumer;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.seasonspecific.rebuilt2026.RebuiltFuelOnFly;
@@ -145,7 +144,6 @@ public class RobotContainer {
   private final ShooterSubsystem shooterSub = buildShooter();
   private final TransferSubsystem transferSub = buildTransfer();
   private final IntakeSubsystem intakeSub = buildIntake();
-  private final RobotVisualizer robotVisualizer = new RobotVisualizer(robotState);
   // private final RollerSubsystem transferRoller = buildTransfer();
   // private final IntakeSubsystem intakePivotSub = buildIntakePivotSubsystem();
   // private final VisionSubsystem visionSub = buildVisionSubsystem();
@@ -196,20 +194,20 @@ public class RobotContainer {
             Commands.runOnce(
                 () -> shooterSub.setDesiredState(ShooterSubsystem.DesiredState.STOPPED)));
     controller
-        .leftTrigger()
+        .leftBumper()
         .whileTrue(
-            Commands.runOnce(
-                () -> intakeSub.setDesiredState(IntakeSubsystem.DesiredState.FORWARD_PIVOT)))
-        .whileFalse(
+            Commands.run(
+                () -> intakeSub.setDesiredState(IntakeSubsystem.DesiredState.REVERSE_PIVOT)))
+        .onFalse(
             Commands.runOnce(
                 () -> intakeSub.setDesiredState(IntakeSubsystem.DesiredState.STOPPPED_PIVOT)));
 
     controller
-        .leftBumper()
+        .leftTrigger()
         .whileTrue(
-            Commands.runOnce(
-                () -> intakeSub.setDesiredState(IntakeSubsystem.DesiredState.REVERSE_PIVOT)))
-        .whileFalse(
+            Commands.run(
+                () -> intakeSub.setDesiredState(IntakeSubsystem.DesiredState.FORWARD_PIVOT)))
+        .onFalse(
             Commands.runOnce(
                 () -> intakeSub.setDesiredState(IntakeSubsystem.DesiredState.STOPPPED_PIVOT)));
 
@@ -376,6 +374,7 @@ public class RobotContainer {
     SimulatedArena.getInstance().addGamePieceProjectile(fuelOnFly);
   }
 
+  // Preguntaaaaaa (Isju)
   private void generateFuelTaxi() {
     RebuiltFuelOnFly fuelOnFly =
         new RebuiltFuelOnFly(
@@ -428,11 +427,6 @@ public class RobotContainer {
   /*
    * Configura las diferentes rutas que se pueden utilizar para el manejo en el auto
    */
-
-  public RobotVisualizer getRobotVisualizer() {
-    return robotVisualizer;
-  }
-
   public void configureAuto() {
     autoChooser.addDefaultOption("None Auto", new NoneAuto());
     autoChooser.addOption("Testing Auto", new Auto1Test());

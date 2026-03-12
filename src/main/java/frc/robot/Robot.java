@@ -112,7 +112,7 @@ public class Robot extends LoggedRobot {
       Threads.setCurrentThreadPriority(false, NON_REAL_TIME_PRIORITY);
     }
 
-    robotContainer.getRobotVisualizer().updateRobotVisualizer();
+    // robotContainer.getRobotVisualizer().updateRobotVisualizer();
     robotContainer.getRobotState().updateLogger();
     if (RobotBase.isSimulation()) {
       robotContainer.getSimRobotState().updateSim();

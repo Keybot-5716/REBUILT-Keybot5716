@@ -109,6 +109,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
     // pivotIO.updateInputs(pivotInputs);
     rollersIO.updateInputs(rollersInputs);
+    pivotIO.updateInputs(pivotInputs);
 
     // pivotDisconnected.set(!pivotDebouncer.calculate(pivotInputs.motorConnected));
 

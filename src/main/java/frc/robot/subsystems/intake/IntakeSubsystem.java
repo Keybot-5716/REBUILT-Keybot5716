@@ -4,6 +4,7 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.team6328.LoggedTunableNumber;
 import frc.robot.subsystems.intake.pivot.IntakePivotIO;
@@ -22,9 +23,17 @@ public class IntakeSubsystem extends SubsystemBase {
       new IntakeRollersIOInputsAutoLogged();
 
   // Creamos un objeto TrapezoidProfile que tenga velocidad y aceleración máximas
-  private TrapezoidProfile.Constraints profile = new TrapezoidProfile.Constraints(2.0, 2.0);
-  private ProfiledPIDController controller = new ProfiledPIDController(4, 0, 0.08, profile);
+  private TrapezoidProfile.Constraints profileConstraints =
+      new TrapezoidProfile.Constraints(2.0, 2.0);
+  private ProfiledPIDController controller =
+      new ProfiledPIDController(4, 0, 0.08, profileConstraints);
+
   private static TrapezoidProfile.State goal = new TrapezoidProfile.State(0, 0);
+  private TrapezoidProfile profile = new TrapezoidProfile(profileConstraints);
+
+  private State Position = new State(0, 0);
+
+  private State desiredPoint = new State(0, 0);
 
   private static final LoggedTunableNumber rollerVolts =
       new LoggedTunableNumber("Intake/Rollers/RollerVoltsIntake", 5.0);
@@ -158,6 +167,11 @@ public class IntakeSubsystem extends SubsystemBase {
 
   public void setPosition(double position) {
     goal.position = position;
+
+    desiredPoint.position = position;
+    Position.position = pivotInputs.positionIntake;
+
+    profile.calculate(2.0, Position, desiredPoint);
     pivotIO.setVoltage(controller.calculate(pivotInputs.positionIntake, goal.position));
   }
 

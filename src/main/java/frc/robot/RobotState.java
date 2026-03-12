@@ -7,6 +7,8 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.lib.team254.ConcurrentTimeInterpolatableBuffer;
 import frc.robot.subsystems.vision.VisionPoseEstimateInField;
+import frc.robot.subsystems.vision.Objects.FuelPoseEstimate;
+
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -213,6 +215,7 @@ public class RobotState {
     return megatagPose;
   }
 
+  
   public Optional<Integer> getExclusiveTag() {
     return exclusiveTag.get();
   }
@@ -231,5 +234,9 @@ public class RobotState {
     if (max.isEmpty() || min.isEmpty()) return Optional.empty();
     if (Math.abs(max.get()) >= Math.abs(min.get())) return max;
     else return min;
+  }
+  private FuelPoseEstimate lastFuelObservation = null;
+  public void addFuelObservation(FuelPoseEstimate observation) {
+    this.lastFuelObservation = observation;
   }
 }

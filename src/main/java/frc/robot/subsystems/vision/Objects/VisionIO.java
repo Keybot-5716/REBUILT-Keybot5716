@@ -1,8 +1,6 @@
-package frc.robot.subsystems.vision;
+package frc.robot.subsystems.vision.Objects;
 
 import edu.wpi.first.math.geometry.Pose3d;
-import frc.robot.subsystems.vision.VisionIO.VisionIOInputs.CameraInputs.AprilTagsInputs;
-import frc.robot.subsystems.vision.VisionIO.VisionIOInputs.CameraInputs.ObjInputs;
 
 public interface VisionIO {
 
@@ -12,26 +10,16 @@ public interface VisionIO {
 
     public static class CameraInputs {
       public boolean seesTarget;
-      public FiducialAprilTagObservation fiducialAprilTagObservation[];
-
-      public static class AprilTagsInputs {
-        public int megatagcount;
-        public int megatag2count;
-        public MegaTagPoseEstimate megatagPoseEstimate;
-        public MegaTagPoseEstimate megatag2PoseEstimate;
-        public Pose3d pose3d;
-        public double[] standardDeviations =
-            new double[12]; // [MT1x, MT1y, MT1z, MT1roll, MT1pitch, MT1Yaw, MT2x,
-        // MT2y, MT2z, MT2roll, MT2pitch, MT2yaw]
-      }
+      public FiducialObjObservation fiducialObjObservation[];
+      public ObjInputs objFuels = new ObjInputs();
 
       public static class ObjInputs {
         public int count;
+        public FuelPoseEstimate fuelPoseEstimate;
+        public Pose3d pose3d;
       }
-    }
 
-    public AprilTagsInputs aprilTags = new AprilTagsInputs();
-    public ObjInputs objFuels = new ObjInputs();
+    }
     public CameraInputs cameraA = new CameraInputs();
   }
 

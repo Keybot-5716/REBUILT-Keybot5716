@@ -43,4 +43,5 @@ public class VisionConstants {
   public static final double kDefaultZThreshold = 0.2;
   public static final double kDefaultNormThreshold = 1.0;
   public static final double kMinAmbiguityToFlip = 0.08;
+
 }

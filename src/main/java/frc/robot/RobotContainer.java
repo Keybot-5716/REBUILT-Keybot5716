@@ -32,6 +32,9 @@ import frc.robot.subsystems.rollers.RollerSparkMax;
 import frc.robot.subsystems.rollers.RollerSubsystem;
 import frc.robot.subsystems.rollers.RolllerIOTalonFx;
 import frc.robot.subsystems.vision.VisionPoseEstimateInField;
+import frc.robot.subsystems.vision.AprilTags.VisionIOLimelight;
+import frc.robot.subsystems.vision.AprilTags.VisionSubsystem;
+
 import java.util.function.Consumer;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
@@ -76,8 +79,11 @@ public class RobotContainer {
     return new RollerSubsystem(new RollerSparkMax(21));
   }
 
-  private VisionSubsystem buildVisionSubsystem() {
+  private frc.robot.subsystems.vision.AprilTags.VisionSubsystem buildVisionSubsystemA() {
     return new VisionSubsystem(new VisionIOLimelight(robotState), robotState);
+  }
+   private frc.robot.subsystems.vision.Objects.VisionSubsystem buildVisionSubsystemO() {
+    return new frc.robot.subsystems.vision.Objects.VisionSubsystem(new frc.robot.subsystems.vision.Objects.VisionIOLimelight(robotState), robotState);
   }
 
   private final Consumer<VisionPoseEstimateInField> visionFieldEstimate =
@@ -114,7 +120,8 @@ public class RobotContainer {
   private final RollerSubsystem intakeRollerSub = buildIntakeRoller();
   private final RollerSubsystem transferRoller = buildTransfer();
   // private final IntakeSubsystem intakePivotSub = buildIntakePivotSubsystem();
-  private final VisionSubsystem visionSub = buildVisionSubsystem();
+  private final frc.robot.subsystems.vision.AprilTags.VisionSubsystem visionSubA = buildVisionSubsystemA();
+  private final frc.robot.subsystems.vision.Objects.VisionSubsystem visionSubO = buildVisionSubsystemO();
 
   // -- AutoChooser
   private final LoggedDashboardChooser<AutoBuilder> autoChooser =
@@ -286,8 +293,12 @@ public class RobotContainer {
     return driveSub;
   }
 
-  public frc.robot.subsystems.vision. getVisionSubsystem() {
-    return visionSub;
+  public frc.robot.subsystems.vision.AprilTags.VisionSubsystem getVisionSubsystemA() {
+    return visionSubA;
+  }
+
+  public frc.robot.subsystems.vision.Objects.VisionSubsystem getVisionSubsystemO() {
+    return visionSubO;
   }
 
   public RobotState getRobotState() {

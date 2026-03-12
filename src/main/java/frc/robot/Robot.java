@@ -132,7 +132,8 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void disabledExit() {
-    robotContainer.getVisionSubsystem().setUseVision(true);
+    robotContainer.getVisionSubsystemA().setUseVision(true);
+    robotContainer.getVisionSubsystemO().setUseVision(true);
     SmartDashboard.setNetworkTableInstance(NetworkTableInstance.getDefault());
   }
 

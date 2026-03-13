@@ -247,10 +247,11 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   private void rotatedToAngle() {
+    var speeds = calculateSpeedsBasedOnJoystickInputs();
     io.setRequest(
         rotationLocked
-            .withVelocityX(calculateSpeedsBasedOnJoystickInputs().vxMetersPerSecond)
-            .withVelocityY(calculateSpeedsBasedOnJoystickInputs().vyMetersPerSecond)
+            .withVelocityX(speeds.vxMetersPerSecond)
+            .withVelocityY(speeds.vyMetersPerSecond)
             .withTargetDirection(desiredRotationToLock));
   }
 

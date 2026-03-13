@@ -275,61 +275,6 @@ public class RobotContainer {
         .onTrue(
             Commands.runOnce(
                 () -> intakePivotSub.setDesiredState(IntakePivotSubsystem.DesiredState.TEST2)));
-    /*  -- SHOOTER
-    controller
-        .rightTrigger()
-        .whileTrue(
-            Commands.run(
-                () -> shooterSub.setDesiredState(ShooterSubsystem.DesiredState.FORWARD_ROLLERS)))
-        .whileFalse(
-            Commands.run(() -> shooterSub.setDesiredState(ShooterSubsystem.DesiredState.STOPPED)));
-
-    controller
-        .rightBumper()
-        .whileTrue(
-            Commands.run(
-                () -> shooterSub.setDesiredState(ShooterSubsystem.DesiredState.REVERSE_ROLLERS)))
-        .whileFalse(
-            Commands.run(() -> shooterSub.setDesiredState(ShooterSubsystem.DesiredState.STOPPED)));
-
-            /*
-    // -- INTAKE ROLLERS
-    controller
-        .leftTrigger()
-        .whileTrue(
-            Commands.run(
-                () -> intakeSub.setDesiredState(IntakeSubsystem.DesiredState.FORWARD_ROLLERS)))
-        .whileFalse(
-            Commands.run(() -> intakeSub.setDesiredState(IntakeSubsystem.DesiredState.STOPPED)));
-
-    controller
-        .leftBumper()
-        .whileTrue(
-            Commands.run(
-                () -> intakeSub.setDesiredState(IntakeSubsystem.DesiredState.REVERSE_ROLLERS)))
-        .whileFalse(
-            Commands.run(() -> intakeSub.setDesiredState(IntakeSubsystem.DesiredState.STOPPED)));
-
-    // -- INTAKE PIVOT OPEN LOOP
-    controller
-        .a()
-        .onTrue(
-            Commands.run(
-                () -> intakeSub.setDesiredState(IntakeSubsystem.DesiredState.FORWARD_PIVOT)));
-    controller
-        .b()
-        .onTrue(
-            Commands.run(
-                () -> intakeSub.setDesiredState(IntakeSubsystem.DesiredState.REVERSE_PIVOT)));
-
-    // INTAKE PIVOT CLOSED LOOP
-    controller
-        .x()
-        .onTrue(Commands.run(() -> intakeSub.setDesiredState(IntakeSubsystem.DesiredState.IN)));
-
-    controller
-        .y()
-        .onTrue(Commands.run(() -> intakeSub.setDesiredState(IntakeSubsystem.DesiredState.OUT)));*/
   }
 
   /**

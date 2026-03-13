@@ -65,10 +65,9 @@ public class Robot extends LoggedRobot {
     switch (Constants.currentMode) {
       case REAL:
         // Running on a real robot, log to a USB stick ("/U/logs")
-        /*if (!DriverStation.isFMSAttached()) {
+        if (!DriverStation.isFMSAttached()) {
           Logger.addDataReceiver(new NT4Publisher());
-        }*/
-        Logger.addDataReceiver(new NT4Publisher());
+        }
         Logger.addDataReceiver(new WPILOGWriter());
         break;
 

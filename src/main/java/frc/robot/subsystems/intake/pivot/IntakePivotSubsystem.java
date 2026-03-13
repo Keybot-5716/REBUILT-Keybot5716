@@ -1,6 +1,5 @@
 package frc.robot.subsystems.intake.pivot;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -57,16 +56,6 @@ public class IntakePivotSubsystem extends SubsystemBase {
 
     pivotIO.updateInputs(pivotInputs);
     Logger.processInputs("IntakePivotInputs", pivotInputs);
-
-    double output = controller.calculate(pivotInputs.positionIntake);
-    output = MathUtil.clamp(output, -12.0, 12.0);
-
-    pivotIO.setVoltage(output);
-
-    Logger.recordOutput("IntakePivot/GoalPosition", goal.position);
-    Logger.recordOutput("IntakePivot/SetpointPosition", controller.getSetpoint().position);
-    Logger.recordOutput("IntakePivot/SetpointVelocity", controller.getSetpoint().velocity);
-    Logger.recordOutput("IntakePivot/Output", output);
 
     intakeState = setStateTransition();
     applyStates();

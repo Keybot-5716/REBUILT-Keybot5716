@@ -6,7 +6,6 @@ import com.pathplanner.lib.commands.FollowPathCommand;
 import com.pathplanner.lib.commands.PathfindingCommand;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.PathPlannerLogging;
-import edu.wpi.first.apriltag.AprilTag;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -31,10 +30,9 @@ import frc.robot.subsystems.drive.TunerConstants;
 import frc.robot.subsystems.rollers.RollerSparkMax;
 import frc.robot.subsystems.rollers.RollerSubsystem;
 import frc.robot.subsystems.rollers.RolllerIOTalonFx;
-import frc.robot.subsystems.vision.VisionPoseEstimateInField;
 import frc.robot.subsystems.vision.AprilTags.VisionIOLimelight;
 import frc.robot.subsystems.vision.AprilTags.VisionSubsystem;
-
+import frc.robot.subsystems.vision.VisionPoseEstimateInField;
 import java.util.function.Consumer;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
@@ -82,8 +80,10 @@ public class RobotContainer {
   private frc.robot.subsystems.vision.AprilTags.VisionSubsystem buildVisionSubsystemA() {
     return new VisionSubsystem(new VisionIOLimelight(robotState), robotState);
   }
-   private frc.robot.subsystems.vision.Objects.VisionSubsystem buildVisionSubsystemO() {
-    return new frc.robot.subsystems.vision.Objects.VisionSubsystem(new frc.robot.subsystems.vision.Objects.VisionIOLimelight(robotState), robotState);
+
+  private frc.robot.subsystems.vision.Objects.VisionSubsystem buildVisionSubsystemO() {
+    return new frc.robot.subsystems.vision.Objects.VisionSubsystem(
+        new frc.robot.subsystems.vision.Objects.VisionIOLimelight(robotState), robotState);
   }
 
   private final Consumer<VisionPoseEstimateInField> visionFieldEstimate =
@@ -120,8 +120,10 @@ public class RobotContainer {
   private final RollerSubsystem intakeRollerSub = buildIntakeRoller();
   private final RollerSubsystem transferRoller = buildTransfer();
   // private final IntakeSubsystem intakePivotSub = buildIntakePivotSubsystem();
-  private final frc.robot.subsystems.vision.AprilTags.VisionSubsystem visionSubA = buildVisionSubsystemA();
-  private final frc.robot.subsystems.vision.Objects.VisionSubsystem visionSubO = buildVisionSubsystemO();
+  private final frc.robot.subsystems.vision.AprilTags.VisionSubsystem visionSubA =
+      buildVisionSubsystemA();
+  private final frc.robot.subsystems.vision.Objects.VisionSubsystem visionSubO =
+      buildVisionSubsystemO();
 
   // -- AutoChooser
   private final LoggedDashboardChooser<AutoBuilder> autoChooser =

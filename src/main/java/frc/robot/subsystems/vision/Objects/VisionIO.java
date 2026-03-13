@@ -18,8 +18,8 @@ public interface VisionIO {
         public FuelPoseEstimate fuelPoseEstimate;
         public Pose3d pose3d;
       }
-
     }
+
     public CameraInputs cameraA = new CameraInputs();
   }
 

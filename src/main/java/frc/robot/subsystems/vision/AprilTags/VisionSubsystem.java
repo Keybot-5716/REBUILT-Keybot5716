@@ -16,7 +16,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotState;
 import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.subsystems.vision.VisionPoseEstimateInField;
-
 import java.util.Optional;
 import org.littletonrobotics.junction.Logger;
 
@@ -124,7 +123,8 @@ public class VisionSubsystem extends SubsystemBase {
     }
 
     if (cam.aprilTags.megatagPoseEstimate != null) {
-      Logger.recordOutput(prefix + "/MegatagPoseEstimate", cam.aprilTags.megatagPoseEstimate.fieldToRobot());
+      Logger.recordOutput(
+          prefix + "/MegatagPoseEstimate", cam.aprilTags.megatagPoseEstimate.fieldToRobot());
       Logger.recordOutput(prefix + "/Quality", cam.aprilTags.megatagPoseEstimate.quality());
       Logger.recordOutput(prefix + "/AvgTagArea", cam.aprilTags.megatagPoseEstimate.avgTagArea());
     }
@@ -281,7 +281,8 @@ public class VisionSubsystem extends SubsystemBase {
       return Optional.empty();
     }
 
-    if (cam.aprilTags.pose3d == null || Math.abs(cam.aprilTags.pose3d.getZ()) > VisionConstants.kDefaultZThreshold) {
+    if (cam.aprilTags.pose3d == null
+        || Math.abs(cam.aprilTags.pose3d.getZ()) > VisionConstants.kDefaultZThreshold) {
       return Optional.empty();
     }
 
@@ -305,9 +306,12 @@ public class VisionSubsystem extends SubsystemBase {
 
     double quality = Math.max(poseEstimate.quality(), 0.001);
     double scaleFactor = 1.0 / quality;
-    double xStd = cam.aprilTags.standardDeviations[VisionConstants.kMegatag1XStdDevIndex] * scaleFactor;
-    double yStd = cam.aprilTags.standardDeviations[VisionConstants.kMegatag1YStdDevIndex] * scaleFactor;
-    double rotStd = cam.aprilTags.standardDeviations[VisionConstants.kMegatag1YawStdDevIndex] * scaleFactor;
+    double xStd =
+        cam.aprilTags.standardDeviations[VisionConstants.kMegatag1XStdDevIndex] * scaleFactor;
+    double yStd =
+        cam.aprilTags.standardDeviations[VisionConstants.kMegatag1YStdDevIndex] * scaleFactor;
+    double rotStd =
+        cam.aprilTags.standardDeviations[VisionConstants.kMegatag1YawStdDevIndex] * scaleFactor;
 
     double xyStd = Math.max(xStd, yStd);
     Matrix<N3, N1> visionStdDevs = VecBuilder.fill(xyStd, xyStd, rotStd);

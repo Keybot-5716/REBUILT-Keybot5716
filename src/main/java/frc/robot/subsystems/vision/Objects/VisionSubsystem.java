@@ -1,6 +1,5 @@
 package frc.robot.subsystems.vision.Objects;
 
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotState;
@@ -36,10 +35,10 @@ public class VisionSubsystem extends SubsystemBase {
 
     // 3. Si es válido, actualizar el estado y guardar en el IO para telemetría
     FuelPoseEstimate acceptedFuel = maybeFuel.get();
-    
+
     // Guardar el resultado procesado de vuelta en la estructura de tu IO
     inputs.cameraA.objFuels.fuelPoseEstimate = acceptedFuel;
-    
+
     // Notificar al RobotState para que los comandos lo usen
     state.addFuelObservation(acceptedFuel);
 
@@ -48,9 +47,7 @@ public class VisionSubsystem extends SubsystemBase {
     Logger.recordOutput("Vision/Fuel/LatencySec", Timer.getFPGATimestamp() - startTime);
   }
 
-  /**
-   * Procesa las observaciones crudas de la cámara para generar una pose en el campo.
-   */
+  /** Procesa las observaciones crudas de la cámara para generar una pose en el campo. */
   private Optional<FuelPoseEstimate> processCamera(
       VisionIO.VisionIOInputs.CameraInputs cam, String label) {
 
@@ -69,19 +66,17 @@ public class VisionSubsystem extends SubsystemBase {
     }
 
     // Crear estimación con txnc y area del record FiducialObjObservation
-    FuelPoseEstimate estimate = FuelPoseEstimate.estimate(
-        latestRobotPose.getValue(), 
-        observation.txnc(), 
-        observation.area(), 
-        Timer.getFPGATimestamp()
-    );
+    FuelPoseEstimate estimate =
+        FuelPoseEstimate.estimate(
+            latestRobotPose.getValue(),
+            observation.txnc(),
+            observation.area(),
+            Timer.getFPGATimestamp());
 
     return Optional.ofNullable(estimate);
   }
 
-  /**
-   * Logs básicos de diagnóstico.
-   */
+  /** Logs básicos de diagnóstico. */
   private void logCameraInputs(String prefix, VisionIO.VisionIOInputs.CameraInputs cam) {
     boolean hasData = cam.fiducialObjObservation != null && cam.fiducialObjObservation.length > 0;
     Logger.recordOutput(prefix + "/SeesTarget", cam.seesTarget && hasData);

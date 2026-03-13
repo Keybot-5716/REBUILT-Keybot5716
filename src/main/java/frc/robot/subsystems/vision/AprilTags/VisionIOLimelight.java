@@ -4,7 +4,6 @@ import edu.wpi.first.networktables.*;
 import frc.lib.limelight.LimelightHelpers;
 import frc.robot.RobotState;
 import frc.robot.subsystems.vision.VisionConstants;
-
 import java.util.concurrent.atomic.AtomicReference;
 
 public class VisionIOLimelight implements VisionIO {

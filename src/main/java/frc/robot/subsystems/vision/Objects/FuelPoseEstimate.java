@@ -12,24 +12,20 @@ public record FuelPoseEstimate(
     Pose2d fieldToFuel,
     double distanceToCamera,
     double timestampSeconds,
-    double avgTagArea
-) implements StructSerializable {
+    double avgTagArea)
+    implements StructSerializable {
 
-  public static FuelPoseEstimate estimate(Pose2d robotPose, double tx, double ta, double timestamp) {
-    double k = 1.5; 
+  public static FuelPoseEstimate estimate(
+      Pose2d robotPose, double tx, double ta, double timestamp) {
+    double k = 1.5;
     double distance = (ta > 0) ? (k / Math.sqrt(ta)) : 0;
 
     Rotation2d angleToFuel = robotPose.getRotation().plus(Rotation2d.fromDegrees(-tx));
-    
-    Translation2d fuelTranslation = new Translation2d(
-        distance * angleToFuel.getCos(),
-        distance * angleToFuel.getSin()
-    );
 
-    Pose2d fieldToFuel = new Pose2d(
-        robotPose.getTranslation().plus(fuelTranslation),
-        angleToFuel
-    );
+    Translation2d fuelTranslation =
+        new Translation2d(distance * angleToFuel.getCos(), distance * angleToFuel.getSin());
+
+    Pose2d fieldToFuel = new Pose2d(robotPose.getTranslation().plus(fuelTranslation), angleToFuel);
 
     return new FuelPoseEstimate(robotPose, fieldToFuel, distance, timestamp, ta);
   }
@@ -37,23 +33,39 @@ public record FuelPoseEstimate(
   public static final FuelPoseEstimateStruct struct = new FuelPoseEstimateStruct();
 
   public static class FuelPoseEstimateStruct implements Struct<FuelPoseEstimate> {
-    @Override public Class<FuelPoseEstimate> getTypeClass() { return FuelPoseEstimate.class; }
-    @Override public String getTypeString() { return "record:FuelPoseEstimate"; }
-    @Override public int getSize() { return (Pose2d.struct.getSize() * 2) + (3 * Double.BYTES); }
-    @Override public String getSchema() { 
-        return "Pose2d fieldToRobot;Pose2d fieldToFuel;double distanceToCamera;double timestampSeconds;double avgTagArea"; 
+    @Override
+    public Class<FuelPoseEstimate> getTypeClass() {
+      return FuelPoseEstimate.class;
     }
-    @Override public Struct<?>[] getNested() { return new Struct<?>[] {Pose2d.struct}; }
+
+    @Override
+    public String getTypeString() {
+      return "record:FuelPoseEstimate";
+    }
+
+    @Override
+    public int getSize() {
+      return (Pose2d.struct.getSize() * 2) + (3 * Double.BYTES);
+    }
+
+    @Override
+    public String getSchema() {
+      return "Pose2d fieldToRobot;Pose2d fieldToFuel;double distanceToCamera;double timestampSeconds;double avgTagArea";
+    }
+
+    @Override
+    public Struct<?>[] getNested() {
+      return new Struct<?>[] {Pose2d.struct};
+    }
 
     @Override
     public FuelPoseEstimate unpack(ByteBuffer bb) {
       return new FuelPoseEstimate(
-          Pose2d.struct.unpack(bb), 
-          Pose2d.struct.unpack(bb), 
-          bb.getDouble(), 
-          bb.getDouble(), 
-          bb.getDouble()
-      );
+          Pose2d.struct.unpack(bb),
+          Pose2d.struct.unpack(bb),
+          bb.getDouble(),
+          bb.getDouble(),
+          bb.getDouble());
     }
 
     @Override
@@ -64,7 +76,10 @@ public record FuelPoseEstimate(
       bb.putDouble(value.timestampSeconds());
       bb.putDouble(value.avgTagArea());
     }
-    
-    @Override public String getTypeName() { return "FuelPoseEstimate"; }
+
+    @Override
+    public String getTypeName() {
+      return "FuelPoseEstimate";
+    }
   }
 }

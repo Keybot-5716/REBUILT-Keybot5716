@@ -1,7 +1,6 @@
 package frc.robot.subsystems.vision.Objects;
 
 import edu.wpi.first.networktables.*;
-import edu.wpi.first.wpilibj.Timer;
 import frc.robot.RobotState;
 import frc.robot.subsystems.vision.VisionConstants;
 import java.util.concurrent.atomic.AtomicReference;
@@ -9,17 +8,15 @@ import java.util.concurrent.atomic.AtomicReference;
 public class VisionIOLimelight implements VisionIO {
   private final NetworkTable tableA =
       NetworkTableInstance.getDefault().getTable(VisionConstants.kLimelightATableName);
-  
-  private final AtomicReference<VisionIOInputs> latestInputs = 
+
+  private final AtomicReference<VisionIOInputs> latestInputs =
       new AtomicReference<>(new VisionIOInputs());
 
   public VisionIOLimelight(RobotState robotState) {
     setLLSettings();
   }
 
-  /**
-   * Configura la posición de la cámara en el espacio del robot dentro de la Limelight.
-   */
+  /** Configura la posición de la cámara en el espacio del robot dentro de la Limelight. */
   private void setLLSettings() {
     double[] cameraAPose = {
       VisionConstants.kRobotToCameraAForward,
@@ -39,9 +36,7 @@ public class VisionIOLimelight implements VisionIO {
     latestInputs.set(inputs);
   }
 
-  /**
-   * Lee los datos de detección de objetos (Fuel) desde NetworkTables.
-   */
+  /** Lee los datos de detección de objetos (Fuel) desde NetworkTables. */
   private void readCameraData(
       NetworkTable table, VisionIOInputs.CameraInputs camera, String limelightName) {
 
@@ -60,20 +55,19 @@ public class VisionIOLimelight implements VisionIO {
       double tx = table.getEntry("tx").getDouble(0.0);
       double ty = table.getEntry("ty").getDouble(0.0);
       double ta = table.getEntry("ta").getDouble(0.0);
-      
+
       // tid: ID de la clase detectada (ej. 0 para Fuel, 1 para otra pieza)
       int classID = (int) table.getEntry("tid").getInteger(0);
 
       // Llenamos el array de observaciones con el objetivo principal
       camera.objFuels.count = 1;
-      camera.fiducialObjObservation = new FiducialObjObservation[] {
-        new FiducialObjObservation(
-            classID,
-            tx,                        // txnc (usado para ángulo)
-            ty,                        // tync
-            ta
-        )
-      };
+      camera.fiducialObjObservation =
+          new FiducialObjObservation[] {
+            new FiducialObjObservation(
+                classID, tx, // txnc (usado para ángulo)
+                ty, // tync
+                ta)
+          };
 
     } catch (Exception e) {
       // Limpieza de seguridad en caso de error en la red

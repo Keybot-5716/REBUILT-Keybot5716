@@ -12,7 +12,7 @@ public interface VisionIO {
       public boolean seesTarget;
       public FiducialAprilTagObservation fiducialAprilTagObservation[];
       public AprilTagsInputs aprilTags = new AprilTagsInputs();
-      
+
       public static class AprilTagsInputs {
         public int megatagcount;
         public int megatag2count;

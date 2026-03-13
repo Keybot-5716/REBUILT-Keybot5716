@@ -22,7 +22,7 @@ public class ShooterHoodIOTalonFX implements ShooterHoodIO {
 
   public ShooterHoodIOTalonFX() {
 
-    motor = new TalonFX(30, new CANBus("canivore"));
+    motor = new TalonFX(31, new CANBus("canivore"));
 
     config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;

@@ -39,6 +39,7 @@ import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.drive.DriveSubsystem.DesiredState;
 import frc.robot.subsystems.drive.TunerConstants;
 import frc.robot.subsystems.intake.IntakeSubsystem;
+import frc.robot.subsystems.intake.pivot.IntakePivotIOTalonFX;
 import frc.robot.subsystems.intake.rollers.IntakeRollersIOSparkMax;
 import frc.robot.subsystems.shooter.*;
 import frc.robot.subsystems.shooter.hood.*;
@@ -85,7 +86,7 @@ public class RobotContainer {
 
   //  -- Intake
   private IntakeSubsystem buildIntake() {
-    return new IntakeSubsystem(new IntakeRollersIOSparkMax());
+    return new IntakeSubsystem(new IntakeRollersIOSparkMax(), new IntakePivotIOTalonFX());
   }
 
   // -- Shooter
@@ -193,12 +194,22 @@ public class RobotContainer {
             Commands.runOnce(
                 () -> shooterSub.setDesiredState(ShooterSubsystem.DesiredState.STOPPED)));
     controller
-        .leftTrigger()
+        .leftBumper()
         .whileTrue(
-            Commands.run(() -> shooterSub.setDesiredState(ShooterSubsystem.DesiredState.TEST)))
+            Commands.run(
+                () -> intakeSub.setDesiredState(IntakeSubsystem.DesiredState.REVERSE_PIVOT)))
         .onFalse(
             Commands.runOnce(
-                () -> shooterSub.setDesiredState(ShooterSubsystem.DesiredState.STOPPED)));
+                () -> intakeSub.setDesiredState(IntakeSubsystem.DesiredState.STOPPPED_PIVOT)));
+
+    controller
+        .leftTrigger()
+        .whileTrue(
+            Commands.run(
+                () -> intakeSub.setDesiredState(IntakeSubsystem.DesiredState.FORWARD_PIVOT)))
+        .onFalse(
+            Commands.runOnce(
+                () -> intakeSub.setDesiredState(IntakeSubsystem.DesiredState.STOPPPED_PIVOT)));
 
     controller
         .a()

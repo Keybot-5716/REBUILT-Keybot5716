@@ -298,9 +298,9 @@ public class DriveSubsystem extends SubsystemBase {
       return new ChassisSpeeds(0, 0, 0);
     }
 
-    double xMagnitude = MathUtil.applyDeadband(controller.getLeftY(), 0.1);
-    double yMagnitude = MathUtil.applyDeadband(controller.getLeftX(), 0.1);
-    double angularMagnitude = MathUtil.applyDeadband(controller.getRightX(), 0.1);
+    double xMagnitude = MathUtil.applyDeadband(controller.getLeftY(), 0.3);
+    double yMagnitude = MathUtil.applyDeadband(controller.getLeftX(), 0.3);
+    double angularMagnitude = MathUtil.applyDeadband(controller.getRightX(), 0.3);
 
     angularMagnitude = Math.copySign(angularMagnitude * angularMagnitude, angularMagnitude);
 

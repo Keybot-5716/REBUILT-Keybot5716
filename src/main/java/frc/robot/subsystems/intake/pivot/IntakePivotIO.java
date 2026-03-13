@@ -5,10 +5,10 @@ import org.littletonrobotics.junction.AutoLog;
 public interface IntakePivotIO {
   @AutoLog
   public class IntakePivotIOInputs {
-    public boolean motorConnected;
-    public double appliedVolts;
-    public double tempCelcius;
-    public double positionIntake;
+    public boolean motorConnected = false;
+    public double appliedVolts = 0.0;
+    public double tempCelcius = 0.0;
+    public double positionIntake = 0.0;
   }
 
   void updateInputs(IntakePivotIOInputs inputs);
@@ -16,4 +16,6 @@ public interface IntakePivotIO {
   void setVoltage(double voltage);
 
   void stopMotor();
+
+  void setPosition(double position);
 }

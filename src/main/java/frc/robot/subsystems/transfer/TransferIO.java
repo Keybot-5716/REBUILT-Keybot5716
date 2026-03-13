@@ -6,9 +6,9 @@ public interface TransferIO {
 
   @AutoLog
   public class TransferIOInputs {
-    public boolean motorConnected;
-    public double appliedVolts;
-    public double tempCelcius;
+    public boolean motorConnected = false;
+    public double appliedVolts = 0.0;
+    public double tempCelcius = 0.0;
   }
 
   void updateInputs(TransferIOInputs inputs);

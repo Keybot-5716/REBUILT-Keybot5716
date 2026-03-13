@@ -59,9 +59,8 @@ public class TransferSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    Logger.processInputs("TransferInputs/TransferSubsystem", transferInputs);
-
     transferIO.updateInputs(transferInputs);
+    Logger.processInputs("TransferInputs/TransferSubsystem", transferInputs);
 
     transferState = setStateTransition();
     applyStates();

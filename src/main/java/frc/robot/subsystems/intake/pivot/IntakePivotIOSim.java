@@ -71,4 +71,7 @@ public class IntakePivotIOSim implements IntakePivotIO {
 
   @Override
   public void stopMotor() {}
+
+  @Override
+  public void setPosition(double position) {}
 }

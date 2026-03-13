@@ -6,9 +6,9 @@ public interface IntakeRollersIO {
 
   @AutoLog
   public class IntakeRollersIOInputs {
-    public boolean motorConnected;
-    public double appliedVolts;
-    public double tempCelcius;
+    public boolean motorConnected = false;
+    public double appliedVolts = 0.0;
+    public double tempCelcius = 0.0;
   }
 
   void updateInputs(IntakeRollersIOInputs inputs);

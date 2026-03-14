@@ -47,7 +47,10 @@ import frc.robot.subsystems.shooter.hood.*;
 import frc.robot.subsystems.shooter.rollers.*;
 import frc.robot.subsystems.transfer.TransferIOSparkMax;
 import frc.robot.subsystems.transfer.TransferSubsystem;
+import frc.robot.subsystems.vision.VisionIOLimelight;
+import frc.robot.subsystems.vision.VisionIOSimPhotonVision;
 import frc.robot.subsystems.vision.VisionPoseEstimateInField;
+import frc.robot.subsystems.vision.VisionSubsystem;
 import java.util.function.Consumer;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.seasonspecific.rebuilt2026.RebuiltFuelOnFly;
@@ -104,7 +107,6 @@ public class RobotContainer {
     return new TransferSubsystem(new TransferIOSparkMax());
   }
 
-  /*
   private VisionSubsystem buildVisionSubsystem() {
     if (Robot.isSimulation()) {
       return new VisionSubsystem(
@@ -112,7 +114,7 @@ public class RobotContainer {
     } else {
       return new VisionSubsystem(new VisionIOLimelight(robotState), robotState);
     }
-  } */
+  }
 
   private final Consumer<VisionPoseEstimateInField> visionFieldEstimate =
       new Consumer<VisionPoseEstimateInField>() {
@@ -149,7 +151,7 @@ public class RobotContainer {
   private final IntakeRollersSubsystem intakeRollersSub = buildIntakeRollers();
   private final IntakePivotSubsystem intakePivotSub = buildIntakePivot();
 
-  // private final VisionSubsystem visionSub = buildVisionSubsystem();
+  private final VisionSubsystem visionSub = buildVisionSubsystem();
   // private final IntakePivotIOSim intakePivotSub = new
   // IntakePivotIOSim(driveSub.getMapleSimDrive().mapleSimDrive);
 
@@ -180,11 +182,17 @@ public class RobotContainer {
     controller
         .start()
         .onTrue(
-            Commands.runOnce(() -> driveSub.resetOdometry(new Pose2d(3.1, 4, new Rotation2d()))));
+            Commands.runOnce(
+                () ->
+                    driveSub.resetOdometry(
+                        new Pose2d(16.54 - 3.1, 8.069 - 4, new Rotation2d(Math.PI)))));
     controller
         .rightBumper()
         .whileTrue(
-            Commands.run(() -> driveSub.setDesiredPointToLock(new Translation2d(4.778, 4.293))))
+            Commands.run(
+                () ->
+                    driveSub.setDesiredPointToLock(
+                        new Translation2d(16.54 - 4.778, 8.069 - 4.293))))
         .onFalse(
             Commands.runOnce(
                 () -> driveSub.setState(DriveSubsystem.DesiredState.MANUAL_FIELD_DRIVE)));
@@ -196,18 +204,18 @@ public class RobotContainer {
         .onFalse(
             Commands.runOnce(
                 () -> shooterSub.setDesiredState(ShooterSubsystem.DesiredState.STOPPED)));
-    controller
-        .leftBumper()
-        .whileTrue(
-            Commands.run(
-                () ->
-                    intakePivotSub.setDesiredState(
-                        IntakePivotSubsystem.DesiredState.REVERSE_PIVOT)))
-        .onFalse(
-            Commands.runOnce(
-                () ->
-                    intakePivotSub.setDesiredState(
-                        IntakePivotSubsystem.DesiredState.STOPPPED_PIVOT)));
+    /*controller
+    .leftBumper()
+    .whileTrue(
+        Commands.run(
+            () ->
+                intakePivotSub.setDesiredState(
+                    IntakePivotSubsystem.DesiredState.REVERSE_PIVOT)))
+    .onFalse(
+        Commands.runOnce(
+            () ->
+                intakePivotSub.setDesiredState(
+                    IntakePivotSubsystem.DesiredState.STOPPPED_PIVOT)));*/
 
     controller
         .leftTrigger()
@@ -431,9 +439,9 @@ public class RobotContainer {
     return driveSub;
   }
 
-  // public VisionSubsystem getVisionSubsystem() {
-  // return visionSub;
-  // }
+  public VisionSubsystem getVisionSubsystem() {
+    return visionSub;
+  }
 
   public RobotState getRobotState() {
     return robotState;

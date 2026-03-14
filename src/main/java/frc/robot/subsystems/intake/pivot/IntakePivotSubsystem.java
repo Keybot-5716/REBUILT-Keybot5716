@@ -96,11 +96,11 @@ public class IntakePivotSubsystem extends SubsystemBase {
         break;
 
       case TEST:
-        test(1.2);
+        test(IntakeIOConstants.Out);
         break;
 
       case TEST2:
-        test(0.0);
+        test(IntakeIOConstants.In);
         break;
     }
   }

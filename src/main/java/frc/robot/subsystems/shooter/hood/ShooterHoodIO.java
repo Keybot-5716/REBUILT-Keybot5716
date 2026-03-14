@@ -2,7 +2,9 @@ package frc.robot.subsystems.shooter.hood;
 
 import org.littletonrobotics.junction.AutoLog;
 
-public interface ShooterHoodIO {
+import frc.lib.util.DataProcessor;
+
+public interface ShooterHoodIO extends DataProcessor.IODataRefresher {
 
   @AutoLog
   public static class HoodIOInputs {
@@ -36,4 +38,7 @@ public interface ShooterHoodIO {
 
   /** Se utiliza para protocolos SysID */
   default void optimizeForSysID() {}
+
+  @Override
+  default void refreshData() {}
 }

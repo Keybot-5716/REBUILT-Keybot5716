@@ -78,4 +78,14 @@ public class ShooterRollersIOTalonFX implements ShooterRollersIO {
     inputs.velocity = velocity.getValueAsDouble();
     inputs.acceleration = acceleration.getValueAsDouble();
   }
+
+  @Override
+  public void refreshData() {
+    BaseStatusSignal.refreshAll(
+      appliedVolts,
+      tempCelsius,
+      velocity,
+      acceleration
+    );
+  }
 }

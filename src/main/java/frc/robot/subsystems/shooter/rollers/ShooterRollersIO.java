@@ -2,7 +2,9 @@ package frc.robot.subsystems.shooter.rollers;
 
 import org.littletonrobotics.junction.AutoLog;
 
-public interface ShooterRollersIO {
+import frc.lib.util.*;
+
+public interface ShooterRollersIO extends DataProcessor.IODataRefresher {
 
   @AutoLog
   public class ShooterRollersIOInputs {
@@ -20,4 +22,7 @@ public interface ShooterRollersIO {
   void setVelocity(double voltage);
 
   void stopRollers();
+  
+  @Override
+  default void refreshData() {}
 }

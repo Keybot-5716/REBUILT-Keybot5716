@@ -4,6 +4,7 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.team6328.LoggedTunableNumber;
+import frc.lib.util.DataProcessor;
 import frc.robot.subsystems.shooter.hood.HoodIOInputsAutoLogged;
 import frc.robot.subsystems.shooter.hood.ShooterHoodIO;
 import frc.robot.subsystems.shooter.rollers.ShooterRollersIO;
@@ -66,21 +67,32 @@ public class ShooterSubsystem extends SubsystemBase {
   public ShooterSubsystem(ShooterRollersIO rollersIO, ShooterHoodIO hoodIO) {
     this.rollersIO = rollersIO;
     this.hoodIO = hoodIO;
+
+    DataProcessor.initDataProcessor(
+      ()-> {
+        synchronized (rollersInputs) {
+          synchronized (hoodInputs) {
+            rollersIO.updateInputs(rollersInputs);
+            hoodIO.updateInputs(hoodInputs);
+          }
+        }
+      }, rollersIO, hoodIO);
   }
 
   @Override
   public void periodic() {
-    /*????
-    if (DriverStation.isDisabled()) {
-      controller.reset(inputs.positionIntake);
+    synchronized (rollersInputs) {
+      synchronized (hoodInputs) {
+        Logger.processInputs("Shooter/RollerInputs", rollersInputs);
+        Logger.processInputs("Shooter/HoodInputs", hoodInputs);
+
+
+        Logger.recordOutput("Shooter/DesiredState", desiredState);
+        Logger.recordOutput("Shooter/CurrentState", shooterState);
+        shooterState = setStateTransition();
+        applyStates();
+      }
     }
-      */
-
-    Logger.processInputs("RollerInputs", rollersInputs);
-    rollersIO.updateInputs(rollersInputs);
-
-    shooterState = setStateTransition();
-    applyStates();
   }
 
   private ShooterState setStateTransition() {

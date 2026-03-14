@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.lib.util.DataProcessor;
 import frc.robot.RobotState;
 import frc.robot.simulation.MapleSimSwerveDrivetrain;
 import frc.robot.subsystems.vision.VisionPoseEstimateInField;
@@ -33,6 +34,8 @@ public class DriveSubsystem extends SubsystemBase {
   RobotState robotState;
 
   CommandXboxController controller;
+
+  private final Object ioLock = new Object();
 
   private final double maxVelocity;
   private final double maxAngularVelocity;
@@ -94,14 +97,20 @@ public class DriveSubsystem extends SubsystemBase {
     autoAllign.HeadingController.enableContinuousInput(-Math.PI, Math.PI);
 
     configurePathPlanner();
+    DataProcessor.initDataProcessor(()-> {
+      synchronized (ioLock) {
+        io.updateInputs(inputs);
+      }
+    }, io);
   }
 
   @Override
   public void periodic() {
     double timestamp = Timer.getFPGATimestamp();
-    io.updateInputs(inputs);
-    telemetry.telemeterize(inputs);
-    Logger.processInputs("SwerveDriveInputs", inputs);
+    synchronized(ioLock) {
+      telemetry.telemeterize(inputs);
+      Logger.processInputs("SwerveDriveInputs", inputs);
+    }
     io.getModuleStates(inputs);
 
     robotState.incrementIteration();
@@ -110,6 +119,7 @@ public class DriveSubsystem extends SubsystemBase {
     } else {
       configureStandardDeviationsForEnabled();
     }
+    
     Logger.recordOutput("Drive/latencyPeriodicSec", Timer.getFPGATimestamp() - timestamp);
     Logger.recordOutput(
         "Drive/currentCommand",

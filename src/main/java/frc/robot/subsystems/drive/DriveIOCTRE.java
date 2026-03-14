@@ -123,15 +123,6 @@ public class DriveIOCTRE extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> im
     var desiredFieldRelativeChassisSpeeds =
         ChassisSpeeds.fromRobotRelativeSpeeds(desiredRobotRelativeChassisSpeeds, gyroRotation);
 
-    BaseStatusSignal.refreshAll(
-        angularRollVelocity,
-        angularPitchVelocity,
-        angularYawVelocity,
-        pitch,
-        roll,
-        accelerationX,
-        accelerationY);
-
     double timestamp = Timer.getFPGATimestamp();
     double rollRadsPs = Units.degreesToRadians(angularRollVelocity.getValueAsDouble());
     double pitchRadsPS = Units.degreesToRadians(angularPitchVelocity.getValueAsDouble());
@@ -182,5 +173,17 @@ public class DriveIOCTRE extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> im
           moduleNames[i] + " Target Drive Velocity",
           driveState.ModuleTargets[i].speedMetersPerSecond);
     }
+  }
+
+  @Override
+  public void refreshData() {
+    BaseStatusSignal.refreshAll(
+        angularRollVelocity,
+        angularPitchVelocity,
+        angularYawVelocity,
+        pitch,
+        roll,
+        accelerationX,
+        accelerationY);
   }
 }

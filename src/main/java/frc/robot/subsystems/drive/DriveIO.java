@@ -5,11 +5,12 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
+import frc.lib.util.DataProcessor;
 import frc.robot.subsystems.vision.VisionPoseEstimateInField;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.AutoLog;
 
-public interface DriveIO {
+public interface DriveIO extends DataProcessor.IODataRefresher {
 
   @AutoLog
   class DriveIOInputs extends SwerveDriveState {
@@ -48,4 +49,7 @@ public interface DriveIO {
   void addVisionMeasurement(VisionPoseEstimateInField fieldEstimation);
 
   void setStateStandardDeviations(double x, double y, double r);
+
+  @Override
+  default void refreshData() {}
 }

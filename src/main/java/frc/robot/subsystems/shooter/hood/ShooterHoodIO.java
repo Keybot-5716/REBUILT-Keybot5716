@@ -1,43 +1,37 @@
 package frc.robot.subsystems.shooter.hood;
 
-import org.littletonrobotics.junction.AutoLog;
-
 import frc.lib.util.DataProcessor;
+import org.littletonrobotics.junction.AutoLog;
 
 public interface ShooterHoodIO extends DataProcessor.IODataRefresher {
 
   @AutoLog
   public static class HoodIOInputs {
-
-    HoodIOData data = new HoodIOData(false, 0, 0, 0, 0, 0);
+    public boolean motorConnected = false;
+    public double appliedVolts = 0.0;
+    public double position = 0.0;
+    public double velocity = 0.0;
+    public double acceleration = 0.0;
+    public double supplyCurrent = 0.0;
+    public double statorCurrent = 0.0;
+    public double tempCelcius = 0.0;
   }
 
-  record HoodIOData(
-      boolean motorConnected,
-      double positionRotations,
-      double velocityRotationsPerSec,
-      double appliedVolts,
-      double supplyCurrentAmps,
-      double tempCelsius) {}
+  void updateInputs(HoodIOInputs inputs);
 
-  public default void updateInputs(HoodIOInputs inputs) {}
+  void stop();
 
-  public default void stop() {}
+  void runOpenLoop(double output);
 
-  public default void runOpenLoop(double output) {}
+  void setVoltage(double volts);
 
-  public default void setVoltage(double volts) {}
+  void setPosition(double position);
 
-  public default void setPosition(double position) {}
+  void setNeutralModeBreak(boolean enable);
 
-  public default void setNeutralModeBreak(boolean enable) {}
+  void resetEncoder();
 
-  public default void resetEncoder() {}
-
-  public default void setPID(double kP, double kI, double kD) {}
-
-  /** Se utiliza para protocolos SysID */
-  default void optimizeForSysID() {}
+  void setPID(double kP, double kI, double kD);
 
   @Override
   default void refreshData() {}

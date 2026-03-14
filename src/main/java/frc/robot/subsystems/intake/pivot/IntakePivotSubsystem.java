@@ -4,7 +4,6 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.team6328.LoggedTunableNumber;
-import frc.robot.subsystems.intake.IntakeIOConstants;
 import org.littletonrobotics.junction.Logger;
 
 public class IntakePivotSubsystem extends SubsystemBase {
@@ -76,11 +75,11 @@ public class IntakePivotSubsystem extends SubsystemBase {
   private void applyStates() {
     switch (intakeState) {
       case INING:
-        setPosition(IntakeIOConstants.In);
+        setPosition(0.0);
         break;
 
       case OUTING:
-        setPosition(IntakeIOConstants.Out);
+        setPosition(0.0);
         break;
 
       case FORWARDING_PIVOT:
@@ -96,11 +95,11 @@ public class IntakePivotSubsystem extends SubsystemBase {
         break;
 
       case TEST:
-        test(IntakeIOConstants.Out);
+        test(0.0);
         break;
 
       case TEST2:
-        test(IntakeIOConstants.In);
+        test(0.0);
         break;
     }
   }

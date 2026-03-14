@@ -98,7 +98,7 @@ public class IntakeRollersSubsystem extends SubsystemBase {
 
   public void stop() {
     // pivotIO.stopMotor();
-    rollersIO.stopRollers();
+    rollersIO.stopMotor();
   }
 
   public void setVoltage(double voltage) {

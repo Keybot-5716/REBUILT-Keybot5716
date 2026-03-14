@@ -1,4 +1,4 @@
-package frc.robot.subsystems.intake.pivot;
+package frc.robot.subsystems.intake.rollers;
 
 import static edu.wpi.first.units.Units.Volts;
 
@@ -6,14 +6,12 @@ import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
@@ -22,33 +20,31 @@ import edu.wpi.first.units.measure.Voltage;
 import frc.lib.util.TalonFXSignalFrequencies;
 import frc.robot.subsystems.superstructure.SuperstructureConstants.IDs;
 
-public class IntakePivotIOTalonFX implements IntakePivotIO {
+public class IntakeRollerIOTalonFX implements IntakeRollersIO {
   private final TalonFX motor;
   private final VoltageOut voltageOut = new VoltageOut(Volts.zero());
-  private final PositionVoltage positionVoltage = new PositionVoltage(0.0);
 
   private final TalonFXConfiguration config = new TalonFXConfiguration();
 
   private final StatusSignal<Voltage> appliedVolts;
-  private final StatusSignal<Angle> positionIntake;
-  private final StatusSignal<AngularVelocity> velocityIntake;
-  private final StatusSignal<AngularAcceleration> accelerationIntake;
-  private final StatusSignal<Current> supplyCurrentIntake;
-  private final StatusSignal<Current> statorCurrentIntake;
+  private final StatusSignal<AngularVelocity> velocityRollers;
+  private final StatusSignal<AngularAcceleration> accelerationRollers;
+  private final StatusSignal<Current> supplyCurrentRollers;
+  private final StatusSignal<Current> statorCurrentRollers;
   private final StatusSignal<Temperature> tempCelsius;
 
-  public IntakePivotIOTalonFX() {
+  public IntakeRollerIOTalonFX() {
     motor = new TalonFX(IDs.INTAKE_PIVOT_ID, new CANBus("canivore"));
 
-    config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-    config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+    config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
+    config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
     config.MotorOutput.DutyCycleNeutralDeadband = 0.04;
     config.MotorOutput.PeakForwardDutyCycle = 1.0;
     config.MotorOutput.PeakReverseDutyCycle = -1.0;
 
     config.CurrentLimits.SupplyCurrentLimitEnable = true;
     config.CurrentLimits.StatorCurrentLimitEnable = true;
-    config.CurrentLimits.SupplyCurrentLimit = 60;
+    config.CurrentLimits.SupplyCurrentLimit = 40;
     config.CurrentLimits.StatorCurrentLimit = 80;
     config.CurrentLimits.SupplyCurrentLowerTime = 1;
 
@@ -69,32 +65,22 @@ public class IntakePivotIOTalonFX implements IntakePivotIO {
     motor.getConfigurator().apply(config);
 
     appliedVolts = motor.getMotorVoltage();
-    positionIntake = motor.getRotorPosition();
-    velocityIntake = motor.getRotorVelocity();
-    accelerationIntake = motor.getAcceleration();
-    supplyCurrentIntake = motor.getSupplyCurrent();
-    statorCurrentIntake = motor.getStatorCurrent();
+    velocityRollers = motor.getRotorVelocity();
+    accelerationRollers = motor.getAcceleration();
+    supplyCurrentRollers = motor.getSupplyCurrent();
+    statorCurrentRollers = motor.getStatorCurrent();
     tempCelsius = motor.getDeviceTemp();
 
     TalonFXSignalFrequencies.updateFrequencyTalonFX(
         appliedVolts,
-        positionIntake,
-        velocityIntake,
-        accelerationIntake,
-        supplyCurrentIntake,
-        statorCurrentIntake,
+        velocityRollers,
+        accelerationRollers,
+        supplyCurrentRollers,
+        statorCurrentRollers,
         tempCelsius);
 
     motor.optimizeBusUtilization();
     motor.setPosition(0.0);
-  }
-
-  public void setPosition(double position) {
-    motor.setControl(positionVoltage.withPosition(position));
-  }
-
-  public void posTest(double position) {
-    motor.setControl(positionVoltage.withPosition(position));
   }
 
   @Override
@@ -108,22 +94,20 @@ public class IntakePivotIOTalonFX implements IntakePivotIO {
   }
 
   @Override
-  public void updateInputs(IntakePivotIOInputs inputs) {
+  public void updateInputs(IntakeRollersIOInputs inputs) {
     inputs.motorConnected =
         BaseStatusSignal.isAllGood(
             appliedVolts,
-            positionIntake,
-            velocityIntake,
-            accelerationIntake,
-            supplyCurrentIntake,
-            statorCurrentIntake,
+            velocityRollers,
+            accelerationRollers,
+            supplyCurrentRollers,
+            statorCurrentRollers,
             tempCelsius);
     inputs.appliedVolts = appliedVolts.getValueAsDouble();
-    inputs.position = positionIntake.getValueAsDouble();
-    inputs.velocity = velocityIntake.getValueAsDouble();
-    inputs.acceleration = accelerationIntake.getValueAsDouble();
-    inputs.supplyCurrent = supplyCurrentIntake.getValueAsDouble();
-    inputs.statorCurrent = statorCurrentIntake.getValueAsDouble();
+    inputs.velocity = velocityRollers.getValueAsDouble();
+    inputs.acceleration = accelerationRollers.getValueAsDouble();
+    inputs.supplyCurrent = supplyCurrentRollers.getValueAsDouble();
+    inputs.statorCurrent = statorCurrentRollers.getValueAsDouble();
     inputs.tempCelcius = tempCelsius.getValueAsDouble();
   }
 
@@ -131,11 +115,10 @@ public class IntakePivotIOTalonFX implements IntakePivotIO {
   public void refreshData() {
     BaseStatusSignal.refreshAll(
         appliedVolts,
-        positionIntake,
-        velocityIntake,
-        accelerationIntake,
-        supplyCurrentIntake,
-        statorCurrentIntake,
+        velocityRollers,
+        accelerationRollers,
+        supplyCurrentRollers,
+        statorCurrentRollers,
         tempCelsius);
   }
 }

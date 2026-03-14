@@ -40,13 +40,13 @@ import frc.robot.subsystems.drive.DriveSubsystem.DesiredState;
 import frc.robot.subsystems.drive.TunerConstants;
 import frc.robot.subsystems.intake.pivot.IntakePivotIOTalonFX;
 import frc.robot.subsystems.intake.pivot.IntakePivotSubsystem;
-import frc.robot.subsystems.intake.rollers.IntakeRollersIOSparkMax;
+import frc.robot.subsystems.intake.rollers.IntakeRollerIOTalonFX;
 import frc.robot.subsystems.intake.rollers.IntakeRollersSubsystem;
 import frc.robot.subsystems.shooter.*;
 import frc.robot.subsystems.shooter.hood.*;
 import frc.robot.subsystems.shooter.rollers.*;
-import frc.robot.subsystems.transfer.TransferIOSparkMax;
 import frc.robot.subsystems.transfer.TransferSubsystem;
+import frc.robot.subsystems.transfer.TrasnferIOTalonFX;
 import frc.robot.subsystems.vision.VisionIOLimelight;
 import frc.robot.subsystems.vision.VisionIOSimPhotonVision;
 import frc.robot.subsystems.vision.VisionPoseEstimateInField;
@@ -94,7 +94,7 @@ public class RobotContainer {
   }
 
   private IntakeRollersSubsystem buildIntakeRollers() {
-    return new IntakeRollersSubsystem(new IntakeRollersIOSparkMax());
+    return new IntakeRollersSubsystem(new IntakeRollerIOTalonFX());
   }
 
   // -- Shooter
@@ -104,7 +104,7 @@ public class RobotContainer {
 
   // -- Transfer
   private TransferSubsystem buildTransfer() {
-    return new TransferSubsystem(new TransferIOSparkMax());
+    return new TransferSubsystem(new TrasnferIOTalonFX());
   }
 
   private VisionSubsystem buildVisionSubsystem() {
@@ -200,7 +200,8 @@ public class RobotContainer {
     controller
         .rightTrigger()
         .whileTrue(
-            Commands.run(() -> shooterSub.setDesiredState(ShooterSubsystem.DesiredState.TEST)))
+            Commands.run(
+                () -> shooterSub.setDesiredState(ShooterSubsystem.DesiredState.FORWARD_ROLLERS)))
         .onFalse(
             Commands.runOnce(
                 () -> shooterSub.setDesiredState(ShooterSubsystem.DesiredState.STOPPED)));
@@ -229,18 +230,6 @@ public class RobotContainer {
                 () ->
                     intakePivotSub.setDesiredState(
                         IntakePivotSubsystem.DesiredState.STOPPPED_PIVOT)));
-
-    controller
-        .a()
-        .whileTrue(
-            Commands.run(
-                () ->
-                    shooterSub.setDesiredStateWithVelocity(
-                        ShooterSubsystem.DesiredState.TEST, 52.0)))
-        .onFalse(
-            Commands.runOnce(
-                () -> shooterSub.setDesiredState(ShooterSubsystem.DesiredState.STOPPED)));
-
     controller
         .b()
         .whileTrue(

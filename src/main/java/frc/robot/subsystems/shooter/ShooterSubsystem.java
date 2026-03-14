@@ -1,7 +1,5 @@
 package frc.robot.subsystems.shooter;
 
-import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.team6328.LoggedTunableNumber;
 import frc.lib.util.DataProcessor;
@@ -21,23 +19,8 @@ public class ShooterSubsystem extends SubsystemBase {
 
   private final HoodIOInputsAutoLogged hoodInputs = new HoodIOInputsAutoLogged();
 
-  private static final LoggedTunableNumber rollerVolts =
-      new LoggedTunableNumber("Shooter/Rollers/RollerVolts", 1.0);
-
-  // Creamos un objeto TrapezoidProfile que tenga velocidad y aceleración máximas
-  private TrapezoidProfile.Constraints profile = new TrapezoidProfile.Constraints(2.0, 2.0);
-
-  // Creamos un controller para el trapezoidProfile
-  private ProfiledPIDController controller = new ProfiledPIDController(5, 0, 0, profile);
-
-  // Cambiar hasta qué posición queremos que llegue el intake
-  private static TrapezoidProfile.State goal = new TrapezoidProfile.State(0, 0);
-
   private DesiredState desiredState = DesiredState.STOPPED;
   private ShooterState shooterState = ShooterState.STOPPING;
-
-  private double desiredVoltage = 0;
-  private double desiredVelocity = 0;
 
   private static final LoggedTunableNumber desiredVelocityTunable =
       new LoggedTunableNumber("Shooter/Rollers/RollerVelocity", 50.0);
@@ -48,7 +31,6 @@ public class ShooterSubsystem extends SubsystemBase {
     REVERSE_ROLLERS,
     IN,
     OUT,
-    TEST,
     SCORE,
     TAXI
   }
@@ -59,7 +41,6 @@ public class ShooterSubsystem extends SubsystemBase {
     REVERSING_ROLLERS,
     INING,
     OUTING,
-    TESTING,
     SCORING,
     TAXIING
   }
@@ -69,14 +50,16 @@ public class ShooterSubsystem extends SubsystemBase {
     this.hoodIO = hoodIO;
 
     DataProcessor.initDataProcessor(
-      ()-> {
-        synchronized (rollersInputs) {
-          synchronized (hoodInputs) {
-            rollersIO.updateInputs(rollersInputs);
-            hoodIO.updateInputs(hoodInputs);
+        () -> {
+          synchronized (rollersInputs) {
+            synchronized (hoodInputs) {
+              rollersIO.updateInputs(rollersInputs);
+              hoodIO.updateInputs(hoodInputs);
+            }
           }
-        }
-      }, rollersIO, hoodIO);
+        },
+        rollersIO,
+        hoodIO);
   }
 
   @Override
@@ -85,7 +68,6 @@ public class ShooterSubsystem extends SubsystemBase {
       synchronized (hoodInputs) {
         Logger.processInputs("Shooter/RollerInputs", rollersInputs);
         Logger.processInputs("Shooter/HoodInputs", hoodInputs);
-
 
         Logger.recordOutput("Shooter/DesiredState", desiredState);
         Logger.recordOutput("Shooter/CurrentState", shooterState);
@@ -102,14 +84,46 @@ public class ShooterSubsystem extends SubsystemBase {
       case REVERSE_ROLLERS -> ShooterState.REVERSING_ROLLERS;
       case IN -> ShooterState.INING;
       case OUT -> ShooterState.OUTING;
-      case TEST -> ShooterState.TESTING;
       case SCORE -> ShooterState.SCORING;
       case TAXI -> ShooterState.TAXIING;
     };
   }
 
+  private void applyStates() {
+    switch (shooterState) {
+      case FORWARDING_ROLLERS:
+        setVelocityRollers(desiredVelocityTunable.get());
+        break;
+
+      case REVERSING_ROLLERS:
+        setVelocityRollers(-desiredVelocityTunable.get());
+        break;
+
+      case STOPPING:
+        setVoltageRollers(0);
+        // setPosition(0.0);
+        break;
+
+      case INING:
+        setPosition(0.0);
+        break;
+
+      case OUTING:
+        setPosition(0.0);
+        break;
+
+      case SCORING:
+        setPosition(0.0);
+        break;
+
+      case TAXIING:
+        setPosition(0.0);
+        break;
+    }
+  }
+
   public void stop() {
-    rollersIO.stopRollers();
+    rollersIO.stopMotor();
   }
 
   public void stopHood() {
@@ -124,61 +138,11 @@ public class ShooterSubsystem extends SubsystemBase {
     rollersIO.setVelocity(rps);
   }
 
-  private void applyStates() {
-    switch (shooterState) {
-      case FORWARDING_ROLLERS:
-        setVoltageRollers(desiredVoltage);
-        break;
-
-      case REVERSING_ROLLERS:
-        setVoltageRollers(-desiredVoltage);
-        break;
-
-      case STOPPING:
-        setVoltageRollers(0);
-        // setPosition(0.0);
-        break;
-
-      case INING:
-        setPosition(ShooterConstants.In);
-        break;
-
-      case OUTING:
-        setPosition(ShooterConstants.Out);
-        break;
-
-      case TESTING:
-        setVelocityRollers(desiredVelocityTunable.get());
-        // setPosition(ShooterConstants.hoodScore);
-        break;
-
-      case SCORING:
-        setPosition(ShooterConstants.hoodScore);
-        break;
-
-      case TAXIING:
-        setPosition(ShooterConstants.hoodTaxi);
-        break;
-    }
-  }
-
   public void setPosition(double position) {
-    goal.position = position;
     hoodIO.setPosition(position);
-    // io.setVoltage(controller.calculate(inputs.positionIntake, goal.position));
   }
 
   public void setDesiredState(DesiredState desiredState) {
     this.desiredState = desiredState;
-  }
-
-  public void setDesiredStateWithVoltage(DesiredState desiredState, double desiredVoltage) {
-    this.desiredState = desiredState;
-    this.desiredVoltage = desiredVoltage;
-  }
-
-  public void setDesiredStateWithVelocity(DesiredState desiredState, double rps) {
-    this.desiredState = desiredState;
-    this.desiredVelocity = rps;
   }
 }

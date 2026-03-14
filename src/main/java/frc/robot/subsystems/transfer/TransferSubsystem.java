@@ -2,6 +2,7 @@ package frc.robot.subsystems.transfer;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.team6328.LoggedTunableNumber;
+import frc.lib.util.DataProcessor;
 import org.littletonrobotics.junction.Logger;
 
 public class TransferSubsystem extends SubsystemBase {
@@ -13,9 +14,7 @@ public class TransferSubsystem extends SubsystemBase {
   private TransferState transferState = TransferState.STOPPING;
 
   private static final LoggedTunableNumber rollerVolts =
-      new LoggedTunableNumber("Transfer/Rollers/RollerVolts", 7.0);
-
-  private double desiredRollersVoltage;
+      new LoggedTunableNumber("Transfer/Rollers/RollerVolts", 5.0);
 
   public enum DesiredState {
     STOPPED,
@@ -31,6 +30,25 @@ public class TransferSubsystem extends SubsystemBase {
 
   public TransferSubsystem(TransferIO transferIO) {
     this.transferIO = transferIO;
+    DataProcessor.initDataProcessor(
+        () -> {
+          synchronized (transferInputs) {
+            transferIO.updateInputs(transferInputs);
+          }
+        },
+        transferIO);
+  }
+
+  @Override
+  public void periodic() {
+    synchronized (transferInputs) {
+      Logger.processInputs("Transfer/TransferInputs", transferInputs);
+
+      Logger.recordOutput("Transfer/DesiredState", desiredState);
+      Logger.recordOutput("Transfer/CurrentState", transferState);
+      transferState = setStateTransition();
+      applyStates();
+    }
   }
 
   private TransferState setStateTransition() {
@@ -57,17 +75,8 @@ public class TransferSubsystem extends SubsystemBase {
     }
   }
 
-  @Override
-  public void periodic() {
-    transferIO.updateInputs(transferInputs);
-    Logger.processInputs("TransferInputs/TransferSubsystem", transferInputs);
-
-    transferState = setStateTransition();
-    applyStates();
-  }
-
   public void stop() {
-    transferIO.stopRollers();
+    transferIO.stopMotor();
   }
 
   public void setVoltage(double voltage) {
@@ -76,10 +85,5 @@ public class TransferSubsystem extends SubsystemBase {
 
   public void setDesiredState(DesiredState desiredState) {
     this.desiredState = desiredState;
-  }
-
-  public void setDesiredStateWithVoltage(DesiredState desiredState, double desiredVoltage) {
-    this.desiredState = desiredState;
-    this.desiredRollersVoltage = desiredVoltage;
   }
 }

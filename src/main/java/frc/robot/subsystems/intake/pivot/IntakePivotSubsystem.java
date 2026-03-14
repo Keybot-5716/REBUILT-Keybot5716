@@ -4,6 +4,8 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.team6328.LoggedTunableNumber;
+import frc.lib.util.DataProcessor;
+
 import org.littletonrobotics.junction.Logger;
 
 public class IntakePivotSubsystem extends SubsystemBase {
@@ -48,16 +50,25 @@ public class IntakePivotSubsystem extends SubsystemBase {
   public IntakePivotSubsystem(IntakePivotIO pivotIO) {
     this.pivotIO = pivotIO;
     controller.setTolerance(0.02);
+    DataProcessor.initDataProcessor(
+        () -> {
+          synchronized (pivotInputs) {
+            pivotIO.updateInputs(pivotInputs);
+          }
+        },
+        pivotIO);
   }
 
   @Override
   public void periodic() {
+    synchronized (pivotInputs) {
+      Logger.processInputs("Intake/Pivot/PivotInputs", pivotInputs);
 
-    pivotIO.updateInputs(pivotInputs);
-    Logger.processInputs("IntakePivotInputs", pivotInputs);
-
-    intakeState = setStateTransition();
-    applyStates();
+      Logger.recordOutput("Intake/Pivot/DesiredState", desiredState);
+      Logger.recordOutput("Intake/Pivot/CurrentState", intakeState);
+      intakeState = setStateTransition();
+      applyStates();
+    }
   }
 
   private IntakeState setStateTransition() {

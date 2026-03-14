@@ -1,47 +1,22 @@
 package frc.robot.subsystems.intake.rollers;
 
-import edu.wpi.first.math.filter.Debouncer;
-import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.team6328.LoggedTunableNumber;
+import frc.lib.util.DataProcessor;
+
 import org.littletonrobotics.junction.Logger;
 
 public class IntakeRollersSubsystem extends SubsystemBase {
   private final IntakeRollersIO rollersIO;
 
-  // private final IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
   private final IntakeRollersIOInputsAutoLogged rollersInputs =
       new IntakeRollersIOInputsAutoLogged();
 
   private static final LoggedTunableNumber rollerVolts =
       new LoggedTunableNumber("Intake/Rollers/RollerVoltsIntake", 5.0);
 
-  // private static final LoggedTunableNumber pivotP = new LoggedTunableNumber("Intake/Pivot/kP");
-  // private static final LoggedTunableNumber pivotD = new LoggedTunableNumber("Intake/Pivot/kD");
-
-  /*
-  static {
-    switch (Constants.currentMode) {
-      case REAL -> {
-        pivotP.initDefault(3);
-        pivotD.initDefault(0.01);
-      }
-      case SIM -> {
-        pivotP.initDefault(5);
-        pivotD.initDefault(0.01);
-      }
-    }
-  }*/
-
-  private final Debouncer pivotDebouncer = new Debouncer(0.5, DebounceType.kFalling);
-  // private final Alert pivotDisconnected = new Alert("Pivot disconnected :(",
-  // Alert.AlertType.kWarning);
-
   private DesiredState desiredState = DesiredState.STOPPED;
   private RollersState rollersState = RollersState.STOPPING;
-
-  private double desiredRollersVoltage;
-  private double desiredPivotVoltageForOpenLoop;
 
   public enum DesiredState {
     STOPPED,
@@ -57,19 +32,25 @@ public class IntakeRollersSubsystem extends SubsystemBase {
 
   public IntakeRollersSubsystem(IntakeRollersIO rollersIO) {
     this.rollersIO = rollersIO;
+    DataProcessor.initDataProcessor(
+        () -> {
+          synchronized (rollersInputs) {
+            rollersIO.updateInputs(rollersInputs);
+          }
+        },
+        rollersIO);
   }
 
   @Override
   public void periodic() {
+    synchronized (rollersInputs) {
+      Logger.processInputs("Intake/Rollers/RollersInputs", rollersInputs);
 
-    // if (DriverStation.isDisabled()) {
-    // controller.reset(pivotInputs.positionIntake);
-    /////////////////////////// }
-    rollersIO.updateInputs(rollersInputs);
-    Logger.processInputs("IntakeRollersInputs", rollersInputs);
-
-    rollersState = setStateTransition();
-    applyStates();
+      Logger.recordOutput("Intake/Rollers/DesiredState", desiredState);
+      Logger.recordOutput("Intake/Rollers/CurrentState", rollersState);
+      rollersState = setStateTransition();
+      applyStates();
+    }
   }
 
   private RollersState setStateTransition() {
@@ -97,7 +78,6 @@ public class IntakeRollersSubsystem extends SubsystemBase {
   }
 
   public void stop() {
-    // pivotIO.stopMotor();
     rollersIO.stopMotor();
   }
 
@@ -107,11 +87,5 @@ public class IntakeRollersSubsystem extends SubsystemBase {
 
   public void setDesiredState(DesiredState desiredState) {
     this.desiredState = desiredState;
-  }
-
-  public void setDesiredStateWithVoltage(DesiredState desiredState, double desiredVoltage) {
-    this.desiredState = desiredState;
-    this.desiredRollersVoltage = desiredVoltage;
-    this.desiredPivotVoltageForOpenLoop = desiredVoltage;
   }
 }

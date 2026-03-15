@@ -10,7 +10,6 @@ import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.units.measure.Angle;
@@ -178,18 +177,16 @@ public class RobotContainer {
     controller.start().onTrue(Commands.runOnce(() -> driveSub.resetOdometry()));
     controller
         .start()
-        .onTrue(
-            Commands.runOnce(
-                () ->
-                    driveSub.resetOdometry(
-                        new Pose2d(16.54 - 3.1, 8.069 - 4, new Rotation2d(Math.PI)))));
+        .onTrue(Commands.runOnce(() -> driveSub.resetOdometry(FieldConstants.getTestingPose())));
     controller
         .rightBumper()
         .whileTrue(
             Commands.run(
                 () ->
                     driveSub.setDesiredPointToLock(
-                        new Translation2d(16.54 - 4.778, 8.069 - 4.293))))
+                        new Translation2d(
+                            FieldConstants.getHubShootingPose().getX(),
+                            FieldConstants.getHubShootingPose().getY()))))
         .onFalse(
             Commands.runOnce(
                 () -> driveSub.setState(DriveSubsystem.DesiredState.MANUAL_FIELD_DRIVE)));

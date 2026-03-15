@@ -18,8 +18,6 @@ public interface TransferIO extends DataProcessor.IODataRefresher {
 
   void updateInputs(TransferIOInputs inputs);
 
-  void setVoltage(double voltage);
-
   void setVelocity(double rps);
 
   void stopMotor();

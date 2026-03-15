@@ -40,7 +40,7 @@ public class Robot extends LoggedRobot {
 
   private final RobotContainer robotContainer;
 
-  private Optional<Alliance> alliance = Optional.of(Alliance.Blue);
+  public static Optional<Alliance> alliance = Optional.of(Alliance.Blue);
 
   static final int REAL_TIME_PRIORITY = 2;
   static final int NON_REAL_TIME_PRIORITY = 1;

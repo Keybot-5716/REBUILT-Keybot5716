@@ -13,7 +13,8 @@ public class TransferSubsystem extends SubsystemBase {
   private DesiredState desiredState = DesiredState.STOPPED;
   private TransferState transferState = TransferState.STOPPING;
 
-  private static final LoggedTunableNumber rollerRPS = new LoggedTunableNumber("Transfer/Rollers/RollerRPS", 25.0);
+  private static final LoggedTunableNumber rollerRPS =
+      new LoggedTunableNumber("Transfer/Rollers/RollerRPS", 25.0);
 
   public enum DesiredState {
     STOPPED,

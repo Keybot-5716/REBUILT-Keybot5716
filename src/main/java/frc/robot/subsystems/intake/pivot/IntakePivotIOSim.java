@@ -1,4 +1,4 @@
-/*package frc.robot.subsystems.intake.pivot;
+package frc.robot.subsystems.intake.pivot;
 
 import static edu.wpi.first.units.Units.Meters;
 
@@ -11,7 +11,7 @@ public class IntakePivotIOSim implements IntakePivotIO {
   /**
    * Este método sirve para configurar la especificaciones del intake que se va a mostrar simulado
    *
-   * @param driveTrain Sirve para tener en cuenta en qué base estara este intake
+   * @param driveTrain Sirve para tener en cuenta en qué base estara este intake*/
 
   public IntakePivotIOSim(AbstractDriveTrainSimulation driveTrain) {
     this.intakeSimulation =
@@ -27,13 +27,13 @@ public class IntakePivotIOSim implements IntakePivotIO {
             // The intake is mounted on the front? side of the chassis
             IntakeSimulation.IntakeSide.FRONT,
             // The intake can hold up to ? balls?
-            20);
+            4);
   }
 
   /**
    * Con esto podemos hacer que extienda o que retraiga el intake
    *
-   * @param runIntake sirve si es que queremos que se extienda o se retraiga
+   * @param runIntake sirve si es que queremos que se extienda o se retraiga*/
 
   public void setRunning(boolean runIntake) {
     if (runIntake)
@@ -47,7 +47,7 @@ public class IntakePivotIOSim implements IntakePivotIO {
   }
 
   /**
-   * @return si hay algun fuel en el intake
+   * @return si hay algun fuel en el intake*/
 
   public boolean isFuelInsideIntake() {
     return intakeSimulation.getGamePiecesAmount()
@@ -61,7 +61,7 @@ public class IntakePivotIOSim implements IntakePivotIO {
     if (intakeSimulation.obtainGamePieceFromIntake()) {}
     // ShooterIOSim.launchFuel(); //notify the simulated flywheels to launch a fuel (We need the
     // shooter to be aware of this)
-  }
+  }*/
 
   @Override
   public void updateInputs(IntakePivotIOInputs inputs) {}
@@ -75,4 +75,3 @@ public class IntakePivotIOSim implements IntakePivotIO {
   @Override
   public void setPosition(double position) {}
 }
-*/

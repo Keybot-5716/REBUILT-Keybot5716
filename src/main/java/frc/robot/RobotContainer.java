@@ -31,16 +31,9 @@ import frc.robot.auto.AutoBuilder;
 import frc.robot.auto.AutoForwardTest;
 import frc.robot.auto.NoneAuto;
 import frc.robot.simulation.SimulatedRobotState;
-import frc.robot.subsystems.drive.DriveConstants;
-import frc.robot.subsystems.drive.DriveIOCTRE;
-import frc.robot.subsystems.drive.DriveIOSim;
-import frc.robot.subsystems.drive.DriveSubsystem;
-import frc.robot.subsystems.drive.DriveSubsystem.DesiredState;
-import frc.robot.subsystems.drive.TunerConstants;
-import frc.robot.subsystems.intake.pivot.IntakePivotIOTalonFX;
-import frc.robot.subsystems.intake.pivot.IntakePivotSubsystem;
-import frc.robot.subsystems.intake.rollers.IntakeRollerIOTalonFX;
-import frc.robot.subsystems.intake.rollers.IntakeRollersSubsystem;
+import frc.robot.subsystems.drive.*;
+import frc.robot.subsystems.intake.pivot.*;
+import frc.robot.subsystems.intake.rollers.*;
 import frc.robot.subsystems.shooter.*;
 import frc.robot.subsystems.shooter.hood.*;
 import frc.robot.subsystems.shooter.rollers.*;
@@ -165,7 +158,7 @@ public class RobotContainer {
       configureButtonBindings(DRIVE_CONTROLLER);
     }
     configureAuto();
-    driveSub.setState(DesiredState.MANUAL_FIELD_DRIVE);
+    driveSub.setState(DriveSubsystem.DesiredState.MANUAL_FIELD_DRIVE);
   }
 
   /**

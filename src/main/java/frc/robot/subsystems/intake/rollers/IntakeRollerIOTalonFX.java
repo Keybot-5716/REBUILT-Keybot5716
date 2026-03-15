@@ -34,7 +34,7 @@ public class IntakeRollerIOTalonFX implements IntakeRollersIO {
   private final StatusSignal<Temperature> tempCelsius;
 
   public IntakeRollerIOTalonFX() {
-    motor = new TalonFX(IDs.INTAKE_PIVOT_ID, new CANBus("canivore"));
+    motor = new TalonFX(IDs.INTAKE_ROLLER_ID, new CANBus("canivore"));
 
     config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
     config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;

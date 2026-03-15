@@ -97,17 +97,19 @@ public class DriveSubsystem extends SubsystemBase {
     autoAllign.HeadingController.enableContinuousInput(-Math.PI, Math.PI);
 
     configurePathPlanner();
-    DataProcessor.initDataProcessor(()-> {
-      synchronized (ioLock) {
-        io.updateInputs(inputs);
-      }
-    }, io);
+    DataProcessor.initDataProcessor(
+        () -> {
+          synchronized (ioLock) {
+            io.updateInputs(inputs);
+          }
+        },
+        io);
   }
 
   @Override
   public void periodic() {
     double timestamp = Timer.getFPGATimestamp();
-    synchronized(ioLock) {
+    synchronized (ioLock) {
       telemetry.telemeterize(inputs);
       Logger.processInputs("SwerveDriveInputs", inputs);
     }
@@ -119,7 +121,7 @@ public class DriveSubsystem extends SubsystemBase {
     } else {
       configureStandardDeviationsForEnabled();
     }
-    
+
     Logger.recordOutput("Drive/latencyPeriodicSec", Timer.getFPGATimestamp() - timestamp);
     Logger.recordOutput(
         "Drive/currentCommand",

@@ -3,7 +3,6 @@ package frc.robot.subsystems.transfer;
 import static edu.wpi.first.units.Units.Volts;
 
 import com.ctre.phoenix6.BaseStatusSignal;
-import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.VelocityVoltage;
@@ -19,6 +18,7 @@ import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
 import frc.lib.util.TalonFXSignalFrequencies;
+import frc.robot.subsystems.superstructure.SuperstructureConstants.IDs;
 
 public class TrasnferIOTalonFX implements TransferIO {
   private final TalonFX motor;
@@ -36,7 +36,7 @@ public class TrasnferIOTalonFX implements TransferIO {
   private final StatusSignal<Temperature> tempCelsius;
 
   public TrasnferIOTalonFX() {
-    motor = new TalonFX(30, new CANBus("canivore"));
+    motor = new TalonFX(IDs.TRANSFER_ID);
 
     config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
     config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;

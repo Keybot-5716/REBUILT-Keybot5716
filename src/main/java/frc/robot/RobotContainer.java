@@ -47,10 +47,7 @@ import frc.robot.subsystems.shooter.hood.*;
 import frc.robot.subsystems.shooter.rollers.*;
 import frc.robot.subsystems.transfer.TransferSubsystem;
 import frc.robot.subsystems.transfer.TrasnferIOTalonFX;
-import frc.robot.subsystems.vision.VisionIOLimelight;
-import frc.robot.subsystems.vision.VisionIOSimPhotonVision;
 import frc.robot.subsystems.vision.VisionPoseEstimateInField;
-import frc.robot.subsystems.vision.VisionSubsystem;
 import java.util.function.Consumer;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.seasonspecific.rebuilt2026.RebuiltFuelOnFly;
@@ -107,14 +104,14 @@ public class RobotContainer {
     return new TransferSubsystem(new TrasnferIOTalonFX());
   }
 
-  private VisionSubsystem buildVisionSubsystem() {
+  /*private VisionSubsystem buildVisionSubsystem() {
     if (Robot.isSimulation()) {
       return new VisionSubsystem(
           new VisionIOSimPhotonVision(robotState, simulatedRobotState), robotState);
     } else {
       return new VisionSubsystem(new VisionIOLimelight(robotState), robotState);
     }
-  }
+  }*/
 
   private final Consumer<VisionPoseEstimateInField> visionFieldEstimate =
       new Consumer<VisionPoseEstimateInField>() {
@@ -151,7 +148,7 @@ public class RobotContainer {
   private final IntakeRollersSubsystem intakeRollersSub = buildIntakeRollers();
   private final IntakePivotSubsystem intakePivotSub = buildIntakePivot();
 
-  private final VisionSubsystem visionSub = buildVisionSubsystem();
+  // private final VisionSubsystem visionSub = buildVisionSubsystem();
   // private final IntakePivotIOSim intakePivotSub = new
   // IntakePivotIOSim(driveSub.getMapleSimDrive().mapleSimDrive);
 
@@ -428,9 +425,9 @@ public class RobotContainer {
     return driveSub;
   }
 
-  public VisionSubsystem getVisionSubsystem() {
+  /*public VisionSubsystem getVisionSubsystem() {
     return visionSub;
-  }
+  }*/
 
   public RobotState getRobotState() {
     return robotState;

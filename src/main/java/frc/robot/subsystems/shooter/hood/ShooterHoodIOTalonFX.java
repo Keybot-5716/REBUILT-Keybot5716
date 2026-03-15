@@ -18,6 +18,7 @@ import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
 import frc.lib.util.TalonFXSignalFrequencies;
+import frc.robot.subsystems.superstructure.SuperstructureConstants.IDs;
 
 public class ShooterHoodIOTalonFX implements ShooterHoodIO {
 
@@ -36,7 +37,7 @@ public class ShooterHoodIOTalonFX implements ShooterHoodIO {
   private final StatusSignal<Temperature> tempCelsius;
 
   public ShooterHoodIOTalonFX() {
-    motor = new TalonFX(31, new CANBus("canivore"));
+    motor = new TalonFX(IDs.SHOOTER_HOOD_ID, new CANBus("canivore"));
 
     config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;

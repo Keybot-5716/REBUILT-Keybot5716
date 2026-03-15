@@ -112,8 +112,9 @@ public class DriveIOCTRE extends SwerveDrivetrain<TalonFX, TalonFX, CANcoder> im
 
   @Override
   public void updateInputs(DriveIOInputs inputs) {
-    if (telemetryCache.get() == null) return;
-    inputs.dataSwerveState(telemetryCache.get());
+    var state = telemetryCache.get();
+    if (state == null) return;
+    inputs.dataSwerveState(state);
     var gyroRotation = inputs.Pose.getRotation();
     inputs.gyroAngle = gyroRotation.getDegrees();
     var measuredRobotRelativeChassisSpeeds = getKinematics().toChassisSpeeds(inputs.ModuleStates);

@@ -13,8 +13,7 @@ public class TransferSubsystem extends SubsystemBase {
   private DesiredState desiredState = DesiredState.STOPPED;
   private TransferState transferState = TransferState.STOPPING;
 
-  private static final LoggedTunableNumber rollerVolts =
-      new LoggedTunableNumber("Transfer/Rollers/RollerVolts", 5.0);
+  private static final LoggedTunableNumber rollerRPS = new LoggedTunableNumber("Transfer/Rollers/RollerRPS", 25.0);
 
   public enum DesiredState {
     STOPPED,
@@ -62,11 +61,11 @@ public class TransferSubsystem extends SubsystemBase {
   private void applyStates() {
     switch (transferState) {
       case FORWARDING:
-        setVoltage(rollerVolts.get());
+        setVelocity(rollerRPS.get());
         break;
 
       case REVERSING:
-        setVoltage(-rollerVolts.get());
+        setVelocity(-rollerRPS.get());
         break;
 
       case STOPPING:
@@ -75,12 +74,12 @@ public class TransferSubsystem extends SubsystemBase {
     }
   }
 
-  public void stop() {
+  private void stop() {
     transferIO.stopMotor();
   }
 
-  public void setVoltage(double voltage) {
-    transferIO.setVoltage(voltage);
+  private void setVelocity(double rps) {
+    transferIO.setVelocity(rps);
   }
 
   public void setDesiredState(DesiredState desiredState) {

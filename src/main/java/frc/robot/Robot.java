@@ -74,7 +74,6 @@ public class Robot extends LoggedRobot {
       case SIM:
         // Running a physics simulator, log to NT
         Logger.addDataReceiver(new NT4Publisher());
-        Logger.addDataReceiver(new WPILOGWriter());
         break;
 
       case REPLAY:
@@ -95,11 +94,6 @@ public class Robot extends LoggedRobot {
     robotContainer = new RobotContainer();
     SmartDashboard.putData("Command Scheduler", CommandScheduler.getInstance());
     SignalLogger.enableAutoLogging(false);
-
-    if (RobotBase.isSimulation()) {
-      robotContainer.getDriveSubsystem().resetOdometry(new Pose2d(2, 2, new Rotation2d()));
-      // robotContainer.getDriveSubsystem().resetOdometry(new Pose2d(0, 0, new Rotation2d()));
-    }
   }
 
   /** This function is called periodically during all modes. */
@@ -110,23 +104,23 @@ public class Robot extends LoggedRobot {
     } else {
       Threads.setCurrentThreadPriority(false, NON_REAL_TIME_PRIORITY);
     }
-
+    CommandScheduler.getInstance().run();
     // robotContainer.getRobotVisualizer().updateRobotVisualizer();
     robotContainer.getRobotState().updateLogger();
     if (RobotBase.isSimulation()) {
       robotContainer.getSimRobotState().updateSim();
     }
-    CommandScheduler.getInstance().run();
   }
 
   /** This function is called once when the robot is disabled. */
   @Override
-  public void disabledInit() {}
+  public void disabledInit() {
+    autonomousCommand = robotContainer.getAutonomousCommand();
+  }
 
   /** This function is called periodically when disabled. */
   @Override
   public void disabledPeriodic() {
-    autonomousCommand = robotContainer.getAutonomousCommand();
     alliance = DriverStation.getAlliance().isPresent() ? DriverStation.getAlliance() : alliance;
   }
 
@@ -189,6 +183,9 @@ public class Robot extends LoggedRobot {
   /** This function is called once when the robot is first started up. */
   @Override
   public void simulationInit() {
+    robotContainer.getDriveSubsystem().resetOdometry(new Pose2d(2, 2, new Rotation2d()));
+    // robotContainer.getDriveSubsystem().resetOdometry(new Pose2d(0, 0, new Rotation2d()));
+
     // AIRobotSimulated.startOpponentRobotSimulations();
   }
 

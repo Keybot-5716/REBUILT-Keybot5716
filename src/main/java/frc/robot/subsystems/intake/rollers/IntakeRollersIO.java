@@ -20,6 +20,8 @@ public interface IntakeRollersIO extends DataProcessor.IODataRefresher {
 
   void setVoltage(double voltage);
 
+  void setVelocity(double rps);
+
   void stopMotor();
 
   @Override

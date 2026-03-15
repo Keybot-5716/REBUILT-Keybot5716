@@ -12,7 +12,7 @@ public class IntakeRollersSubsystem extends SubsystemBase {
       new IntakeRollersIOInputsAutoLogged();
 
   private static final LoggedTunableNumber rollerVolts =
-      new LoggedTunableNumber("Intake/Rollers/RollerVoltsIntake", 5.0);
+      new LoggedTunableNumber("Intake/Rollers/RollerVoltsIntake", 25.0);
 
   private DesiredState desiredState = DesiredState.STOPPED;
   private RollersState rollersState = RollersState.STOPPING;

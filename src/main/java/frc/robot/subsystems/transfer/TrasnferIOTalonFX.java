@@ -1,15 +1,11 @@
 package frc.robot.subsystems.transfer;
 
-import static edu.wpi.first.units.Units.Volts;
-
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.VelocityVoltage;
-import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
-import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.units.measure.AngularAcceleration;
@@ -23,7 +19,6 @@ import frc.robot.subsystems.superstructure.SuperstructureConstants.IDs;
 public class TrasnferIOTalonFX implements TransferIO {
   private final TalonFX motor;
 
-  private final VoltageOut voltageOut = new VoltageOut(Volts.zero());
   private final VelocityVoltage velocityRequest = new VelocityVoltage(0);
 
   private final TalonFXConfiguration config = new TalonFXConfiguration();
@@ -57,10 +52,10 @@ public class TrasnferIOTalonFX implements TransferIO {
 
     config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RotorSensor;
 
-    config.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
-    config.Slot0.kP = 7.0;
+    config.Slot0.kP = 0.15;
     config.Slot0.kI = 0.0;
     config.Slot0.kD = 0.0;
+    config.Slot0.kV = 0.13;
 
     config.Audio.BeepOnBoot = true;
 
@@ -87,11 +82,6 @@ public class TrasnferIOTalonFX implements TransferIO {
 
   public void setPosition(double position) {
     motor.setPosition(position);
-  }
-
-  @Override
-  public void setVoltage(double voltage) {
-    motor.setControl(voltageOut.withOutput(voltage));
   }
 
   @Override

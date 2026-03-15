@@ -46,7 +46,7 @@ public class DriveIOSim extends DriveIOCTRE {
     super(robotState, swerveConstants, modules);
     this.simRobotState = simRobotState;
 
-    registerTelemetry(telemetryConsumer);
+    registerTelemetry(simTelemetryConsumer);
     startThread();
   }
 

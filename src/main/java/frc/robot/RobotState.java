@@ -242,4 +242,15 @@ public class RobotState {
   public boolean passedTrench() {
     return passedTrench(this.isRedAlliance(), this.getLatestFieldToRobot().getValue());
   }
+
+  // ----- Arm
+  private final AtomicReference<Double> armAngle = new AtomicReference<>(0.0);
+
+  public void setArmAngle(double angle) {
+    armAngle.set(angle);
+  }
+  
+  public double getArmAngle() {
+    return armAngle.get();
+  }
 }

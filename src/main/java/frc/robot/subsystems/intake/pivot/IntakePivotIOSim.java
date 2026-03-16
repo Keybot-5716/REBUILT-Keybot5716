@@ -11,8 +11,8 @@ public class IntakePivotIOSim implements IntakePivotIO {
   /**
    * Este método sirve para configurar la especificaciones del intake que se va a mostrar simulado
    *
-   * @param driveTrain Sirve para tener en cuenta en qué base estara este intake*/
-
+   * @param driveTrain Sirve para tener en cuenta en qué base estara este intake
+   */
   public IntakePivotIOSim(AbstractDriveTrainSimulation driveTrain) {
     this.intakeSimulation =
         IntakeSimulation.OverTheBumperIntake(
@@ -33,8 +33,8 @@ public class IntakePivotIOSim implements IntakePivotIO {
   /**
    * Con esto podemos hacer que extienda o que retraiga el intake
    *
-   * @param runIntake sirve si es que queremos que se extienda o se retraiga*/
-
+   * @param runIntake sirve si es que queremos que se extienda o se retraiga
+   */
   public void setRunning(boolean runIntake) {
     if (runIntake)
       intakeSimulation
@@ -47,22 +47,19 @@ public class IntakePivotIOSim implements IntakePivotIO {
   }
 
   /**
-   * @return si hay algun fuel en el intake*/
-
+   * @return si hay algun fuel en el intake
+   */
   public boolean isFuelInsideIntake() {
     return intakeSimulation.getGamePiecesAmount()
         != 0; // True if there is a game piece in the intake
   }
 
   /**
-  public void launchFuel() {
-    // if there is a fuel in the intake, it will be removed and return true; otherwise, returns
-    // false
-    if (intakeSimulation.obtainGamePieceFromIntake()) {}
-    // ShooterIOSim.launchFuel(); //notify the simulated flywheels to launch a fuel (We need the
-    // shooter to be aware of this)
-  }*/
-
+   * public void launchFuel() { // if there is a fuel in the intake, it will be removed and return
+   * true; otherwise, returns // false if (intakeSimulation.obtainGamePieceFromIntake()) {} //
+   * ShooterIOSim.launchFuel(); //notify the simulated flywheels to launch a fuel (We need the //
+   * shooter to be aware of this) }
+   */
   @Override
   public void updateInputs(IntakePivotIOInputs inputs) {}
 

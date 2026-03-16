@@ -107,6 +107,7 @@ public class Robot extends LoggedRobot {
     CommandScheduler.getInstance().run();
     // robotContainer.getRobotVisualizer().updateRobotVisualizer();
     robotContainer.getRobotState().updateLogger();
+    robotContainer.getRobotVisualizer().updateRobotVisualizer();
     if (RobotBase.isSimulation()) {
       robotContainer.getSimRobotState().updateSim();
     }
@@ -192,7 +193,7 @@ public class Robot extends LoggedRobot {
   /** This function is called periodically whilst in simulation. */
   @Override
   public void simulationPeriodic() {
-    // Logger.recordOutput("FieldSimulation/Fuel",
-    // SimulatedArena.getInstance().getGamePiecesArrayByType("Fuel"));
+    Logger.recordOutput(
+        "FieldSimulation/Fuel", SimulatedArena.getInstance().getGamePiecesArrayByType("Fuel"));
   }
 }

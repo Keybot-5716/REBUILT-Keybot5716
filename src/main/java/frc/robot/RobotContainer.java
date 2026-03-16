@@ -33,6 +33,7 @@ import frc.robot.subsystems.shooter.hood.*;
 import frc.robot.subsystems.shooter.rollers.*;
 import frc.robot.subsystems.transfer.*;
 import frc.robot.subsystems.vision.VisionPoseEstimateInField;
+import frc.robot.subsystems.visualizers.RobotVisualizer;
 import java.util.function.Consumer;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.seasonspecific.rebuilt2026.RebuiltFuelOnFly;
@@ -142,11 +143,13 @@ public class RobotContainer {
       new LoggedDashboardChooser<>("Auto Chooser");
   public static Field2d autoPrev = new Field2d();
 
+  private final RobotVisualizer robotVisualizer = new RobotVisualizer(robotState);
+
   public RobotContainer() {
     if (RobotBase.isSimulation()) {
       assert this.simulatedRobotState != null;
       this.simulatedRobotState.init();
-      // configureButtonBindingsSim(DRIVE_CONTROLLER);
+      configureButtonBindingsSim(DRIVE_CONTROLLER);
     } else {
       configureButtonBindings(DRIVE_CONTROLLER);
     }
@@ -275,6 +278,21 @@ public class RobotContainer {
    *     incicial del fuel, la dirección en la cual se va a estar lanzando la velocidad y el ángulo
    *     al que será lanzado
    */
+  public void configureButtonBindingsSim(CommandXboxController controller) {
+    controller
+        .rightBumper()
+        .whileTrue(
+            Commands.run(
+                () ->
+                    driveSub.setDesiredPointToLock(
+                        new Translation2d(
+                            FieldConstants.getHubShootingPose().getX(),
+                            FieldConstants.getHubShootingPose().getY()))))
+        .onFalse(
+            Commands.runOnce(
+                () -> driveSub.setState(DriveSubsystem.DesiredState.MANUAL_FIELD_DRIVE)));
+  }
+
   private void generateFuel() {
     RebuiltFuelOnFly fuelOnFly =
         new RebuiltFuelOnFly(
@@ -418,6 +436,10 @@ public class RobotContainer {
 
   public SimulatedRobotState getSimRobotState() {
     return simulatedRobotState;
+  }
+
+  public RobotVisualizer getRobotVisualizer() {
+    return robotVisualizer;
   }
 
   public Command getAutonomousCommand() {

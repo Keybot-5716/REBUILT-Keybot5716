@@ -7,7 +7,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 public class FieldConstants {
 
   private static final Pose2d STARTING_POSE = new Pose2d(3.1, 4, new Rotation2d());
-  private static final Pose2d HUB_SHOOTING = new Pose2d(4.778, 4.293, new Rotation2d());
+  private static final Pose2d HUB_SHOOTING = new Pose2d(4.778, 4.220, new Rotation2d());
 
   public static boolean isRedAlliance() {
     return Robot.alliance.isPresent() && Robot.alliance.get() == DriverStation.Alliance.Red;

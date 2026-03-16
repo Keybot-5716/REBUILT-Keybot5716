@@ -24,7 +24,7 @@ public class RobotVisualizer {
     double intakeWidth = 0.5; // Example width of the intake
     double intakeHeight = 0.3; // Example height of the intake
     */
-    double amplitud = 0.785; 
+    double amplitud = 0.785;
     double offset = -0.785;
     double anguloRad = (Math.sin(Timer.getFPGATimestamp() * 1.2) * amplitud) + offset;
 

@@ -249,7 +249,7 @@ public class RobotState {
   public void setArmAngle(double angle) {
     armAngle.set(angle);
   }
-  
+
   public double getArmAngle() {
     return armAngle.get();
   }

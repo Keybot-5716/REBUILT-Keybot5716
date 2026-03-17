@@ -1,7 +1,6 @@
 package frc.robot.subsystems.shooter.hood;
 
 import com.ctre.phoenix6.BaseStatusSignal;
-import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
@@ -37,7 +36,7 @@ public class ShooterHoodIOTalonFX implements ShooterHoodIO {
   private final StatusSignal<Temperature> tempCelsius;
 
   public ShooterHoodIOTalonFX() {
-    motor = new TalonFX(IDs.SHOOTER_HOOD_ID, new CANBus("canivore"));
+    motor = new TalonFX(IDs.SHOOTER_HOOD_ID);
 
     config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;

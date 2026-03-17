@@ -3,7 +3,6 @@ package frc.robot.subsystems.shooter.rollers;
 import static edu.wpi.first.units.Units.Volts;
 
 import com.ctre.phoenix6.BaseStatusSignal;
-import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.VelocityVoltage;
@@ -36,7 +35,7 @@ public class ShooterRollersIOTalonFX implements ShooterRollersIO {
   private final StatusSignal<Temperature> tempCelsius;
 
   public ShooterRollersIOTalonFX() {
-    motor = new TalonFX(IDs.SHOOTER_ROLLERS_ID, new CANBus("canivore"));
+    motor = new TalonFX(IDs.SHOOTER_ROLLERS_ID);
 
     config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
     config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;

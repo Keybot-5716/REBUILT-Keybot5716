@@ -278,12 +278,7 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   public boolean isAlignedToAngle() {
-    double error =
-        Math.abs(
-            inputs.Pose
-                .getRotation()
-                .minus(desiredRotationToLock)
-                .getRadians());
+    double error = Math.abs(inputs.Pose.getRotation().minus(desiredRotationToLock).getRadians());
 
     boolean aligned = error < Units.degreesToRadians(5);
 

@@ -3,7 +3,6 @@ package frc.robot.subsystems.intake.pivot;
 import static edu.wpi.first.units.Units.Volts;
 
 import com.ctre.phoenix6.BaseStatusSignal;
-import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.PositionVoltage;
@@ -38,7 +37,7 @@ public class IntakePivotIOTalonFX implements IntakePivotIO {
   private final StatusSignal<Temperature> tempCelsius;
 
   public IntakePivotIOTalonFX() {
-    motor = new TalonFX(IDs.INTAKE_PIVOT_ID, new CANBus("canivore"));
+    motor = new TalonFX(IDs.INTAKE_PIVOT_ID);
 
     config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;

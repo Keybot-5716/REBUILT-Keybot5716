@@ -1,36 +1,43 @@
 package frc.robot.subsystems.superstructure;
 
-import frc.robot.subsystems.superstructure.SuperstructureConstants.IntakeConstants;
+import java.util.EnumSet;
+import java.util.Set;
 
 public enum SuperstructureStates {
-  DEFAULT(IntakeConstants.ZERO_RVOLTAGE, 0.0),
-  HOME(IntakeConstants.ZERO_RVOLTAGE, 0.0),
-  PREP_INTAKE(IntakeConstants.ZERO_RVOLTAGE, 0.0),
-  INTAKING(7.0, 0.0),
-  PREP_SHOOTING(IntakeConstants.ZERO_RVOLTAGE, 0.0),
-  SHOOTING(IntakeConstants.ZERO_RVOLTAGE, 5.0);
+  DEFAULT,
+  HOME,
+  INTAKE,
+  SCORE,
+  TAXI,
+  EJECT;
 
-  private final double intakeRollerSpeed;
-  private final double shooterRollerVelocity;
-
-  SuperstructureStates(double intakeRollerVelocity, double shooterRollerVelocity) {
-    this.intakeRollerSpeed = intakeRollerVelocity;
-    this.shooterRollerVelocity = shooterRollerVelocity;
+  public boolean isScoring() {
+    return this == SCORE;
   }
 
-  public double getIntakeRollerSpeed() {
-    return intakeRollerSpeed;
+  public boolean isIntaking() {
+    return this == INTAKE;
   }
 
-  public double getShooterRollerSpeed() {
-    return shooterRollerVelocity;
-  }
+  public Set<SuperstructureStates> allowedNextStates() {
+    switch (this) {
+      case DEFAULT:
+        return EnumSet.of(INTAKE);
 
-  public boolean isIntake() {
-    return this == INTAKING || this == PREP_INTAKE;
-  }
+      case INTAKE:
+        return EnumSet.of(HOME, EJECT);
 
-  public boolean isShooter() {
-    return this == PREP_SHOOTING || this == SHOOTING;
+      case HOME:
+        return EnumSet.of(INTAKE, SCORE, EJECT);
+
+      case SCORE:
+        return EnumSet.of(HOME);
+
+      case TAXI:
+        return EnumSet.of(HOME);
+
+      default:
+        return EnumSet.allOf(SuperstructureStates.class);
+    }
   }
 }

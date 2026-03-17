@@ -13,6 +13,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -254,6 +255,15 @@ public class DriveSubsystem extends SubsystemBase {
             .withTargetDirection(delta.getAngle().plus(new Rotation2d((Math.PI / 2)))));
   }
 
+  public boolean isAlignedToPoint() {
+    var pos = inputs.Pose.getTranslation();
+    var delta = desiredPoint.minus(pos);
+    Rotation2d targetAngle = delta.getAngle().plus(new Rotation2d(Math.PI / 2));
+    double error = Math.abs(inputs.Pose.getRotation().minus(targetAngle).getRadians());
+
+    return error < Units.degreesToRadians(5);
+  }
+
   public Translation2d getDesiredPoint() {
     return inputs.Pose.getTranslation();
   }
@@ -265,6 +275,19 @@ public class DriveSubsystem extends SubsystemBase {
             .withVelocityX(speeds.vxMetersPerSecond)
             .withVelocityY(speeds.vyMetersPerSecond)
             .withTargetDirection(desiredRotationToLock));
+  }
+
+  public boolean isAlignedToAngle() {
+    double error =
+        Math.abs(
+            inputs.Pose
+                .getRotation()
+                .minus(desiredRotationToLock)
+                .getRadians());
+
+    boolean aligned = error < Units.degreesToRadians(5);
+
+    return aligned;
   }
 
   private void drivenToPose() {

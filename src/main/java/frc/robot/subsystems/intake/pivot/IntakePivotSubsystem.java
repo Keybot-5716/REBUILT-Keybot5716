@@ -1,10 +1,12 @@
 package frc.robot.subsystems.intake.pivot;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.team6328.LoggedTunableNumber;
 import frc.lib.util.DataProcessor;
+import frc.robot.subsystems.superstructure.SuperstructureConstants.IntakeConstants;
 import org.littletonrobotics.junction.Logger;
 
 public class IntakePivotSubsystem extends SubsystemBase {
@@ -112,6 +114,14 @@ public class IntakePivotSubsystem extends SubsystemBase {
         test(0.0);
         break;
     }
+  }
+
+  public boolean isOut() {
+    return MathUtil.isNear(IntakeConstants.OUT, pivotInputs.position, 0.08);
+  }
+
+  public boolean isIn() {
+    return MathUtil.isNear(IntakeConstants.IN, pivotInputs.position, 0.08);
   }
 
   public void test(double position) {

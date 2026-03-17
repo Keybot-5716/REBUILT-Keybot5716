@@ -294,57 +294,6 @@ public class AIRobotSimulated extends SubsystemBase {
         .toArray(Pose2d[]::new);
   }
 
-  /** shoots a speaker-shot note from the opponent robot */
-  private Command shootAtSpeaker() {
-    return Commands.runOnce(
-        () ->
-            SimulatedArena.getInstance()
-                .addGamePieceProjectile(
-                    new NoteOnFly(
-                            this.driveSimulation.getActualPoseInSimulationWorld().getTranslation(),
-                            new Translation2d(0.3, 0),
-                            this.driveSimulation.getActualSpeedsFieldRelative(),
-                            this.driveSimulation.getActualPoseInSimulationWorld().getRotation(),
-                            Meters.of(0.5),
-                            MetersPerSecond.of(10),
-                            Degrees.of(60))
-                        .asSpeakerShotNote(() -> {})));
-  }
-
-  /** shoots a low-shot note from the opponent robot for feed-shots */
-  private Command feedShotLow() {
-    return Commands.runOnce(
-        () ->
-            SimulatedArena.getInstance()
-                .addGamePieceProjectile(
-                    new NoteOnFly(
-                            this.driveSimulation.getActualPoseInSimulationWorld().getTranslation(),
-                            new Translation2d(0.3, 0),
-                            this.driveSimulation.getActualSpeedsFieldRelative(),
-                            this.driveSimulation.getActualPoseInSimulationWorld().getRotation(),
-                            Meters.of(0.5),
-                            MetersPerSecond.of(10),
-                            Degrees.of(20))
-                        .enableBecomeNoteOnFieldAfterTouchGround()));
-  }
-
-  /** shoots a high-shot note from the opponent robot for feed-shots */
-  private Command feedShotHigh() {
-    return Commands.runOnce(
-        () ->
-            SimulatedArena.getInstance()
-                .addGamePieceProjectile(
-                    new NoteOnFly(
-                            this.driveSimulation.getActualPoseInSimulationWorld().getTranslation(),
-                            new Translation2d(0.3, 0),
-                            this.driveSimulation.getActualSpeedsFieldRelative(),
-                            this.driveSimulation.getActualPoseInSimulationWorld().getRotation(),
-                            Meters.of(0.5),
-                            MetersPerSecond.of(10),
-                            Degrees.of(55))
-                        .enableBecomeNoteOnFieldAfterTouchGround()));
-  }
-
   private Command noneCommand() {
     return Commands.none();
   }

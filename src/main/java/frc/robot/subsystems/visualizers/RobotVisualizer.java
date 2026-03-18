@@ -2,8 +2,10 @@ package frc.robot.subsystems.visualizers;
 
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.RobotState;
+import frc.robot.subsystems.intake.pivot.IntakePivotIOSim;
 import org.littletonrobotics.junction.Logger;
 
 public class RobotVisualizer {
@@ -16,8 +18,7 @@ public class RobotVisualizer {
     this.state = state;
   }
 
-  public void updateRobotVisualizer() {
-
+  public void updateRobotVisualizer(IntakePivotIOSim intakePivotIOSim) {
     // model is chasis
     // model_0 is intake
     /*
@@ -27,9 +28,19 @@ public class RobotVisualizer {
     double amplitud = 0.785;
     double offset = -0.785;
     double anguloRad = (Math.sin(Timer.getFPGATimestamp() * 1.2) * amplitud) + offset;
+    double adentro = -90.0;
+    if (RobotBase.isSimulation()) {
+      if (intakePivotIOSim.isRunning()) {
+        intakePose3d = new Pose3d(0.26, 0, 0.255, new Rotation3d(0, 0, 0));
+      } else {
+        intakePose3d = new Pose3d(0.26, 0, 0.255, new Rotation3d(0, adentro, 0));
+      }
+    } else {
+      intakePose3d =
+          new Pose3d(0.26, 0, 0.255, new Rotation3d(0, state.getArmAngle() - (Math.PI / 2), 0));
+    }
 
-    intakePose3d =
-        new Pose3d(0.26, 0, 0.255, new Rotation3d(0, state.getArmAngle() - (Math.PI / 2), 0));
+    // intakePose3d = new Pose3d(0.26, 0, 0.255, new Rotation3d(0, anguloRad, 0));
     // intakePose3d = new Pose3d(0.135, 0.0, 0.05, new Rotation3d(0.0,0.0,0.0));
 
     Logger.recordOutput("ComponentsPoseArray", new Pose3d[] {intakePose3d});

@@ -2,12 +2,15 @@ package frc.robot.subsystems.intake.pivot;
 
 import static edu.wpi.first.units.Units.Meters;
 
+import frc.robot.subsystems.shooter.rollers.ShooterRollersIOSim;
 import org.ironmaple.simulation.IntakeSimulation;
 import org.ironmaple.simulation.drivesims.AbstractDriveTrainSimulation;
 
 public class IntakePivotIOSim implements IntakePivotIO {
 
   private final IntakeSimulation intakeSimulation;
+  private ShooterRollersIOSim shooterRollersIOSim = new ShooterRollersIOSim();
+
   /**
    * Este método sirve para configurar la especificaciones del intake que se va a mostrar simulado
    *
@@ -21,13 +24,13 @@ public class IntakePivotIOSim implements IntakePivotIO {
             // Specify the drivetrain to which this intake is attached
             driveTrain,
             // The width of the intake (CHANGEEEEE)
-            Meters.of(0.508), // 20 inches
+            Meters.of(0.6985), // 20 inches ancho : 25 22.5
             // The extension length of the intake beyond the robot's frame (when activated)
-            Meters.of(0.2),
+            Meters.of(0.26),
             // The intake is mounted on the front? side of the chassis
             IntakeSimulation.IntakeSide.FRONT,
             // The intake can hold up to ? balls?
-            4);
+            30);
   }
 
   /**
@@ -52,6 +55,29 @@ public class IntakePivotIOSim implements IntakePivotIO {
   public boolean isFuelInsideIntake() {
     return intakeSimulation.getGamePiecesAmount()
         != 0; // True if there is a game piece in the intake
+  }
+
+  public int getFuelAmount() {
+    return intakeSimulation.getGamePiecesAmount();
+  }
+
+  public IntakeSimulation getIntakeSimulation() {
+    return intakeSimulation;
+  }
+
+  public boolean isRunning() {
+    return intakeSimulation.isRunning();
+  }
+
+  public void resetIntake() {
+    intakeSimulation.setGamePiecesCount(0);
+  }
+
+  public void launchFuel() {
+    if (isFuelInsideIntake()) {
+      shooterRollersIOSim.shoot();
+    }
+    intakeSimulation.setGamePiecesCount(getFuelAmount() - 1);
   }
 
   /**

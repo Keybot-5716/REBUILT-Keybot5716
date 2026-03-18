@@ -107,7 +107,7 @@ public class Robot extends LoggedRobot {
     CommandScheduler.getInstance().run();
     // robotContainer.getRobotVisualizer().updateRobotVisualizer();
     robotContainer.getRobotState().updateLogger();
-    robotContainer.getRobotVisualizer().updateRobotVisualizer();
+    robotContainer.getRobotVisualizer().updateRobotVisualizer(robotContainer.getIntakePivotIOSim());
     if (RobotBase.isSimulation()) {
       robotContainer.getSimRobotState().updateSim();
     }

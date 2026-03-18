@@ -5,6 +5,7 @@ import edu.wpi.first.math.interpolation.TimeInterpolatableBuffer;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.RobotContainer;
 import frc.robot.RobotState;
+import frc.robot.subsystems.intake.pivot.IntakePivotIOSim;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.littletonrobotics.junction.Logger;
 
@@ -13,6 +14,7 @@ public class SimulatedRobotState {
       TimeInterpolatableBuffer.createBuffer(RobotState.BUFFER_TIME);
 
   private SwerveDriveSimulation simSwerveDrive;
+  private IntakePivotIOSim intakePivotSim;
   private final RobotContainer container;
 
   public SimulatedRobotState(RobotContainer container) {
@@ -21,6 +23,7 @@ public class SimulatedRobotState {
 
   public void init() {
     this.simSwerveDrive = this.container.getDriveSubsystem().getMapleSimDrive().mapleSimDrive;
+    this.intakePivotSim = this.container.getIntakePivotIOSim();
   }
 
   public synchronized void addFieldToRobot(Pose2d pose) {
@@ -36,5 +39,8 @@ public class SimulatedRobotState {
   public synchronized void updateSim() {
     var pose = simSwerveDrive.getSimulatedDriveTrainPose();
     Logger.recordOutput("FieldSimulation/SimulatedPose", pose);
+    Logger.recordOutput("Intake/Pivot/Sim/FuelInside", intakePivotSim.isFuelInsideIntake());
+    Logger.recordOutput("Intake/Pivot/Sim/FuelAmount", intakePivotSim.getFuelAmount());
+    Logger.recordOutput("Intake/Pivot/Sim/IsRunning", intakePivotSim.isRunning());
   }
 }

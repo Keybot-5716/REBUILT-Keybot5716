@@ -11,8 +11,8 @@ public class IntakeRollersSubsystem extends SubsystemBase {
   private final IntakeRollersIOInputsAutoLogged rollersInputs =
       new IntakeRollersIOInputsAutoLogged();
 
-  private static final LoggedTunableNumber rollerVolts =
-      new LoggedTunableNumber("Intake/Rollers/RollerVoltsIntake", 25.0);
+  private static final LoggedTunableNumber rollerVelocity =
+      new LoggedTunableNumber("Intake/Rollers/RollersVelocityRPS", 25.0); // Antes 25
 
   private DesiredState desiredState = DesiredState.STOPPED;
   private RollersState rollersState = RollersState.STOPPING;
@@ -63,11 +63,11 @@ public class IntakeRollersSubsystem extends SubsystemBase {
   private void applyStates() {
     switch (rollersState) {
       case FORWARDING_ROLLERS:
-        setVoltage(rollerVolts.get());
+        setVelocity(rollerVelocity.get());
         break;
 
       case REVERSING_ROLLERS:
-        setVoltage(-rollerVolts.get());
+        setVelocity(-rollerVelocity.get());
         break;
 
       case STOPPING:
@@ -80,8 +80,8 @@ public class IntakeRollersSubsystem extends SubsystemBase {
     rollersIO.stopMotor();
   }
 
-  public void setVoltage(double voltage) {
-    rollersIO.setVoltage(voltage);
+  public void setVelocity(double rps) {
+    rollersIO.setVelocity(rps);
   }
 
   public void setDesiredState(DesiredState desiredState) {

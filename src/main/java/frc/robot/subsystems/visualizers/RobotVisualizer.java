@@ -28,7 +28,8 @@ public class RobotVisualizer {
     double offset = -0.785;
     double anguloRad = (Math.sin(Timer.getFPGATimestamp() * 1.2) * amplitud) + offset;
 
-    intakePose3d = new Pose3d(0.26, 0, 0.255, new Rotation3d(0, anguloRad, 0));
+    intakePose3d =
+        new Pose3d(0.26, 0, 0.255, new Rotation3d(0, state.getArmAngle() - (Math.PI / 2), 0));
     // intakePose3d = new Pose3d(0.135, 0.0, 0.05, new Rotation3d(0.0,0.0,0.0));
 
     Logger.recordOutput("ComponentsPoseArray", new Pose3d[] {intakePose3d});

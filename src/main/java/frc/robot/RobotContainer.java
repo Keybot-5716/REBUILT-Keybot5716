@@ -32,7 +32,10 @@ import frc.robot.subsystems.shooter.*;
 import frc.robot.subsystems.shooter.hood.*;
 import frc.robot.subsystems.shooter.rollers.*;
 import frc.robot.subsystems.transfer.*;
+import frc.robot.subsystems.vision.VisionIOLimelight;
+import frc.robot.subsystems.vision.VisionIOSimPhotonVision;
 import frc.robot.subsystems.vision.VisionPoseEstimateInField;
+import frc.robot.subsystems.vision.VisionSubsystem;
 import frc.robot.subsystems.visualizers.RobotVisualizer;
 import java.util.function.Consumer;
 import org.ironmaple.simulation.SimulatedArena;
@@ -73,7 +76,7 @@ public class RobotContainer {
 
   //  -- Intake
   private IntakePivotSubsystem buildIntakePivot() {
-    return new IntakePivotSubsystem(new IntakePivotIOTalonFX());
+    return new IntakePivotSubsystem(new IntakePivotIOTalonFX(), robotState);
   }
 
   private IntakeRollersSubsystem buildIntakeRollers() {
@@ -90,14 +93,14 @@ public class RobotContainer {
     return new TransferSubsystem(new TrasnferIOTalonFX());
   }
 
-  /*private VisionSubsystem buildVisionSubsystem() {
+  private VisionSubsystem buildVisionSubsystem() {
     if (Robot.isSimulation()) {
       return new VisionSubsystem(
           new VisionIOSimPhotonVision(robotState, simulatedRobotState), robotState);
     } else {
       return new VisionSubsystem(new VisionIOLimelight(robotState), robotState);
     }
-  }*/
+  }
 
   private final Consumer<VisionPoseEstimateInField> visionFieldEstimate =
       new Consumer<VisionPoseEstimateInField>() {
@@ -134,7 +137,7 @@ public class RobotContainer {
   private final IntakeRollersSubsystem intakeRollersSub = buildIntakeRollers();
   private final IntakePivotSubsystem intakePivotSub = buildIntakePivot();
 
-  // private final VisionSubsystem visionSub = buildVisionSubsystem();
+  private final VisionSubsystem visionSub = buildVisionSubsystem();
   // private final IntakePivotIOSim intakePivotSub = new
   // IntakePivotIOSim(driveSub.getMapleSimDrive().mapleSimDrive);
 
@@ -188,35 +191,17 @@ public class RobotContainer {
         .onFalse(
             Commands.runOnce(
                 () -> shooterSub.setDesiredState(ShooterSubsystem.DesiredState.STOPPED)));
-    /*controller
-    .leftBumper()
-    .whileTrue(
-        Commands.run(
-            () ->
-                intakePivotSub.setDesiredState(
-                    IntakePivotSubsystem.DesiredState.REVERSE_PIVOT)))
-    .onFalse(
-        Commands.runOnce(
-            () ->
-                intakePivotSub.setDesiredState(
-                    IntakePivotSubsystem.DesiredState.STOPPPED_PIVOT)));*/
-
-    controller
-        .leftTrigger()
-        .whileTrue(
-            Commands.run(
-                () ->
-                    intakePivotSub.setDesiredState(
-                        IntakePivotSubsystem.DesiredState.FORWARD_PIVOT)))
-        .onFalse(
-            Commands.runOnce(
-                () ->
-                    intakePivotSub.setDesiredState(
-                        IntakePivotSubsystem.DesiredState.STOPPPED_PIVOT)));
     controller
         .b()
         .whileTrue(
             Commands.run(() -> transferSub.setDesiredState(TransferSubsystem.DesiredState.FORWARD)))
+        .onFalse(
+            Commands.runOnce(
+                () -> transferSub.setDesiredState(TransferSubsystem.DesiredState.STOPPED)));
+    controller
+        .a()
+        .whileTrue(
+            Commands.run(() -> transferSub.setDesiredState(TransferSubsystem.DesiredState.REVERSE)))
         .onFalse(
             Commands.runOnce(
                 () -> transferSub.setDesiredState(TransferSubsystem.DesiredState.STOPPED)));
@@ -249,12 +234,12 @@ public class RobotContainer {
         .povUp()
         .onTrue(
             Commands.runOnce(
-                () -> intakePivotSub.setDesiredState(IntakePivotSubsystem.DesiredState.TEST)));
+                () -> intakePivotSub.setDesiredState(IntakePivotSubsystem.DesiredState.IN)));
     controller
         .povDown()
         .onTrue(
             Commands.runOnce(
-                () -> intakePivotSub.setDesiredState(IntakePivotSubsystem.DesiredState.TEST2)));
+                () -> intakePivotSub.setDesiredState(IntakePivotSubsystem.DesiredState.OUT)));
   }
 
   /**
@@ -426,9 +411,9 @@ public class RobotContainer {
     return driveSub;
   }
 
-  /*public VisionSubsystem getVisionSubsystem() {
+  public VisionSubsystem getVisionSubsystem() {
     return visionSub;
-  }*/
+  }
 
   public RobotState getRobotState() {
     return robotState;

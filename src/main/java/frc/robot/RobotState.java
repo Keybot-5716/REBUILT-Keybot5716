@@ -181,6 +181,8 @@ public class RobotState {
 
     Logger.recordOutput("RobotState/isRedAlliance", isRedAlliance());
     Logger.recordOutput("RobotState/PassedTrench", passedTrench());
+
+    Logger.recordOutput("RobotState/ArmDeg", getArmDeg());
   }
 
   private final AtomicReference<Optional<Integer>> exclusiveTag =
@@ -252,5 +254,16 @@ public class RobotState {
 
   public double getArmAngle() {
     return armAngle.get();
+  }
+
+  // ------ Intake pivot
+  private final AtomicReference<Double> armDeg = new AtomicReference<>(0.0);
+
+  public void setIntakePivotDeg(double deg) {
+    armDeg.set(deg);
+  }
+
+  public double getArmDeg() {
+    return armDeg.get();
   }
 }

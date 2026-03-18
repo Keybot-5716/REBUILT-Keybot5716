@@ -25,12 +25,12 @@ public class VisionConstants {
   public static final AprilTagFieldLayout kAprilTagLayout =
       AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltAndymark);
 
-  public static final double kCameraAPitchDegrees = 20.0;
+  public static final double kCameraAPitchDegrees = 25.62481;
   public static final double kCameraAPitchRads = Units.degreesToRadians(kCameraAPitchDegrees);
-  public static final double kCameraAHeightOffGroundMeters = Units.inchesToMeters(8.3787);
+  public static final double kCameraAHeightOffGroundMeters =  0.14986;
   public static final String kLimelightATableName = "limelight-frontal";
-  public static final double kRobotToCameraAForward = Units.inchesToMeters(7.8757);
-  public static final double kRobotToCameraASide = Units.inchesToMeters(-11.9269);
+  public static final double kRobotToCameraAForward = -0.14;
+  public static final double kRobotToCameraASide = -0.12;
   public static final Rotation2d kCameraAYawOffset = Rotation2d.fromDegrees(0.0);
   public static final Transform2d kRobotToCameraA =
       new Transform2d(

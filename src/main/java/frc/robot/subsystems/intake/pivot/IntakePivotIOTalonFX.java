@@ -59,7 +59,7 @@ public class IntakePivotIOTalonFX implements IntakePivotIO {
     config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RotorSensor;
 
     config.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
-    config.Slot0.kP = 1.0;
+    config.Slot0.kP = 0.82;
     config.Slot0.kI = 0.0;
     config.Slot0.kD = 0.0;
 

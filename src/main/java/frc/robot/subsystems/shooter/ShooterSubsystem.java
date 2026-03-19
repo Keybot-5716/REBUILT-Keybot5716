@@ -110,15 +110,15 @@ public class ShooterSubsystem extends SubsystemBase {
         break;
 
       case OUTING:
-        setPosition(0.0);
+        setPosition(0.87);
         break;
 
       case SCORING:
-        setPosition(0.0);
+        setPosition(0.3);
         break;
 
       case TAXIING:
-        setPosition(0.0);
+        setPosition(0.9);
         break;
     }
   }

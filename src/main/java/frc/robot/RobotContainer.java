@@ -1,7 +1,5 @@
 package frc.robot;
 
-import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 
 import com.pathplanner.lib.commands.FollowPathCommand;
@@ -9,13 +7,7 @@ import com.pathplanner.lib.commands.PathfindingCommand;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.Distance;
-import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -33,16 +25,9 @@ import frc.robot.subsystems.shooter.*;
 import frc.robot.subsystems.shooter.hood.*;
 import frc.robot.subsystems.shooter.rollers.*;
 import frc.robot.subsystems.transfer.*;
-import frc.robot.subsystems.vision.VisionIOLimelight;
-import frc.robot.subsystems.vision.VisionIOSimPhotonVision;
 import frc.robot.subsystems.vision.VisionPoseEstimateInField;
-import frc.robot.subsystems.vision.VisionSubsystem;
 import frc.robot.subsystems.visualizers.RobotVisualizer;
 import java.util.function.Consumer;
-import org.ironmaple.simulation.IntakeSimulation;
-import org.ironmaple.simulation.SimulatedArena;
-import org.ironmaple.simulation.seasonspecific.rebuilt2026.RebuiltFuelOnFly;
-import org.ironmaple.utils.FieldMirroringUtils;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
@@ -80,10 +65,11 @@ public class RobotContainer {
   private IntakePivotSubsystem buildIntakePivot() {
     return new IntakePivotSubsystem(new IntakePivotIOTalonFX(), robotState);
   }
-
+  /*
   private IntakePivotIOSim buildIntakePivotSim() {
     return new IntakePivotIOSim(driveSub.getMapleSimDrive().mapleSimDrive);
   }
+    */
 
   private IntakeRollersSubsystem buildIntakeRollers() {
     return new IntakeRollersSubsystem(new IntakeRollerIOTalonFX());
@@ -99,14 +85,14 @@ public class RobotContainer {
     return new TransferSubsystem(new TrasnferIOTalonFX());
   }
 
-  private VisionSubsystem buildVisionSubsystem() {
+  /*private VisionSubsystem buildVisionSubsystem() {
     if (Robot.isSimulation()) {
       return new VisionSubsystem(
           new VisionIOSimPhotonVision(robotState, simulatedRobotState), robotState);
     } else {
       return new VisionSubsystem(new VisionIOLimelight(robotState), robotState);
     }
-  }
+  }*/
 
   private final Consumer<VisionPoseEstimateInField> visionFieldEstimate =
       new Consumer<VisionPoseEstimateInField>() {
@@ -142,9 +128,11 @@ public class RobotContainer {
   private final TransferSubsystem transferSub = buildTransfer();
   private final IntakeRollersSubsystem intakeRollersSub = buildIntakeRollers();
   private final IntakePivotSubsystem intakePivotSub = buildIntakePivot();
-  private final IntakePivotIOSim intakePivotSubSim = buildIntakePivotSim();
+  // private final IntakePivotIOSim intakePivotSubSim = buildIntakePivotSim();
+  // private final Superstructure superstructure = buildSuperstructure();
+  // private final SuperstructureCommands superstructureCommands = new SuperstructureCommands();
 
-  private final VisionSubsystem visionSub = buildVisionSubsystem();
+  // private final VisionSubsystem visionSub = buildVisionSubsystem();
   // private final IntakePivotIOSim intakePivotSub = new
   // IntakePivotIOSim(driveSub.getMapleSimDrive().mapleSimDrive);
 
@@ -153,13 +141,20 @@ public class RobotContainer {
       new LoggedDashboardChooser<>("Auto Chooser");
   public static Field2d autoPrev = new Field2d();
 
+  /*
+  private Superstructure buildSuperstructure() {
+    return new Superstructure(
+        driveSub, intakePivotSub, intakeRollersSub, transferSub, shooterSub, robotState);
+  }
+        */
+
   private final RobotVisualizer robotVisualizer = new RobotVisualizer(robotState);
 
   public RobotContainer() {
     if (RobotBase.isSimulation()) {
       assert this.simulatedRobotState != null;
       this.simulatedRobotState.init();
-      configureButtonBindingsSim(DRIVE_CONTROLLER);
+      // configureButtonBindingsSim(DRIVE_CONTROLLER);
     } else {
       configureButtonBindings(DRIVE_CONTROLLER);
     }
@@ -177,6 +172,7 @@ public class RobotContainer {
     controller
         .start()
         .onTrue(Commands.runOnce(() -> driveSub.resetOdometry(FieldConstants.getTestingPose())));
+
     controller
         .rightBumper()
         .whileTrue(
@@ -200,18 +196,24 @@ public class RobotContainer {
                 () -> shooterSub.setDesiredState(ShooterSubsystem.DesiredState.STOPPED)));
     controller
         .b()
-        .whileTrue(
-            Commands.run(() -> transferSub.setDesiredState(TransferSubsystem.DesiredState.FORWARD)))
+        .whileTrue(Commands.runOnce(() -> transferSub.startOscillatingForward(), transferSub))
         .onFalse(
             Commands.runOnce(
-                () -> transferSub.setDesiredState(TransferSubsystem.DesiredState.STOPPED)));
+                () -> {
+                  transferSub.stopOscillating();
+                  transferSub.setDesiredState(TransferSubsystem.DesiredState.STOPPED);
+                },
+                transferSub));
     controller
         .a()
         .whileTrue(
-            Commands.run(() -> transferSub.setDesiredState(TransferSubsystem.DesiredState.REVERSE)))
+            Commands.run(
+                () -> transferSub.setDesiredState(TransferSubsystem.DesiredState.REVERSE),
+                transferSub))
         .onFalse(
             Commands.runOnce(
-                () -> transferSub.setDesiredState(TransferSubsystem.DesiredState.STOPPED)));
+                () -> transferSub.setDesiredState(TransferSubsystem.DesiredState.STOPPED),
+                transferSub));
 
     controller
         .x()
@@ -247,6 +249,19 @@ public class RobotContainer {
         .onTrue(
             Commands.runOnce(
                 () -> intakePivotSub.setDesiredState(IntakePivotSubsystem.DesiredState.OUT)));
+
+    controller
+        .povRight()
+        .onTrue(
+            Commands.runOnce(() -> shooterSub.setDesiredState(ShooterSubsystem.DesiredState.OUT)));
+
+    controller
+        .povLeft()
+        .onTrue(
+            Commands.runOnce(() -> shooterSub.setDesiredState(ShooterSubsystem.DesiredState.IN)));
+
+    // controller.povLeft().onTrue(superstructureCommands.setCommand(superstructure,
+    // SuperstructureStates.HOME));
   }
 
   /**
@@ -270,6 +285,7 @@ public class RobotContainer {
    *     incicial del fuel, la dirección en la cual se va a estar lanzando la velocidad y el ángulo
    *     al que será lanzado
    */
+  /*
   public void configureButtonBindingsSim(CommandXboxController controller) {
     controller
         .rightBumper()
@@ -474,9 +490,9 @@ public class RobotContainer {
     return driveSub;
   }
 
-  public VisionSubsystem getVisionSubsystem() {
-    return visionSub;
-  }
+  // public VisionSubsystem getVisionSubsystem() {
+  // return visionSub;
+  // }
 
   public RobotState getRobotState() {
     return robotState;
@@ -493,8 +509,9 @@ public class RobotContainer {
   public Command getAutonomousCommand() {
     return autoChooser.get();
   }
-
+  /*
   public IntakePivotIOSim getIntakePivotIOSim() {
     return intakePivotSubSim;
   }
+    */
 }

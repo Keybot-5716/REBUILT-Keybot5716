@@ -23,7 +23,7 @@ public class SimulatedRobotState {
 
   public void init() {
     this.simSwerveDrive = this.container.getDriveSubsystem().getMapleSimDrive().mapleSimDrive;
-    this.intakePivotSim = this.container.getIntakePivotIOSim();
+    // this.intakePivotSim = this.container.getIntakePivotIOSim();
   }
 
   public synchronized void addFieldToRobot(Pose2d pose) {

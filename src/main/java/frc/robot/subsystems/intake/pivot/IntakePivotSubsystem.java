@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.team6328.LoggedTunableNumber;
 import frc.lib.util.DataProcessor;
 import frc.robot.RobotState;
+import frc.robot.subsystems.superstructure.SuperstructureConstants;
 import frc.robot.subsystems.superstructure.SuperstructureConstants.IntakeConstants;
 import org.littletonrobotics.junction.Logger;
 
@@ -93,11 +94,11 @@ public class IntakePivotSubsystem extends SubsystemBase {
   private void applyStates() {
     switch (intakeState) {
       case INING:
-        setPosition(0.0);
+        setPosition(SuperstructureConstants.IntakeConstants.IN);
         break;
 
       case OUTING:
-        setPosition(4.94);
+        setPosition(SuperstructureConstants.IntakeConstants.OUT);
         break;
 
       case FORWARDING_PIVOT:

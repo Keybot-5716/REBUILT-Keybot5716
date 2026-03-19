@@ -72,13 +72,14 @@ public class IntakePivotIOSim implements IntakePivotIO {
   public void resetIntake() {
     intakeSimulation.setGamePiecesCount(0);
   }
-
+  /*
   public void launchFuel() {
     if (isFuelInsideIntake()) {
       shooterRollersIOSim.shoot();
     }
     intakeSimulation.setGamePiecesCount(getFuelAmount() - 1);
   }
+    */
 
   /**
    * public void launchFuel() { // if there is a fuel in the intake, it will be removed and return

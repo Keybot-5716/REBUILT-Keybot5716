@@ -32,6 +32,11 @@ public class SuperstructureConstants {
 
   public static class ShooterConstants {
     public static final double ROLLERS_RPS = 50.0;
+
+    public static final double HOME = 0.0;
+    public static final double IN_TEST = 0.0;
+    public static final double OUT_TEST = 0.87;
+    public static final double MID_TEST = 0.3;
   }
 
   public static class TransferConstants {

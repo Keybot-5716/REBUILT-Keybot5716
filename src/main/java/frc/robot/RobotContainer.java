@@ -8,7 +8,6 @@ import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -16,68 +15,53 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.lib.team6328.LocalADStarAK;
+import frc.lib.util.RobotCore;
 import frc.robot.auto.*;
-import frc.robot.simulation.SimulatedRobotState;
 import frc.robot.subsystems.drive.*;
 import frc.robot.subsystems.intake.pivot.*;
 import frc.robot.subsystems.intake.rollers.*;
-import frc.robot.subsystems.shooter.*;
 import frc.robot.subsystems.shooter.hood.*;
 import frc.robot.subsystems.shooter.rollers.*;
+import frc.robot.subsystems.superstructure.Superstructure;
+import frc.robot.subsystems.superstructure.SuperstructureStates;
 import frc.robot.subsystems.transfer.*;
+import frc.robot.subsystems.vision.VisionIOLimelight;
 import frc.robot.subsystems.vision.VisionPoseEstimateInField;
+import frc.robot.subsystems.vision.VisionSubsystem;
 import frc.robot.subsystems.visualizers.RobotVisualizer;
 import java.util.function.Consumer;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
-public class RobotContainer {
+public class RobotContainer implements RobotCore {
   private DriveSubsystem buildDriveSubsystem() {
-    if (RobotBase.isSimulation()) {
-      return new DriveSubsystem(
-          new DriveIOSim(
-              robotState,
-              simulatedRobotState,
-              DriveConstants.SWERVE_DRIVETRAIN.getDrivetrainConstants(),
-              DriveConstants.SWERVE_DRIVETRAIN.getModuleConstants()),
-          robotState,
-          DRIVE_CONTROLLER,
-          TunerConstants.kSpeedAt12Volts.in(MetersPerSecond),
-          TunerConstants.kSpeedAt12Volts.in(MetersPerSecond));
-    } else {
-      return new DriveSubsystem(
-          new DriveIOCTRE(
-              robotState,
-              DriveConstants.SWERVE_DRIVETRAIN.getDrivetrainConstants(),
-              DriveConstants.SWERVE_DRIVETRAIN.getModuleConstants()),
-          robotState,
-          DRIVE_CONTROLLER,
-          TunerConstants.kSpeedAt12Volts.in(MetersPerSecond),
-          TunerConstants.kSpeedAt12Volts.in(MetersPerSecond));
-    }
+    return new DriveSubsystem(
+        new DriveIOCTRE(
+            robotState,
+            DriveConstants.SWERVE_DRIVETRAIN.getDrivetrainConstants(),
+            DriveConstants.SWERVE_DRIVETRAIN.getModuleConstants()),
+        robotState,
+        DRIVE_CONTROLLER,
+        TunerConstants.kSpeedAt12Volts.in(MetersPerSecond),
+        TunerConstants.kSpeedAt12Volts.in(MetersPerSecond));
   }
-
-  // -- Rollers genéricos
-  // private RollerSubsystem buildRollerSubsystem() {return new RollerSubsystem(new
-  // RolllerIOTalonFx());}
 
   //  -- Intake
   private IntakePivotSubsystem buildIntakePivot() {
     return new IntakePivotSubsystem(new IntakePivotIOTalonFX(), robotState);
   }
-  /*
-  private IntakePivotIOSim buildIntakePivotSim() {
-    return new IntakePivotIOSim(driveSub.getMapleSimDrive().mapleSimDrive);
-  }
-    */
 
   private IntakeRollersSubsystem buildIntakeRollers() {
     return new IntakeRollersSubsystem(new IntakeRollerIOTalonFX());
   }
 
   // -- Shooter
-  private ShooterSubsystem buildShooter() {
-    return new ShooterSubsystem(new ShooterRollersIOTalonFX(), new ShooterHoodIOTalonFX());
+  private ShooterHoodSubsystem buildShooterHood() {
+    return new ShooterHoodSubsystem(new ShooterHoodIOTalonFX());
+  }
+
+  private ShooterRollersSubsystem buildShooterRollers() {
+    return new ShooterRollersSubsystem(new ShooterRollersIOTalonFX());
   }
 
   // -- Transfer
@@ -85,14 +69,20 @@ public class RobotContainer {
     return new TransferSubsystem(new TrasnferIOTalonFX());
   }
 
-  /*private VisionSubsystem buildVisionSubsystem() {
-    if (Robot.isSimulation()) {
-      return new VisionSubsystem(
-          new VisionIOSimPhotonVision(robotState, simulatedRobotState), robotState);
-    } else {
-      return new VisionSubsystem(new VisionIOLimelight(robotState), robotState);
-    }
-  }*/
+  private Superstructure buildSuperstructure() {
+    return new Superstructure(
+        driveSub,
+        intakePivotSub,
+        intakeRollersSub,
+        transferSub,
+        shooterHoodSub,
+        shooterRollersSub,
+        robotState);
+  }
+
+  private VisionSubsystem buildVisionSubsystem() {
+    return new VisionSubsystem(new VisionIOLimelight(robotState), robotState);
+  }
 
   private final Consumer<VisionPoseEstimateInField> visionFieldEstimate =
       new Consumer<VisionPoseEstimateInField>() {
@@ -119,45 +109,26 @@ public class RobotContainer {
 
   private final RobotState robotState = new RobotState(visionFieldEstimate);
 
-  private final SimulatedRobotState simulatedRobotState =
-      RobotBase.isSimulation() ? new SimulatedRobotState(this) : null;
-
   // -- Subsystems
   private final DriveSubsystem driveSub = buildDriveSubsystem();
-  private final ShooterSubsystem shooterSub = buildShooter();
+  private final ShooterHoodSubsystem shooterHoodSub = buildShooterHood();
+  private final ShooterRollersSubsystem shooterRollersSub = buildShooterRollers();
   private final TransferSubsystem transferSub = buildTransfer();
   private final IntakeRollersSubsystem intakeRollersSub = buildIntakeRollers();
   private final IntakePivotSubsystem intakePivotSub = buildIntakePivot();
-  // private final IntakePivotIOSim intakePivotSubSim = buildIntakePivotSim();
-  // private final Superstructure superstructure = buildSuperstructure();
-  // private final SuperstructureCommands superstructureCommands = new SuperstructureCommands();
+  private final VisionSubsystem visionSub = buildVisionSubsystem();
 
-  // private final VisionSubsystem visionSub = buildVisionSubsystem();
-  // private final IntakePivotIOSim intakePivotSub = new
-  // IntakePivotIOSim(driveSub.getMapleSimDrive().mapleSimDrive);
+  private final Superstructure superstructure = buildSuperstructure();
 
   // -- AutoChooser
   private final LoggedDashboardChooser<AutoBuilder> autoChooser =
       new LoggedDashboardChooser<>("Auto Chooser");
   public static Field2d autoPrev = new Field2d();
 
-  /*
-  private Superstructure buildSuperstructure() {
-    return new Superstructure(
-        driveSub, intakePivotSub, intakeRollersSub, transferSub, shooterSub, robotState);
-  }
-        */
-
   private final RobotVisualizer robotVisualizer = new RobotVisualizer(robotState);
 
   public RobotContainer() {
-    if (RobotBase.isSimulation()) {
-      assert this.simulatedRobotState != null;
-      this.simulatedRobotState.init();
-      // configureButtonBindingsSim(DRIVE_CONTROLLER);
-    } else {
-      configureButtonBindings(DRIVE_CONTROLLER);
-    }
+    configureButtonBindings(DRIVE_CONTROLLER);
     configureAuto();
     driveSub.setState(DriveSubsystem.DesiredState.MANUAL_FIELD_DRIVE);
   }
@@ -168,11 +139,12 @@ public class RobotContainer {
    * @param controller es un mando de xbox
    */
   public void configureButtonBindings(CommandXboxController controller) {
-    controller.start().onTrue(Commands.runOnce(() -> driveSub.resetOdometry()));
     controller
         .start()
         .onTrue(Commands.runOnce(() -> driveSub.resetOdometry(FieldConstants.getTestingPose())));
-
+    controller
+        .back()
+        .onTrue(Commands.runOnce(() -> driveSub.resetOdometry(FieldConstants.getTaxiPose())));
     controller
         .rightBumper()
         .whileTrue(
@@ -188,22 +160,8 @@ public class RobotContainer {
 
     controller
         .rightTrigger()
-        .whileTrue(
-            Commands.run(
-                () -> shooterSub.setDesiredState(ShooterSubsystem.DesiredState.FORWARD_ROLLERS)))
-        .onFalse(
-            Commands.runOnce(
-                () -> shooterSub.setDesiredState(ShooterSubsystem.DesiredState.STOPPED)));
-    controller
-        .b()
-        .whileTrue(Commands.runOnce(() -> transferSub.startOscillatingForward(), transferSub))
-        .onFalse(
-            Commands.runOnce(
-                () -> {
-                  transferSub.stopOscillating();
-                  transferSub.setDesiredState(TransferSubsystem.DesiredState.STOPPED);
-                },
-                transferSub));
+        .onTrue(superstructure.setCommand(SuperstructureStates.TAXI, SuperstructureStates.SCORE))
+        .onFalse(superstructure.setCommand(SuperstructureStates.DEFAULT));
     controller
         .a()
         .whileTrue(
@@ -250,210 +208,8 @@ public class RobotContainer {
             Commands.runOnce(
                 () -> intakePivotSub.setDesiredState(IntakePivotSubsystem.DesiredState.OUT)));
 
-    controller
-        .povRight()
-        .onTrue(
-            Commands.runOnce(() -> shooterSub.setDesiredState(ShooterSubsystem.DesiredState.OUT)));
-
-    controller
-        .povLeft()
-        .onTrue(
-            Commands.runOnce(() -> shooterSub.setDesiredState(ShooterSubsystem.DesiredState.IN)));
-
     // controller.povLeft().onTrue(superstructureCommands.setCommand(superstructure,
     // SuperstructureStates.HOME));
-  }
-
-  /**
-   * Este metodo configura los botones para el simulador
-   *
-   * @param controller es un mando de xbox
-   *     <p>public void configureButtonBindingsSim(CommandXboxController controller) {
-   *     controller.a().onTrue(Commands.runOnce(() -> generateFuel()));
-   *     controller.b().onTrue(Commands.runOnce(() -> intakePivotSub.setRunning(true)));
-   *     controller.x().onTrue(Commands.runOnce(() -> intakePivotSub.setRunning(false))); controller
-   *     .start() .onTrue(Commands.runOnce(() -> SimulatedArena.getInstance().resetFieldForAuto()));
-   *     <p>controller .rightTrigger() .whileTrue( Commands.sequence( Commands.either( Commands.run(
-   *     () -> driveSub.setDesiredPointToLock(new Translation2d(4.626, 4.033))), Commands.run( () ->
-   *     driveSub.setDesiredRotationToLock( new Rotation2d(robotState.isRedAlliance() ? 0 :
-   *     Math.PI))), () -> !robotState.passedTrench()) .withTimeout(0.7),
-   *     Commands.repeatingSequence( Commands.either( Commands.runOnce(() -> generateFuel()),
-   *     Commands.runOnce(() -> generateFuelTaxi()), () -> !robotState.passedTrench()),
-   *     Commands.waitSeconds(0.2)))) .onFalse( Commands.runOnce( () ->
-   *     driveSub.setState(DriveSubsystem.DesiredState.MANUAL_FIELD_DRIVE))); }
-   *     <p>/** Este metodo genera los fuels dependiento de la posición del chasis, la velocidad
-   *     incicial del fuel, la dirección en la cual se va a estar lanzando la velocidad y el ángulo
-   *     al que será lanzado
-   */
-  /*
-  public void configureButtonBindingsSim(CommandXboxController controller) {
-    controller
-        .rightBumper()
-        .whileTrue(
-            Commands.run(
-                () ->
-                    driveSub.setDesiredPointToLock(
-                        new Translation2d(
-                            FieldConstants.getHubShootingPose().getX(),
-                            FieldConstants.getHubShootingPose().getY()))))
-        .onFalse(
-            Commands.runOnce(
-                () -> driveSub.setState(DriveSubsystem.DesiredState.MANUAL_FIELD_DRIVE)));
-    controller
-        .start()
-        .onTrue(Commands.runOnce(() -> SimulatedArena.getInstance().resetFieldForAuto()));
-    controller.povUp().onTrue(Commands.runOnce(() -> intakePivotSubSim.resetIntake()));
-    controller.a().onTrue(Commands.runOnce(() -> intakePivotSubSim.setRunning(true)));
-    controller.b().onTrue(Commands.runOnce(() -> intakePivotSubSim.setRunning(false)));
-    controller
-        .x()
-        .whileTrue(Commands.run(() -> intakePivotSubSim.launchFuel()))
-        .onFalse(Commands.run(() -> intakePivotSubSim.stopMotor()));
-
-    controller
-        .rightTrigger()
-        .whileTrue(
-            Commands.sequence(
-                Commands.either(
-                        Commands.run(
-                            () ->
-                                driveSub.setDesiredPointToLock(
-                                    new Translation2d(
-                                        FieldConstants.getHubShootingPose().getX(),
-                                        FieldConstants.getHubShootingPose().getY()))),
-                        Commands.run(
-                            () ->
-                                driveSub.setDesiredRotationToLock(
-                                    new Rotation2d(robotState.isRedAlliance() ? 0 : Math.PI))),
-                        () -> !robotState.passedTrench())
-                    .withTimeout(0.7),
-                Commands.repeatingSequence(
-                    Commands.either(
-                        Commands.runOnce(() -> generateFuel()),
-                        Commands.runOnce(() -> generateFuelTaxi()),
-                        () -> !robotState.passedTrench()),
-                    Commands.waitSeconds(0.2))))
-        .onFalse(
-            Commands.runOnce(
-                () -> driveSub.setState(DriveSubsystem.DesiredState.MANUAL_FIELD_DRIVE)));
-  }
-
-  public void generateFuel() {
-    IntakeSimulation intakeSimulation = intakePivotSubSim.getIntakeSimulation();
-    if (intakePivotSubSim.isFuelInsideIntake()) {
-      RebuiltFuelOnFly fuelOnFly =
-          new RebuiltFuelOnFly(
-              // Specify the position of the chassis when the note is launched
-              driveSub.getDesiredPoint(),
-              // Specify the translation of the shooter from the robot center (in the shooter’s
-              // reference frame)
-              new Translation2d(-0.2, -0.2),
-              // Specify the field-relative speed of the chassis, adding it to the initial velocity
-              // of
-              // the projectile
-              robotState.getLatestFusedFieldRelativeChassisSpeeds(),
-              // The shooter facing direction is the same as the robot’s facing direction
-              robotState
-                  .getLatestFieldToRobot()
-                  .getValue()
-                  .getRotation()
-                  .minus(new Rotation2d(Math.PI / 2)),
-              // Add the shooter’s rotation
-              // + shooterRotation,
-              // Initial height of the flying note
-              Distance.ofRelativeUnits(0.56, Meters),
-              // The launch speed is proportional to the RPM
-              // RPM
-              LinearVelocity.ofRelativeUnits(7, MetersPerSecond),
-              // The angle at which the fuel is launched
-              Angle.ofRelativeUnits(54, Degrees));
-
-      fuelOnFly
-          // Set the target center to the Rebbuilt Hub of the current alliance
-          .withTargetPosition(
-              () ->
-                  FieldMirroringUtils.toCurrentAllianceTranslation(new Translation3d(4.6, 4, 2.3)))
-          // Set the tolerance: x: ±0.5m, y: ±1.2m, z: ±0.3m (this is the size of the speaker's
-          // "mouth")
-          .withTargetTolerance(new Translation3d(0.5, 1.2, 0.3))
-          // Set a callback to run when the fuel hits the target
-          .withHitTargetCallBack(() -> System.out.println("Hit hub, +1 point!"));
-
-      fuelOnFly
-          // Configure callbacks to visualize the flight trajectory of the projectile
-          .withProjectileTrajectoryDisplayCallBack(
-          // Callback for when the fuel will eventually hit the target (if configured)
-          (pose3ds) ->
-              Logger.recordOutput(
-                  "Flywheel/FuelProjectileSuccessfulShot", pose3ds.toArray(Pose3d[]::new)),
-          // Callback for when the fuel will eventually miss the target, or if no target is
-          // configured
-          (pose3ds) ->
-              Logger.recordOutput(
-                  "Flywheel/FuelProjectileUnsuccessfulShot", pose3ds.toArray(Pose3d[]::new)));
-
-      // Add the projectile to the simulated arena
-      SimulatedArena.getInstance().addGamePieceProjectile(fuelOnFly);
-
-      intakeSimulation.setGamePiecesCount(intakePivotSubSim.getFuelAmount() - 1);
-    }
-  }
-
-  private void generateFuelTaxi() {
-    IntakeSimulation intakeSimulation = intakePivotSubSim.getIntakeSimulation();
-    if (intakePivotSubSim.isFuelInsideIntake()) {
-      RebuiltFuelOnFly fuelOnFly =
-          new RebuiltFuelOnFly(
-              // Specify the position of the chassis when the note is launched
-              driveSub.getDesiredPoint(),
-              // Specify the translation of the shooter from the robot center (in the shooter’s
-              // reference frame)
-              new Translation2d(0.2, 0),
-              // Specify the field-relative speed of the chassis, adding it to the initial velocity
-              // of
-              // the projectile
-              robotState.getLatestFusedFieldRelativeChassisSpeeds(),
-              // The shooter facing direction is the same as the robot’s facing direction
-              robotState.getLatestFieldToRobot().getValue().getRotation(),
-              // Add the shooter’s rotation
-              // + shooterRotation,
-              // Initial height of the flying note
-              Distance.ofRelativeUnits(1, Meters),
-              // The launch speed is proportional to the RPM; assumed to be 16 meters/second at 6000
-              // RPM
-              LinearVelocity.ofRelativeUnits(7, MetersPerSecond),
-              // The angle at which the fuel is launched
-              Angle.ofRelativeUnits(3, Degrees));
-
-      fuelOnFly
-          // Set the target center to the Rebbuilt Hub of the current alliance
-          .withTargetPosition(
-              () ->
-                  FieldMirroringUtils.toCurrentAllianceTranslation(new Translation3d(4.6, 4, 2.3)))
-          // Set the tolerance: x: ±0.5m, y: ±1.2m, z: ±0.3m (this is the size of the speaker's
-          // "mouth")
-          .withTargetTolerance(new Translation3d(0.5, 1.2, 0.3))
-          // Set a callback to run when the fuel hits the target
-          .withHitTargetCallBack(() -> System.out.println("Hit hub, +1 point!"));
-
-      fuelOnFly
-          // Configure callbacks to visualize the flight trajectory of the projectile
-          .withProjectileTrajectoryDisplayCallBack(
-          // Callback for when the fuel will eventually hit the target (if configured)
-          (pose3ds) ->
-              Logger.recordOutput(
-                  "Flywheel/FuelProjectileSuccessfulShot", pose3ds.toArray(Pose3d[]::new)),
-          // Callback for when the fuel will eventually miss the target, or if no target is
-          // configured
-          (pose3ds) ->
-              Logger.recordOutput(
-                  "Flywheel/FuelProjectileUnsuccessfulShot", pose3ds.toArray(Pose3d[]::new)));
-
-      // Add the projectile to the simulated arena
-      SimulatedArena.getInstance().addGamePieceProjectile(fuelOnFly);
-
-      intakeSimulation.setGamePiecesCount(intakePivotSubSim.getFuelAmount() - 1);
-    }
   }
 
   /*
@@ -490,16 +246,12 @@ public class RobotContainer {
     return driveSub;
   }
 
-  // public VisionSubsystem getVisionSubsystem() {
-  // return visionSub;
-  // }
+  public VisionSubsystem getVisionSubsystem() {
+    return visionSub;
+  }
 
   public RobotState getRobotState() {
     return robotState;
-  }
-
-  public SimulatedRobotState getSimRobotState() {
-    return simulatedRobotState;
   }
 
   public RobotVisualizer getRobotVisualizer() {
@@ -509,9 +261,4 @@ public class RobotContainer {
   public Command getAutonomousCommand() {
     return autoChooser.get();
   }
-  /*
-  public IntakePivotIOSim getIntakePivotIOSim() {
-    return intakePivotSubSim;
-  }
-    */
 }

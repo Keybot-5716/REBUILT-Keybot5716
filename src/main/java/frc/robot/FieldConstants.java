@@ -6,7 +6,8 @@ import edu.wpi.first.wpilibj.DriverStation;
 
 public class FieldConstants {
 
-  private static final Pose2d STARTING_POSE = new Pose2d(3.1, 4, new Rotation2d());
+  private static final Pose2d STARTING_POSE_TEST = new Pose2d(3.1, 4, new Rotation2d());
+  private static final Pose2d TAXI_POSE = new Pose2d(6.0, 2.5, new Rotation2d(Math.PI));
   private static final Pose2d HUB_SHOOTING = new Pose2d(4.778, 4.220, new Rotation2d());
 
   public static boolean isRedAlliance() {
@@ -31,7 +32,11 @@ public class FieldConstants {
   }
 
   public static Pose2d getTestingPose() {
-    return allianceFlip(STARTING_POSE);
+    return allianceFlip(STARTING_POSE_TEST);
+  }
+
+  public static Pose2d getTaxiPose() {
+    return allianceFlip(TAXI_POSE);
   }
 
   public static Pose2d getHubShootingPose() {

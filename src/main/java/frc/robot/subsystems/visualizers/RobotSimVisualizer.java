@@ -7,13 +7,13 @@ import frc.lib.util.Visualizer;
 import frc.robot.RobotState;
 import org.littletonrobotics.junction.Logger;
 
-public class RobotVisualizer implements Visualizer {
+public class RobotSimVisualizer implements Visualizer {
   @SuppressWarnings("unused")
   private RobotState state;
 
   private Pose3d intakePose3d = new Pose3d();
 
-  public RobotVisualizer(RobotState state) {
+  public RobotSimVisualizer(RobotState state) {
     this.state = state;
   }
 
@@ -30,11 +30,11 @@ public class RobotVisualizer implements Visualizer {
     double adentro = -90.0;
     /*
     if (RobotBase.isSimulation()) {
-      if (intakePivotIOSim.isRunning()) {
+    if (intakePivotIOSim.isRunning()) {
         intakePose3d = new Pose3d(0.26, 0, 0.255, new Rotation3d(0, 0, 0));
-      } else {
+    } else {
         intakePose3d = new Pose3d(0.26, 0, 0.255, new Rotation3d(0, adentro, 0));
-      }
+    }
     } else {
 
     } */

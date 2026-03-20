@@ -3,7 +3,7 @@ package frc.robot.simulation;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.interpolation.TimeInterpolatableBuffer;
 import edu.wpi.first.wpilibj.Timer;
-import frc.robot.RobotContainer;
+import frc.robot.RobotContainerSim;
 import frc.robot.RobotState;
 import frc.robot.subsystems.intake.pivot.IntakePivotIOSim;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
@@ -15,15 +15,16 @@ public class SimulatedRobotState {
 
   private SwerveDriveSimulation simSwerveDrive;
   private IntakePivotIOSim intakePivotSim;
-  private final RobotContainer container;
+  private final RobotContainerSim containerSim;
 
-  public SimulatedRobotState(RobotContainer container) {
-    this.container = container;
+  public SimulatedRobotState(RobotContainerSim containerSim) {
+    this.containerSim = containerSim;
   }
 
   public void init() {
-    this.simSwerveDrive = this.container.getDriveSubsystem().getMapleSimDrive().mapleSimDrive;
-    // this.intakePivotSim = this.container.getIntakePivotIOSim();
+
+    this.simSwerveDrive = this.containerSim.getDriveSubsystem().getMapleSimDrive().mapleSimDrive;
+    this.intakePivotSim = this.containerSim.getIntakePivotIOSim();
   }
 
   public synchronized void addFieldToRobot(Pose2d pose) {

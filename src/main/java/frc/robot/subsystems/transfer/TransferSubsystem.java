@@ -23,7 +23,8 @@ public class TransferSubsystem extends SubsystemBase {
   public enum DesiredState {
     STOPPED,
     FORWARD,
-    REVERSE
+    REVERSE,
+    OSCILLATE_FORWARD
   }
 
   private enum TransferState {
@@ -60,13 +61,15 @@ public class TransferSubsystem extends SubsystemBase {
       case STOPPED -> TransferState.STOPPING;
       case FORWARD -> TransferState.FORWARDING;
       case REVERSE -> TransferState.REVERSING;
+      case OSCILLATE_FORWARD -> TransferState.FORWARDING;
     };
   }
 
   private void applyStates() {
     switch (transferState) {
       case FORWARDING:
-        if (oscillating) {
+        if (desiredState == DesiredState.OSCILLATE_FORWARD) {
+
           double cycleTime = oscillationTimer.get() % 2.0;
 
           if (cycleTime < 1.8) {
@@ -99,6 +102,15 @@ public class TransferSubsystem extends SubsystemBase {
   }
 
   public void setDesiredState(DesiredState desiredState) {
+    if (this.desiredState != desiredState) {
+
+      if (desiredState == DesiredState.OSCILLATE_FORWARD) {
+        oscillationTimer.stop();
+        oscillationTimer.reset();
+        oscillationTimer.start();
+      }
+    }
+
     this.desiredState = desiredState;
   }
 

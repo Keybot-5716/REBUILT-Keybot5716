@@ -161,7 +161,12 @@ public class RobotContainer implements RobotCore {
     controller
         .rightTrigger()
         .onTrue(superstructure.setCommand(SuperstructureStates.TAXI, SuperstructureStates.SCORE))
-        .onFalse(superstructure.setCommand(SuperstructureStates.DEFAULT));
+        .onFalse(superstructure.setCommand(SuperstructureStates.HOME));
+
+    controller.leftTrigger()
+      .onTrue(superstructure.setCommand(SuperstructureStates.INTAKE))
+      .onFalse(superstructure.setCommand(SuperstructureStates.DEFAULT));
+      
     controller
         .a()
         .whileTrue(

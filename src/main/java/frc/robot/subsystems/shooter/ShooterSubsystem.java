@@ -23,7 +23,7 @@ public class ShooterSubsystem extends SubsystemBase {
   private ShooterState shooterState = ShooterState.STOPPING;
 
   private static final LoggedTunableNumber desiredVelocityTunable =
-      new LoggedTunableNumber("Shooter/Rollers/RollerVelocity", 50.0);
+      new LoggedTunableNumber("Shooter/Rollers/RollerVelocity", 56.7);
 
   public enum DesiredState {
     STOPPED,
@@ -93,6 +93,7 @@ public class ShooterSubsystem extends SubsystemBase {
     switch (shooterState) {
       case FORWARDING_ROLLERS:
         setVelocityRollers(desiredVelocityTunable.get());
+
         break;
 
       case REVERSING_ROLLERS:
@@ -109,15 +110,15 @@ public class ShooterSubsystem extends SubsystemBase {
         break;
 
       case OUTING:
-        setPosition(0.0);
+        setPosition(0.87);
         break;
 
       case SCORING:
-        setPosition(0.0);
+        setPosition(0.3);
         break;
 
       case TAXIING:
-        setPosition(0.0);
+        setPosition(0.9);
         break;
     }
   }

@@ -57,7 +57,7 @@ public class ShooterHoodIOTalonFX implements ShooterHoodIO {
 
     config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RotorSensor;
 
-    config.Slot0.kP = 7.0;
+    config.Slot0.kP = 32.0;
     config.Slot0.kI = 0.0;
     config.Slot0.kD = 0.0;
 

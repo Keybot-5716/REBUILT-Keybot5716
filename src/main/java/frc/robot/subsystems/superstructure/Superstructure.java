@@ -1,6 +1,8 @@
 package frc.robot.subsystems.superstructure;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.FieldConstants;
 import frc.robot.RobotState;
@@ -111,6 +113,7 @@ public class Superstructure extends SubsystemBase {
   }
 
   private void score() {
+
     driveSub.setDesiredPointToLock(FieldConstants.getHubShootingPose().getTranslation());
     intakePivotSubsystem.setDesiredState(IntakePivotSubsystem.DesiredState.IN);
     intakeRollersSub.setDesiredState(IntakeRollersSubsystem.DesiredState.STOPPED);
@@ -134,5 +137,9 @@ public class Superstructure extends SubsystemBase {
     } else {
       transferSub.setDesiredState(TransferSubsystem.DesiredState.STOPPED);
     }
+  }
+
+  public Command setCommand(Superstructure superstructure, SuperstructureStates states) {
+    return new InstantCommand(() -> superstructure.setDesiredState(states));
   }
 }

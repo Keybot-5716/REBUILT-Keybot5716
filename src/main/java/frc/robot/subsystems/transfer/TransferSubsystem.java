@@ -15,7 +15,7 @@ public class TransferSubsystem extends SubsystemBase {
   private TransferState transferState = TransferState.STOPPING;
 
   private final Timer oscillationTimer = new Timer();
-  private boolean oscillating = false;
+  boolean oscillating = false;
 
   private static final LoggedTunableNumber rollerRPS =
       new LoggedTunableNumber("Transfer/Rollers/RollerRPS", 25.0);

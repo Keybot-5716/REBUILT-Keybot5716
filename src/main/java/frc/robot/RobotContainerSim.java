@@ -87,7 +87,8 @@ public class RobotContainerSim implements RobotCore {
 
   private final CommandXboxController DRIVE_CONTROLLER = new CommandXboxController(0);
 
-  private final RobotSimVisualizer robotVisualizer = new RobotSimVisualizer(robotState, intakePivotSubSim);
+  private final RobotSimVisualizer robotVisualizer =
+      new RobotSimVisualizer(robotState, intakePivotSubSim);
 
   public static Field2d autoPrev = new Field2d();
 

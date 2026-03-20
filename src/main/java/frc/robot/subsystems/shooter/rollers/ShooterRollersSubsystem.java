@@ -48,6 +48,9 @@ public class ShooterRollersSubsystem extends SubsystemBase {
 
       Logger.recordOutput("Shooter/DesiredState", desiredState);
       Logger.recordOutput("Shooter/ShooterSollerState", rollerState);
+
+      rollerState = setStateTransition();
+      applyStates();
     }
   }
 

@@ -94,6 +94,7 @@ public class Superstructure extends SubsystemBase {
     intakeRollersSub.setDesiredState(IntakeRollersSubsystem.DesiredState.STOPPED);
     transferSub.setDesiredState(TransferSubsystem.DesiredState.STOPPED);
     shooterHoodSub.setDesiredState(ShooterHoodSubsystem.DesiredState.STOPPED);
+    shooterRollerSub.setDesiredState(ShooterRollersSubsystem.DesiredState.STOPPED);
   }
 
   private void home() {
@@ -102,6 +103,7 @@ public class Superstructure extends SubsystemBase {
     intakeRollersSub.setDesiredState(IntakeRollersSubsystem.DesiredState.STOPPED);
     transferSub.setDesiredState(TransferSubsystem.DesiredState.STOPPED);
     shooterHoodSub.setDesiredState(ShooterHoodSubsystem.DesiredState.HOME);
+    shooterRollerSub.setDesiredState(ShooterRollersSubsystem.DesiredState.STOPPED);
   }
 
   private void intake() {
@@ -109,6 +111,7 @@ public class Superstructure extends SubsystemBase {
     intakePivotSubsystem.setDesiredState(IntakePivotSubsystem.DesiredState.OUT);
     transferSub.setDesiredState(TransferSubsystem.DesiredState.STOPPED);
     shooterHoodSub.setDesiredState(ShooterHoodSubsystem.DesiredState.STOPPED);
+    shooterRollerSub.setDesiredState(ShooterRollersSubsystem.DesiredState.STOPPED);
 
     if (intakePivotSubsystem.isOut()) {
       intakeRollersSub.setDesiredState(IntakeRollersSubsystem.DesiredState.FORWARD_ROLLERS);
@@ -121,6 +124,7 @@ public class Superstructure extends SubsystemBase {
     driveSub.setDesiredPointToLock(FieldConstants.getHubShootingPose().getTranslation());
     intakeRollersSub.setDesiredState(IntakeRollersSubsystem.DesiredState.STOPPED);
     shooterRollerSub.setDesiredState(ShooterRollersSubsystem.DesiredState.FORWARD_ROLLERS);
+    shooterHoodSub.setDesiredState(ShooterHoodSubsystem.DesiredState.CALC_POS_TO_SCORE);
 
     if (driveSub.isAlignedToPoint() && shooterHoodSub.atHome()) {
       transferSub.setDesiredState(TransferSubsystem.DesiredState.OSCILLATE_FORWARD);
@@ -134,6 +138,7 @@ public class Superstructure extends SubsystemBase {
         new Rotation2d(robotState.isRedAlliance() ? (Math.PI / 2) : (Math.PI + (Math.PI / 2))));
     intakeRollersSub.setDesiredState(IntakeRollersSubsystem.DesiredState.STOPPED);
     shooterRollerSub.setDesiredState(ShooterRollersSubsystem.DesiredState.FORWARD_ROLLERS);
+    shooterHoodSub.setDesiredState(ShooterHoodSubsystem.DesiredState.CALC_POS_TO_TAXI);
 
     if (driveSub.isAlignedToAngle() && shooterHoodSub.isOut()) {
       transferSub.setDesiredState(TransferSubsystem.DesiredState.OSCILLATE_FORWARD);

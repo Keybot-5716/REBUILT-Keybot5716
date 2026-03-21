@@ -32,11 +32,7 @@ public class VisionConstants {
   public static final double kRobotToCameraAForward = -0.12;
   public static final double kRobotToCameraASide = -0.28;
   public static final Rotation2d kCameraAYawOffset = Rotation2d.fromDegrees(-90);
-  public static final double kCameraAHeightOffGroundMeters = 0.0;
-  public static final String kLimelightATableName = "limelight-uno";
-  public static final double kRobotToCameraAForward =0.0;
-  public static final double kRobotToCameraASide = 0.0;
-  public static final Rotation2d kCameraAYawOffset = Rotation2d.fromDegrees(0.0);
+ 
   public static final Transform2d kRobotToCameraA =
       new Transform2d(
           new Translation2d(kRobotToCameraAForward, kRobotToCameraASide), kCameraAYawOffset);

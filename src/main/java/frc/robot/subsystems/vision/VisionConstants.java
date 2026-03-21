@@ -28,7 +28,7 @@ public class VisionConstants {
   public static final double kCameraAPitchDegrees = 25.62481;
   public static final double kCameraAPitchRads = Units.degreesToRadians(kCameraAPitchDegrees);
   public static final double kCameraAHeightOffGroundMeters = 0.45;
-  public static final String kLimelightATableName = "limelight-frontal";
+  public static final String kLimelightATableName = "limelight-uno";
   public static final double kRobotToCameraAForward = -0.12;
   public static final double kRobotToCameraASide = -0.28;
   public static final Rotation2d kCameraAYawOffset = Rotation2d.fromDegrees(-90);

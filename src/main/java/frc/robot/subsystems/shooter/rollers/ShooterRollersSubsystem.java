@@ -67,7 +67,7 @@ public class ShooterRollersSubsystem extends SubsystemBase {
   private void applyStates() {
     switch (rollerState) {
       case FORWARDING_ROLLERS:
-        setVelocityRollers(desiredVelocity);
+        setVelocityRollers(desiredVelocityRollers.get());
         break;
 
       case REVERSING_ROLLERS:

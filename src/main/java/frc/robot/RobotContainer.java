@@ -20,6 +20,7 @@ import frc.robot.auto.*;
 import frc.robot.subsystems.drive.*;
 import frc.robot.subsystems.intake.pivot.*;
 import frc.robot.subsystems.intake.rollers.*;
+import frc.robot.subsystems.shooter.ShootCalculator;
 import frc.robot.subsystems.shooter.hood.*;
 import frc.robot.subsystems.shooter.rollers.*;
 import frc.robot.subsystems.superstructure.Superstructure;
@@ -119,6 +120,7 @@ public class RobotContainer implements RobotCore {
   private final VisionSubsystem visionSub = buildVisionSubsystem();
 
   private final Superstructure superstructure = buildSuperstructure();
+  private final ShootCalculator s = new ShootCalculator(robotState);
 
   // -- AutoChooser
   private final LoggedDashboardChooser<AutoBuilder> autoChooser =

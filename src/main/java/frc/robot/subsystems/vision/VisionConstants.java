@@ -44,10 +44,10 @@ public class VisionConstants {
           new Translation2d(kRobotToCameraAForward, kRobotToCameraASide), kCameraAYawOffset);
 
   // Camera B (Right-side camera)
-  public static final double kCameraBPitchDegrees = 25.0;
+  public static final double kCameraBPitchDegrees = 15.0;
   public static final double kCameraBPitchRads = Units.degreesToRadians(kCameraBPitchDegrees);
   public static final double kCameraBHeightOffGroundMeters = 0.463;
-  public static final String kLimelightBTableName = "limelight-backward";
+  public static final String kLimelightBTableName = "limelight-back";
   public static final double kRobotToCameraBForward = -0.258;
   public static final double kRobotToCameraBSide = -0.335;
   public static final Rotation2d kCameraBYawOffset = Rotation2d.fromDegrees(90);

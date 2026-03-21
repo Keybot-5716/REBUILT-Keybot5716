@@ -52,7 +52,7 @@ public class TrasnferIOTalonFX implements TransferIO {
 
     config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RotorSensor;
 
-    config.Slot0.kP = 0.15;
+    config.Slot0.kP = 0.3;
     config.Slot0.kI = 0.0;
     config.Slot0.kD = 0.0;
     config.Slot0.kV = 0.13;

@@ -25,7 +25,7 @@ import frc.robot.subsystems.shooter.rollers.*;
 import frc.robot.subsystems.superstructure.Superstructure;
 import frc.robot.subsystems.superstructure.SuperstructureStates;
 import frc.robot.subsystems.transfer.*;
-import frc.robot.subsystems.vision.VisionIOLimelight;
+import frc.robot.subsystems.vision.VisionIOHardwareLimelight;
 import frc.robot.subsystems.vision.VisionPoseEstimateInField;
 import frc.robot.subsystems.vision.VisionSubsystem;
 import frc.robot.subsystems.visualizers.RobotVisualizer;
@@ -81,7 +81,7 @@ public class RobotContainer implements RobotCore {
   }
 
   private VisionSubsystem buildVisionSubsystem() {
-    return new VisionSubsystem(new VisionIOLimelight(robotState), robotState);
+    return new VisionSubsystem(new VisionIOHardwareLimelight(robotState), robotState);
   }
 
   private final Consumer<VisionPoseEstimateInField> visionFieldEstimate =
@@ -141,7 +141,8 @@ public class RobotContainer implements RobotCore {
   public void configureButtonBindings(CommandXboxController controller) {
     controller
         .start()
-        .onTrue(Commands.runOnce(() -> driveSub.resetOdometry(FieldConstants.getTestingPose())));
+        .onTrue(
+            Commands.runOnce(() -> driveSub.resetOdometry(FieldConstants.getRightTrenchTesting())));
     controller
         .back()
         .onTrue(Commands.runOnce(() -> driveSub.resetOdometry(FieldConstants.getTaxiPose())));
@@ -163,10 +164,11 @@ public class RobotContainer implements RobotCore {
         .onTrue(superstructure.setCommand(SuperstructureStates.TAXI, SuperstructureStates.SCORE))
         .onFalse(superstructure.setCommand(SuperstructureStates.HOME));
 
-    controller.leftTrigger()
-      .onTrue(superstructure.setCommand(SuperstructureStates.INTAKE))
-      .onFalse(superstructure.setCommand(SuperstructureStates.DEFAULT));
-      
+    controller
+        .leftTrigger()
+        .onTrue(superstructure.setCommand(SuperstructureStates.INTAKE))
+        .onFalse(superstructure.setCommand(SuperstructureStates.DEFAULT));
+
     controller
         .a()
         .whileTrue(
@@ -245,6 +247,13 @@ public class RobotContainer implements RobotCore {
     CommandScheduler.getInstance().schedule(FollowPathCommand.warmupCommand());
 
     SmartDashboard.putData("AutoPrev", autoPrev);
+
+    /*
+    NamedCommands.registerCommand("SCORE", superstructure.setCommand(SuperstructureStates.SCORE));
+    NamedCommands.registerCommand("HOME", superstructure.setCommand(SuperstructureStates.HOME));
+    NamedCommands.registerCommand("INTAKE", superstructure.setCommand(SuperstructureStates.INTAKE));
+    NamedCommands.registerCommand("TAXI", superstructure.setCommand(SuperstructureStates.TAXI));
+    NamedCommands.registerCommand("DEFAULT", superstructure.setCommand(SuperstructureStates.DEFAULT));*/
   }
 
   public DriveSubsystem getDriveSubsystem() {

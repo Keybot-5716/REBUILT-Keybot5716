@@ -99,7 +99,7 @@ public class Superstructure extends SubsystemBase {
 
   private void home() {
     driveSub.setState(DriveSubsystem.DesiredState.MANUAL_FIELD_DRIVE);
-    intakePivotSubsystem.setDesiredState(IntakePivotSubsystem.DesiredState.IN);
+    // intakePivotSubsystem.setDesiredState(IntakePivotSubsystem.DesiredState.IN);
     intakeRollersSub.setDesiredState(IntakeRollersSubsystem.DesiredState.STOPPED);
     transferSub.setDesiredState(TransferSubsystem.DesiredState.STOPPED);
     shooterHoodSub.setDesiredState(ShooterHoodSubsystem.DesiredState.HOME);
@@ -108,16 +108,18 @@ public class Superstructure extends SubsystemBase {
 
   private void intake() {
     driveSub.setState(DriveSubsystem.DesiredState.MANUAL_FIELD_DRIVE);
-    intakePivotSubsystem.setDesiredState(IntakePivotSubsystem.DesiredState.OUT);
+    // intakePivotSubsystem.setDesiredState(IntakePivotSubsystem.DesiredState.OUT);
     transferSub.setDesiredState(TransferSubsystem.DesiredState.STOPPED);
     shooterHoodSub.setDesiredState(ShooterHoodSubsystem.DesiredState.STOPPED);
     shooterRollerSub.setDesiredState(ShooterRollersSubsystem.DesiredState.STOPPED);
+    intakeRollersSub.setDesiredState(IntakeRollersSubsystem.DesiredState.FORWARD_ROLLERS);
 
+    /*
     if (intakePivotSubsystem.isOut()) {
       intakeRollersSub.setDesiredState(IntakeRollersSubsystem.DesiredState.FORWARD_ROLLERS);
     } else {
       intakeRollersSub.setDesiredState(IntakeRollersSubsystem.DesiredState.STOPPED);
-    }
+    } */
   }
 
   private void score() {

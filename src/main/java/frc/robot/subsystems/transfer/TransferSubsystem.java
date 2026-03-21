@@ -18,7 +18,7 @@ public class TransferSubsystem extends SubsystemBase {
   boolean oscillating = false;
 
   private static final LoggedTunableNumber rollerRPS =
-      new LoggedTunableNumber("Transfer/Rollers/RollerRPS", 25.0);
+      new LoggedTunableNumber("Transfer/Rollers/RollerRPS", 50.0);
 
   public enum DesiredState {
     STOPPED,

@@ -1,5 +1,9 @@
 package frc.robot.subsystems.superstructure;
 
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Translation2d;
+
 public class SuperstructureConstants {
 
   public static class IDs {
@@ -18,7 +22,7 @@ public class SuperstructureConstants {
   public static class IntakeConstants {
     // -- PIVOT CONSTANTS
     public static final double IN = 0.0;
-    public static final double OUT = 4.94;
+    public static final double OUT = 4.25;
 
     // -- ROLLER CONSTANTS
     public static final double ZERO_RVOLTAGE = 0.0;
@@ -37,6 +41,9 @@ public class SuperstructureConstants {
     public static final double IN_TEST = 0.0;
     public static final double OUT_TEST = 0.87;
     public static final double MID_TEST = 0.3;
+
+    public static Transform2d robotToLauncher =
+        new Transform2d(new Translation2d(-0.276, 0.09), new Rotation2d(0.0));
   }
 
   public static class TransferConstants {

@@ -6,9 +6,10 @@ import edu.wpi.first.wpilibj.DriverStation;
 
 public class FieldConstants {
 
-  private static final Pose2d STARTING_POSE_TEST = new Pose2d(3.1, 4, new Rotation2d());
+  private static final Pose2d STARTING_POSE_TEST = new Pose2d(3.405, 4, new Rotation2d());
   private static final Pose2d TAXI_POSE = new Pose2d(6.0, 2.5, new Rotation2d(Math.PI));
   private static final Pose2d HUB_SHOOTING = new Pose2d(4.778, 4.220, new Rotation2d());
+  private static final Pose2d RIGHT_TRENCH = new Pose2d(3.560, 0.527, new Rotation2d());
 
   public static boolean isRedAlliance() {
     return Robot.alliance.isPresent() && Robot.alliance.get() == DriverStation.Alliance.Red;
@@ -41,5 +42,9 @@ public class FieldConstants {
 
   public static Pose2d getHubShootingPose() {
     return allianceFlip(HUB_SHOOTING);
+  }
+
+  public static Pose2d getRightTrenchTesting() {
+    return allianceFlip(RIGHT_TRENCH);
   }
 }

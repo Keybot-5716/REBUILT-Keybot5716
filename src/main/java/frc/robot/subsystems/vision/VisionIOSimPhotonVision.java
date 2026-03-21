@@ -22,9 +22,11 @@ import org.photonvision.targeting.PhotonPipelineResult;
  * Simulation implementation of VisionIO using PhotonVision simulation. Extends Limelight hardware
  * implementation to reuse data processing logic.
  */
-public class VisionIOSimPhotonVision extends VisionIOLimelight {
+public class VisionIOSimPhotonVision extends VisionIOHardwareLimelight {
   private final PhotonCamera camera = new PhotonCamera("camera");
+  private final PhotonCamera cameraB = new PhotonCamera("cameraB");
   private PhotonCameraSim cameraSim;
+  private PhotonCameraSim cameraBSim;
   private final VisionSystemSim visionSim;
   private final SimulatedRobotState simRobotState;
 
@@ -49,6 +51,8 @@ public class VisionIOSimPhotonVision extends VisionIOLimelight {
 
     cameraSim = new PhotonCameraSim(camera, prop);
     cameraSim.setMinTargetAreaPixels(1000);
+    cameraBSim = new PhotonCameraSim(cameraB, prop);
+    cameraBSim.setMinTargetAreaPixels(1000);
 
     Transform3d robotToCameraA =
         new Transform3d(
@@ -62,11 +66,27 @@ public class VisionIOSimPhotonVision extends VisionIOLimelight {
                 VisionConstants.kCameraAYawOffset.getRadians() // Yaw
                 ));
 
+    Transform3d robotToCameraB =
+        new Transform3d(
+            new Translation3d(
+                VisionConstants.kRobotToCameraBForward,
+                VisionConstants.kRobotToCameraBSide,
+                VisionConstants.kCameraBHeightOffGroundMeters),
+            new Rotation3d(
+                0.0, // Roll
+                -VisionConstants.kCameraBPitchRads, // Pitch
+                VisionConstants.kCameraBYawOffset.getRadians() // Yaw
+                ));
+
     visionSim.addCamera(cameraSim, robotToCameraA);
+    visionSim.addCamera(cameraBSim, robotToCameraB);
 
     cameraSim.enableRawStream(true);
     cameraSim.enableProcessedStream(true);
     cameraSim.enableDrawWireframe(true);
+    cameraBSim.enableRawStream(true);
+    cameraBSim.enableProcessedStream(true);
+    cameraBSim.enableDrawWireframe(true);
   }
 
   @Override
@@ -79,8 +99,11 @@ public class VisionIOSimPhotonVision extends VisionIOLimelight {
 
     NetworkTable table =
         NetworkTableInstance.getDefault().getTable(VisionConstants.kLimelightATableName);
+    NetworkTable tableB =
+        NetworkTableInstance.getDefault().getTable(VisionConstants.kLimelightBTableName);
 
     writeToTable(camera.getAllUnreadResults(), table, cameraSim);
+    writeToTable(cameraB.getAllUnreadResults(), tableB, cameraBSim);
 
     super.readInputs(inputs);
   }

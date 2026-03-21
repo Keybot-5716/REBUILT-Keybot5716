@@ -7,34 +7,34 @@ import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.Objects;
 
-public record FiducialObjObservation(double txnc, double tync, double ambiguity, double area)
+public record FiducialObservation(int id, double txnc, double tync, double ambiguity, double area)
     implements StructSerializable {
 
   /** Converts a Limelight raw fiducial to a FiducialObservation. */
-  public static FiducialObjObservation fromLimelight(LimelightHelpers.RawFiducial fiducial) {
+  public static FiducialObservation fromLimelight(LimelightHelpers.RawFiducial fiducial) {
     if (fiducial == null) {
       return null;
     }
-    return new FiducialObjObservation(
-        fiducial.txnc, fiducial.tync, fiducial.ambiguity, fiducial.ta);
+    return new FiducialObservation(
+        fiducial.id, fiducial.txnc, fiducial.tync, fiducial.ambiguity, fiducial.ta);
   }
 
   /** Converts an array of Limelight raw fiducials to FiducialObservation array. */
-  public static FiducialObjObservation[] fromLimelight(LimelightHelpers.RawFiducial[] fiducials) {
+  public static FiducialObservation[] fromLimelight(LimelightHelpers.RawFiducial[] fiducials) {
     if (fiducials == null) {
-      return new FiducialObjObservation[0];
+      return new FiducialObservation[0];
     }
     return Arrays.stream(fiducials)
-        .map(FiducialObjObservation::fromLimelight)
+        .map(FiducialObservation::fromLimelight)
         .filter(Objects::nonNull)
-        .toArray(FiducialObjObservation[]::new);
+        .toArray(FiducialObservation[]::new);
   }
 
-  public static final Struct<FiducialObjObservation> struct =
-      new Struct<FiducialObjObservation>() {
+  public static final Struct<FiducialObservation> struct =
+      new Struct<FiducialObservation>() {
         @Override
-        public Class<FiducialObjObservation> getTypeClass() {
-          return FiducialObjObservation.class;
+        public Class<FiducialObservation> getTypeClass() {
+          return FiducialObservation.class;
         }
 
         @Override
@@ -53,16 +53,18 @@ public record FiducialObjObservation(double txnc, double tync, double ambiguity,
         }
 
         @Override
-        public FiducialObjObservation unpack(ByteBuffer bb) {
+        public FiducialObservation unpack(ByteBuffer bb) {
+          int id = bb.getInt();
           double txnc = bb.getDouble();
           double tync = bb.getDouble();
           double ambiguity = bb.getDouble();
           double area = bb.getDouble();
-          return new FiducialObjObservation(txnc, tync, ambiguity, area);
+          return new FiducialObservation(id, txnc, tync, ambiguity, area);
         }
 
         @Override
-        public void pack(ByteBuffer bb, FiducialObjObservation value) {
+        public void pack(ByteBuffer bb, FiducialObservation value) {
+          bb.putInt(value.id());
           bb.putDouble(value.txnc());
           bb.putDouble(value.tync());
           bb.putDouble(value.ambiguity());

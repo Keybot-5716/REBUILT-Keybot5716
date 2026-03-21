@@ -38,7 +38,7 @@ public class VisionConstants {
   public static final double kRobotToCameraAForward = -0.12;
   public static final double kRobotToCameraASide = -0.2578;
   public static final Rotation2d kCameraAYawOffset = Rotation2d.fromDegrees(-90);
- 
+
   public static final Transform2d kRobotToCameraA =
       new Transform2d(
           new Translation2d(kRobotToCameraAForward, kRobotToCameraASide), kCameraAYawOffset);

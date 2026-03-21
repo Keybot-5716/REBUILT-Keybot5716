@@ -24,342 +24,325 @@ import org.littletonrobotics.junction.Logger;
  */
 public class VisionSubsystem extends SubsystemBase {
 
-    private final VisionIO io;
-    private final RobotState state;
-    private final VisionIO.VisionIOInputs inputs = new VisionIO.VisionIOInputs();
+  private final VisionIO io;
+  private final RobotState state;
+  private final VisionIO.VisionIOInputs inputs = new VisionIO.VisionIOInputs();
 
-    private boolean useVision = true;
+  private boolean useVision = true;
 
-    /** Creates a new vision subsystem. */
-    public VisionSubsystem(VisionIO io, RobotState state) {
-        this.io = io;
-        this.state = state;
+  /** Creates a new vision subsystem. */
+  public VisionSubsystem(VisionIO io, RobotState state) {
+    this.io = io;
+    this.state = state;
+  }
+
+  /** Fuses two vision pose estimates using inverse-variance weighting. */
+  private VisionPoseEstimateInField fuseEstimates(
+      VisionPoseEstimateInField a, VisionPoseEstimateInField b) {
+    // Ensure b is the newer measurement
+    if (b.getTimestamp() < a.getTimestamp()) {
+      VisionPoseEstimateInField tmp = a;
+      a = b;
+      b = tmp;
     }
 
-    /** Fuses two vision pose estimates using inverse-variance weighting. */
-    private VisionPoseEstimateInField fuseEstimates(
-            VisionPoseEstimateInField a, VisionPoseEstimateInField b) {
-        // Ensure b is the newer measurement
-        if (b.getTimestamp() < a.getTimestamp()) {
-            VisionPoseEstimateInField tmp = a;
-            a = b;
-            b = tmp;
-        }
+    // Preview both estimates to the same timestamp
+    Transform2d a_T_b =
+        state
+            .getFieldToRobot(b.getTimestamp())
+            .get()
+            .minus(state.getFieldToRobot(a.getTimestamp()).get());
 
-        // Preview both estimates to the same timestamp
-        Transform2d a_T_b =
-                state.getFieldToRobot(b.getTimestamp())
-                        .get()
-                        .minus(state.getFieldToRobot(a.getTimestamp()).get());
+    Pose2d poseA = a.getRobotPose().transformBy(a_T_b);
+    Pose2d poseB = b.getRobotPose();
 
-        Pose2d poseA = a.getRobotPose().transformBy(a_T_b);
-        Pose2d poseB = b.getRobotPose();
+    // Inverse‑variance weighting
+    var varianceA = a.getVisionMeasurementStdDevs().elementTimes(a.getVisionMeasurementStdDevs());
+    var varianceB = b.getVisionMeasurementStdDevs().elementTimes(b.getVisionMeasurementStdDevs());
 
-        // Inverse‑variance weighting
-        var varianceA =
-                a.getVisionMeasurementStdDevs().elementTimes(a.getVisionMeasurementStdDevs());
-        var varianceB =
-                b.getVisionMeasurementStdDevs().elementTimes(b.getVisionMeasurementStdDevs());
-
-        Rotation2d fusedHeading = poseB.getRotation();
-        if (varianceA.get(2, 0) < VisionConstants.kLargeVariance
-                && varianceB.get(2, 0) < VisionConstants.kLargeVariance) {
-            fusedHeading =
-                    new Rotation2d(
-                            poseA.getRotation().getCos() / varianceA.get(2, 0)
-                                    + poseB.getRotation().getCos() / varianceB.get(2, 0),
-                            poseA.getRotation().getSin() / varianceA.get(2, 0)
-                                    + poseB.getRotation().getSin() / varianceB.get(2, 0));
-        }
-
-        double weightAx = 1.0 / varianceA.get(0, 0);
-        double weightAy = 1.0 / varianceA.get(1, 0);
-        double weightBx = 1.0 / varianceB.get(0, 0);
-        double weightBy = 1.0 / varianceB.get(1, 0);
-
-        Pose2d fusedPose =
-                new Pose2d(
-                        new Translation2d(
-                                (poseA.getTranslation().getX() * weightAx
-                                                + poseB.getTranslation().getX() * weightBx)
-                                        / (weightAx + weightBx),
-                                (poseA.getTranslation().getY() * weightAy
-                                                + poseB.getTranslation().getY() * weightBy)
-                                        / (weightAy + weightBy)),
-                        fusedHeading);
-
-        Matrix<N3, N1> fusedStdDev =
-                VecBuilder.fill(
-                        Math.sqrt(1.0 / (weightAx + weightBx)),
-                        Math.sqrt(1.0 / (weightAy + weightBy)),
-                        Math.sqrt(1.0 / (1.0 / varianceA.get(2, 0) + 1.0 / varianceB.get(2, 0))));
-
-        int numTags = a.getNumTags() + b.getNumTags();
-        double time = b.getTimestamp();
-
-        return new VisionPoseEstimateInField(fusedPose, time, fusedStdDev, numTags);
+    Rotation2d fusedHeading = poseB.getRotation();
+    if (varianceA.get(2, 0) < VisionConstants.kLargeVariance
+        && varianceB.get(2, 0) < VisionConstants.kLargeVariance) {
+      fusedHeading =
+          new Rotation2d(
+              poseA.getRotation().getCos() / varianceA.get(2, 0)
+                  + poseB.getRotation().getCos() / varianceB.get(2, 0),
+              poseA.getRotation().getSin() / varianceA.get(2, 0)
+                  + poseB.getRotation().getSin() / varianceB.get(2, 0));
     }
 
-    @Override
-    public void periodic() {
-        double startTime = Timer.getFPGATimestamp();
-        io.readInputs(inputs);
+    double weightAx = 1.0 / varianceA.get(0, 0);
+    double weightAy = 1.0 / varianceA.get(1, 0);
+    double weightBx = 1.0 / varianceB.get(0, 0);
+    double weightBy = 1.0 / varianceB.get(1, 0);
 
-        logCameraInputs("Vision/CameraA", inputs.cameraA);
-        logCameraInputs("Vision/CameraB", inputs.cameraB);
+    Pose2d fusedPose =
+        new Pose2d(
+            new Translation2d(
+                (poseA.getTranslation().getX() * weightAx
+                        + poseB.getTranslation().getX() * weightBx)
+                    / (weightAx + weightBx),
+                (poseA.getTranslation().getY() * weightAy
+                        + poseB.getTranslation().getY() * weightBy)
+                    / (weightAy + weightBy)),
+            fusedHeading);
 
-        var maybeMTA = processCamera(inputs.cameraA, "CameraA", VisionConstants.kRobotToCameraA);
-        var maybeMTB = processCamera(inputs.cameraB, "CameraB", VisionConstants.kRobotToCameraB);
+    Matrix<N3, N1> fusedStdDev =
+        VecBuilder.fill(
+            Math.sqrt(1.0 / (weightAx + weightBx)),
+            Math.sqrt(1.0 / (weightAy + weightBy)),
+            Math.sqrt(1.0 / (1.0 / varianceA.get(2, 0) + 1.0 / varianceB.get(2, 0))));
 
-        if (!useVision) {
-            Logger.recordOutput("Vision/usingVision", false);
-            Logger.recordOutput("Vision/exclusiveTagId", state.getExclusiveTag().orElse(-1));
-            Logger.recordOutput(
-                    "Vision/latencyPeriodicSec", Timer.getFPGATimestamp() - startTime);
-            return;
-        }
+    int numTags = a.getNumTags() + b.getNumTags();
+    double time = b.getTimestamp();
 
-        Logger.recordOutput("Vision/usingVision", true);
+    return new VisionPoseEstimateInField(fusedPose, time, fusedStdDev, numTags);
+  }
 
-        Optional<VisionPoseEstimateInField> accepted = Optional.empty();
-        if (maybeMTA.isPresent() != maybeMTB.isPresent()) {
-            accepted = maybeMTA.isPresent() ? maybeMTA : maybeMTB;
-        } else if (maybeMTA.isPresent() && maybeMTB.isPresent()) {
-            accepted = Optional.of(fuseEstimates(maybeMTA.get(), maybeMTB.get()));
-        }
+  @Override
+  public void periodic() {
+    double startTime = Timer.getFPGATimestamp();
+    io.readInputs(inputs);
 
-        accepted.ifPresent(
-                est -> {
-                    Logger.recordOutput("Vision/fusedAccepted", est.getRobotPose());
-                    state.updateMegatagEstimate(est);
-                });
+    logCameraInputs("Vision/CameraA", inputs.cameraA);
+    logCameraInputs("Vision/CameraB", inputs.cameraB);
 
-        Logger.recordOutput("Vision/exclusiveTagId", state.getExclusiveTag().orElse(-1));
-        Logger.recordOutput(
-                "Vision/latencyPeriodicSec", Timer.getFPGATimestamp() - startTime);
+    var maybeMTA = processCamera(inputs.cameraA, "CameraA", VisionConstants.kRobotToCameraA);
+    var maybeMTB = processCamera(inputs.cameraB, "CameraB", VisionConstants.kRobotToCameraB);
+
+    if (!useVision) {
+      Logger.recordOutput("Vision/usingVision", false);
+      Logger.recordOutput("Vision/exclusiveTagId", state.getExclusiveTag().orElse(-1));
+      Logger.recordOutput("Vision/latencyPeriodicSec", Timer.getFPGATimestamp() - startTime);
+      return;
     }
 
-    private void logCameraInputs(String prefix, VisionIO.VisionIOInputs.CameraInputs cam) {
-        Logger.recordOutput(prefix + "/SeesTarget", cam.seesTarget);
-        Logger.recordOutput(prefix + "/MegatagCount", cam.megatagcount);
+    Logger.recordOutput("Vision/usingVision", true);
 
-        if (DriverStation.isDisabled()) {
-            SmartDashboard.putBoolean(prefix + "/SeesTarget", cam.seesTarget);
-            SmartDashboard.putNumber(prefix + "/MegatagCount", cam.megatagcount);
-        }
-
-        if (cam.pose3d != null) {
-            Logger.recordOutput(prefix + "/Pose3d", cam.pose3d);
-        }
-
-        if (cam.megatagPoseEstimate != null) {
-            Logger.recordOutput(
-                    prefix + "/MegatagPoseEstimate", cam.megatagPoseEstimate.fieldToRobot());
-            Logger.recordOutput(prefix + "/Quality", cam.megatagPoseEstimate.quality());
-            Logger.recordOutput(prefix + "/AvgTagArea", cam.megatagPoseEstimate.avgTagArea());
-        }
-
-        if (cam.fiducialAprilTagObservation != null) {
-            Logger.recordOutput(prefix + "/FiducialCount", cam.fiducialAprilTagObservation.length);
-        }
+    Optional<VisionPoseEstimateInField> accepted = Optional.empty();
+    if (maybeMTA.isPresent() != maybeMTB.isPresent()) {
+      accepted = maybeMTA.isPresent() ? maybeMTA : maybeMTB;
+    } else if (maybeMTA.isPresent() && maybeMTB.isPresent()) {
+      accepted = Optional.of(fuseEstimates(maybeMTA.get(), maybeMTB.get()));
     }
 
-    private Optional<VisionPoseEstimateInField> processCamera(
-            VisionIO.VisionIOInputs.CameraInputs cam, String label, Transform2d robotToCamera) {
+    accepted.ifPresent(
+        est -> {
+          Logger.recordOutput("Vision/fusedAccepted", est.getRobotPose());
+          state.updateMegatagEstimate(est);
+        });
 
-        String logPrefix = "Vision/" + label;
+    Logger.recordOutput("Vision/exclusiveTagId", state.getExclusiveTag().orElse(-1));
+    Logger.recordOutput("Vision/latencyPeriodicSec", Timer.getFPGATimestamp() - startTime);
+  }
 
-        if (!cam.seesTarget) {
-            return Optional.empty();
-        }
+  private void logCameraInputs(String prefix, VisionIO.VisionIOInputs.CameraInputs cam) {
+    Logger.recordOutput(prefix + "/SeesTarget", cam.seesTarget);
+    Logger.recordOutput(prefix + "/MegatagCount", cam.megatagcount);
 
-        Optional<VisionPoseEstimateInField> estimate = Optional.empty();
-
-        if (cam.megatagPoseEstimate != null) {
-            Optional<VisionPoseEstimateInField> mtEstimate =
-                    processMegatagPoseEstimate(cam.megatagPoseEstimate, cam, logPrefix);
-
-            mtEstimate.ifPresent(
-                    est ->
-                            Logger.recordOutput(
-                                    logPrefix + "/AcceptedMegatagEstimate",
-                                    est.getRobotPose()));
-
-            Optional<VisionPoseEstimateInField> gyroEstimate =
-                    fuseWithGyro(cam.megatagPoseEstimate, cam, logPrefix);
-
-            gyroEstimate.ifPresent(
-                    est ->
-                            Logger.recordOutput(
-                                    logPrefix + "/FuseWithGyroEstimate",
-                                    est.getRobotPose()));
-
-            // Prefer Megatag when available
-            if (mtEstimate.isPresent()) {
-                estimate = mtEstimate;
-                Logger.recordOutput(logPrefix + "/AcceptMegatag", true);
-                Logger.recordOutput(logPrefix + "/AcceptGyro", false);
-            } else if (gyroEstimate.isPresent()) {
-                estimate = gyroEstimate;
-                Logger.recordOutput(logPrefix + "/AcceptMegatag", false);
-                Logger.recordOutput(logPrefix + "/AcceptGyro", true);
-            } else {
-                Logger.recordOutput(logPrefix + "/AcceptMegatag", false);
-                Logger.recordOutput(logPrefix + "/AcceptGyro", false);
-            }
-        }
-
-        return estimate;
+    if (DriverStation.isDisabled()) {
+      SmartDashboard.putBoolean(prefix + "/SeesTarget", cam.seesTarget);
+      SmartDashboard.putNumber(prefix + "/MegatagCount", cam.megatagcount);
     }
 
-    private Optional<VisionPoseEstimateInField> fuseWithGyro(
-            MegaTagPoseEstimate poseEstimate,
-            VisionIO.VisionIOInputs.CameraInputs cam,
-            String logPrefix) {
-
-        if (poseEstimate.timestampSeconds() <= state.lastMegatagTimestamp()) {
-            return Optional.empty();
-        }
-
-        // Use Megatag directly when 2 or more tags are visible
-        if (poseEstimate.fiducialIds().length > 1) {
-            return Optional.empty();
-        }
-
-        // Reject if the robot is yawing rapidly (time‑sync unreliable)
-        final double kHighYawLookbackS = 0.3;
-        final double kHighYawVelocityRadS = 5.0;
-
-        if (state.getMaxAbsDriveYawAngularVelocityInRange(
-                                poseEstimate.timestampSeconds() - kHighYawLookbackS,
-                                poseEstimate.timestampSeconds())
-                        .orElse(Double.POSITIVE_INFINITY)
-                > kHighYawVelocityRadS) {
-            return Optional.empty();
-        }
-
-        var priorPose = state.getFieldToRobot(poseEstimate.timestampSeconds());
-        if (priorPose.isEmpty()) {
-            return Optional.empty();
-        }
-
-        var maybeFieldToTag =
-                VisionConstants.kAprilTagLayout.getTagPose(poseEstimate.fiducialIds()[0]);
-        if (maybeFieldToTag.isEmpty()) {
-            return Optional.empty();
-        }
-
-        Pose2d fieldToTag =
-                new Pose2d(maybeFieldToTag.get().toPose2d().getTranslation(), Rotation2d.kZero);
-
-        Pose2d robotToTag = fieldToTag.relativeTo(poseEstimate.fieldToRobot());
-
-        Pose2d posteriorPose =
-                new Pose2d(
-                        fieldToTag
-                                .getTranslation()
-                                .minus(
-                                        robotToTag
-                                                .getTranslation()
-                                                .rotateBy(priorPose.get().getRotation())),
-                        priorPose.get().getRotation());
-
-        double xStd = cam.standardDeviations[VisionConstants.kMegatag1XStdDevIndex];
-        double yStd = cam.standardDeviations[VisionConstants.kMegatag1YStdDevIndex];
-        double xyStd = Math.max(xStd, yStd);
-
-        return Optional.of(
-                new VisionPoseEstimateInField(
-                        posteriorPose,
-                        poseEstimate.timestampSeconds(),
-                        VecBuilder.fill(xyStd, xyStd, VisionConstants.kLargeVariance),
-                        poseEstimate.fiducialIds().length));
+    if (cam.pose3d != null) {
+      Logger.recordOutput(prefix + "/Pose3d", cam.pose3d);
     }
 
-    private Optional<VisionPoseEstimateInField> processMegatagPoseEstimate(
-            MegaTagPoseEstimate poseEstimate,
-            VisionIO.VisionIOInputs.CameraInputs cam,
-            String logPrefix) {
-
-        if (poseEstimate.timestampSeconds() <= state.lastMegatagTimestamp()) {
-            return Optional.empty();
-        }
-
-        // Single‑tag extra checks
-        if (poseEstimate.fiducialIds().length < 2) {
-            for (var fiducial : cam.fiducialAprilTagObservation) {
-                if (fiducial.ambiguity() > VisionConstants.kDefaultAmbiguityThreshold) {
-                    return Optional.empty();
-                }
-            }
-
-            if (poseEstimate.avgTagArea() < VisionConstants.kTagMinAreaForSingleTagMegatag) {
-                return Optional.empty();
-            }
-
-            var priorPose = state.getFieldToRobot(poseEstimate.timestampSeconds());
-            if (poseEstimate.avgTagArea() < VisionConstants.kTagAreaThresholdForYawCheck
-                    && priorPose.isPresent()) {
-                double yawDiff =
-                        Math.abs(
-                                MathUtil.angleModulus(
-                                        priorPose.get().getRotation().getRadians()
-                                                - poseEstimate
-                                                        .fieldToRobot()
-                                                        .getRotation()
-                                                        .getRadians()));
-
-                if (yawDiff > Units.degreesToRadians(VisionConstants.kDefaultYawDiffThreshold)) {
-                    return Optional.empty();
-                }
-            }
-        }
-
-        if (poseEstimate.fieldToRobot().getTranslation().getNorm()
-                < VisionConstants.kDefaultNormThreshold) {
-            return Optional.empty();
-        }
-
-        if (Math.abs(cam.pose3d.getZ()) > VisionConstants.kDefaultZThreshold) {
-            return Optional.empty();
-        }
-
-        // Exclusive‑tag filtering
-        var exclusiveTag = state.getExclusiveTag();
-        boolean hasExclusiveId =
-                exclusiveTag.isPresent()
-                        && java.util.Arrays.stream(poseEstimate.fiducialIds())
-                                .anyMatch(id -> id == exclusiveTag.get());
-
-        if (exclusiveTag.isPresent() && !hasExclusiveId) {
-            return Optional.empty();
-        }
-
-        var loggedPose = state.getFieldToRobot(poseEstimate.timestampSeconds());
-        if (loggedPose.isEmpty()) {
-            return Optional.empty();
-        }
-
-        Pose2d estimatePose = poseEstimate.fieldToRobot();
-
-        double scaleFactor = 1.0 / poseEstimate.quality();
-        double xStd = cam.standardDeviations[VisionConstants.kMegatag1XStdDevIndex] * scaleFactor;
-        double yStd = cam.standardDeviations[VisionConstants.kMegatag1YStdDevIndex] * scaleFactor;
-        double rotStd =
-                cam.standardDeviations[VisionConstants.kMegatag1YawStdDevIndex] * scaleFactor;
-
-        double xyStd = Math.max(xStd, yStd);
-        Matrix<N3, N1> visionStdDevs = VecBuilder.fill(xyStd, xyStd, rotStd);
-
-        return Optional.of(
-                new VisionPoseEstimateInField(
-                        estimatePose,
-                        poseEstimate.timestampSeconds(),
-                        visionStdDevs,
-                        poseEstimate.fiducialIds().length));
+    if (cam.megatagPoseEstimate != null) {
+      Logger.recordOutput(prefix + "/MegatagPoseEstimate", cam.megatagPoseEstimate.fieldToRobot());
+      Logger.recordOutput(prefix + "/Quality", cam.megatagPoseEstimate.quality());
+      Logger.recordOutput(prefix + "/AvgTagArea", cam.megatagPoseEstimate.avgTagArea());
     }
 
-    public void setUseVision(boolean useVision) {
-        this.useVision = useVision;
+    if (cam.fiducialAprilTagObservation != null) {
+      Logger.recordOutput(prefix + "/FiducialCount", cam.fiducialAprilTagObservation.length);
     }
+  }
+
+  private Optional<VisionPoseEstimateInField> processCamera(
+      VisionIO.VisionIOInputs.CameraInputs cam, String label, Transform2d robotToCamera) {
+
+    String logPrefix = "Vision/" + label;
+
+    if (!cam.seesTarget) {
+      return Optional.empty();
+    }
+
+    Optional<VisionPoseEstimateInField> estimate = Optional.empty();
+
+    if (cam.megatagPoseEstimate != null) {
+      Optional<VisionPoseEstimateInField> mtEstimate =
+          processMegatagPoseEstimate(cam.megatagPoseEstimate, cam, logPrefix);
+
+      mtEstimate.ifPresent(
+          est -> Logger.recordOutput(logPrefix + "/AcceptedMegatagEstimate", est.getRobotPose()));
+
+      Optional<VisionPoseEstimateInField> gyroEstimate =
+          fuseWithGyro(cam.megatagPoseEstimate, cam, logPrefix);
+
+      gyroEstimate.ifPresent(
+          est -> Logger.recordOutput(logPrefix + "/FuseWithGyroEstimate", est.getRobotPose()));
+
+      // Prefer Megatag when available
+      if (mtEstimate.isPresent()) {
+        estimate = mtEstimate;
+        Logger.recordOutput(logPrefix + "/AcceptMegatag", true);
+        Logger.recordOutput(logPrefix + "/AcceptGyro", false);
+      } else if (gyroEstimate.isPresent()) {
+        estimate = gyroEstimate;
+        Logger.recordOutput(logPrefix + "/AcceptMegatag", false);
+        Logger.recordOutput(logPrefix + "/AcceptGyro", true);
+      } else {
+        Logger.recordOutput(logPrefix + "/AcceptMegatag", false);
+        Logger.recordOutput(logPrefix + "/AcceptGyro", false);
+      }
+    }
+
+    return estimate;
+  }
+
+  private Optional<VisionPoseEstimateInField> fuseWithGyro(
+      MegaTagPoseEstimate poseEstimate,
+      VisionIO.VisionIOInputs.CameraInputs cam,
+      String logPrefix) {
+
+    if (poseEstimate.timestampSeconds() <= state.lastMegatagTimestamp()) {
+      return Optional.empty();
+    }
+
+    // Use Megatag directly when 2 or more tags are visible
+    if (poseEstimate.fiducialIds().length > 1) {
+      return Optional.empty();
+    }
+
+    // Reject if the robot is yawing rapidly (time‑sync unreliable)
+    final double kHighYawLookbackS = 0.3;
+    final double kHighYawVelocityRadS = 5.0;
+
+    if (state
+            .getMaxAbsDriveYawAngularVelocityInRange(
+                poseEstimate.timestampSeconds() - kHighYawLookbackS,
+                poseEstimate.timestampSeconds())
+            .orElse(Double.POSITIVE_INFINITY)
+        > kHighYawVelocityRadS) {
+      return Optional.empty();
+    }
+
+    var priorPose = state.getFieldToRobot(poseEstimate.timestampSeconds());
+    if (priorPose.isEmpty()) {
+      return Optional.empty();
+    }
+
+    var maybeFieldToTag = VisionConstants.kAprilTagLayout.getTagPose(poseEstimate.fiducialIds()[0]);
+    if (maybeFieldToTag.isEmpty()) {
+      return Optional.empty();
+    }
+
+    Pose2d fieldToTag =
+        new Pose2d(maybeFieldToTag.get().toPose2d().getTranslation(), Rotation2d.kZero);
+
+    Pose2d robotToTag = fieldToTag.relativeTo(poseEstimate.fieldToRobot());
+
+    Pose2d posteriorPose =
+        new Pose2d(
+            fieldToTag
+                .getTranslation()
+                .minus(robotToTag.getTranslation().rotateBy(priorPose.get().getRotation())),
+            priorPose.get().getRotation());
+
+    double xStd = cam.standardDeviations[VisionConstants.kMegatag1XStdDevIndex];
+    double yStd = cam.standardDeviations[VisionConstants.kMegatag1YStdDevIndex];
+    double xyStd = Math.max(xStd, yStd);
+
+    return Optional.of(
+        new VisionPoseEstimateInField(
+            posteriorPose,
+            poseEstimate.timestampSeconds(),
+            VecBuilder.fill(xyStd, xyStd, VisionConstants.kLargeVariance),
+            poseEstimate.fiducialIds().length));
+  }
+
+  private Optional<VisionPoseEstimateInField> processMegatagPoseEstimate(
+      MegaTagPoseEstimate poseEstimate,
+      VisionIO.VisionIOInputs.CameraInputs cam,
+      String logPrefix) {
+
+    if (poseEstimate.timestampSeconds() <= state.lastMegatagTimestamp()) {
+      return Optional.empty();
+    }
+
+    // Single‑tag extra checks
+    if (poseEstimate.fiducialIds().length < 2) {
+      for (var fiducial : cam.fiducialAprilTagObservation) {
+        if (fiducial.ambiguity() > VisionConstants.kDefaultAmbiguityThreshold) {
+          return Optional.empty();
+        }
+      }
+
+      if (poseEstimate.avgTagArea() < VisionConstants.kTagMinAreaForSingleTagMegatag) {
+        return Optional.empty();
+      }
+
+      var priorPose = state.getFieldToRobot(poseEstimate.timestampSeconds());
+      if (poseEstimate.avgTagArea() < VisionConstants.kTagAreaThresholdForYawCheck
+          && priorPose.isPresent()) {
+        double yawDiff =
+            Math.abs(
+                MathUtil.angleModulus(
+                    priorPose.get().getRotation().getRadians()
+                        - poseEstimate.fieldToRobot().getRotation().getRadians()));
+
+        if (yawDiff > Units.degreesToRadians(VisionConstants.kDefaultYawDiffThreshold)) {
+          return Optional.empty();
+        }
+      }
+    }
+
+    if (poseEstimate.fieldToRobot().getTranslation().getNorm()
+        < VisionConstants.kDefaultNormThreshold) {
+      return Optional.empty();
+    }
+
+    if (Math.abs(cam.pose3d.getZ()) > VisionConstants.kDefaultZThreshold) {
+      return Optional.empty();
+    }
+
+    // Exclusive‑tag filtering
+    var exclusiveTag = state.getExclusiveTag();
+    boolean hasExclusiveId =
+        exclusiveTag.isPresent()
+            && java.util.Arrays.stream(poseEstimate.fiducialIds())
+                .anyMatch(id -> id == exclusiveTag.get());
+
+    if (exclusiveTag.isPresent() && !hasExclusiveId) {
+      return Optional.empty();
+    }
+
+    var loggedPose = state.getFieldToRobot(poseEstimate.timestampSeconds());
+    if (loggedPose.isEmpty()) {
+      return Optional.empty();
+    }
+
+    Pose2d estimatePose = poseEstimate.fieldToRobot();
+
+    double scaleFactor = 1.0 / poseEstimate.quality();
+    double xStd = cam.standardDeviations[VisionConstants.kMegatag1XStdDevIndex] * scaleFactor;
+    double yStd = cam.standardDeviations[VisionConstants.kMegatag1YStdDevIndex] * scaleFactor;
+    double rotStd = cam.standardDeviations[VisionConstants.kMegatag1YawStdDevIndex] * scaleFactor;
+
+    double xyStd = Math.max(xStd, yStd);
+    Matrix<N3, N1> visionStdDevs = VecBuilder.fill(xyStd, xyStd, rotStd);
+
+    return Optional.of(
+        new VisionPoseEstimateInField(
+            estimatePose,
+            poseEstimate.timestampSeconds(),
+            visionStdDevs,
+            poseEstimate.fiducialIds().length));
+  }
+
+  public void setUseVision(boolean useVision) {
+    this.useVision = useVision;
+  }
 }

@@ -14,6 +14,8 @@ public class ShooterHoodSubsystem extends SubsystemBase {
 
   private final HoodIOInputsAutoLogged hoodInputs = new HoodIOInputsAutoLogged();
 
+  private double desiredAngle = 0.0;
+
   public enum DesiredState {
     HOME,
     CALC_POS_TO_SCORE,
@@ -67,7 +69,7 @@ public class ShooterHoodSubsystem extends SubsystemBase {
         setPosition(ShooterConstants.HOME);
         break;
       case POSITIONED_TO_SCORE:
-        setPosition(ShooterConstants.IN_TEST);
+        setPosition(desiredAngle);
         break;
 
       case POSITIONED_TO_TAXI:
@@ -94,6 +96,11 @@ public class ShooterHoodSubsystem extends SubsystemBase {
 
   public void setPosition(double pos) {
     hoodIO.setPosition(pos);
+  }
+
+  public void setAngle(double angle) {
+    this.desiredAngle = angle;
+    setDesiredState(DesiredState.CALC_POS_TO_SCORE);
   }
 
   public void setDesiredState(DesiredState desiredState) {

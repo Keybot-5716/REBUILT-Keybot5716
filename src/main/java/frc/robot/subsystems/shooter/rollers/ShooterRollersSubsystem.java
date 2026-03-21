@@ -17,6 +17,8 @@ public class ShooterRollersSubsystem extends SubsystemBase {
   private static final LoggedTunableNumber desiredVelocityRollers =
       new LoggedTunableNumber("Shooter/Rollers/RollerVelocity", 56.7);
 
+  private double desiredVelocity = 0.0;
+
   public enum DesiredState {
     STOPPED,
     FORWARD_ROLLERS,
@@ -65,7 +67,7 @@ public class ShooterRollersSubsystem extends SubsystemBase {
   private void applyStates() {
     switch (rollerState) {
       case FORWARDING_ROLLERS:
-        setVelocityRollers(desiredVelocityRollers.get());
+        setVelocityRollers(desiredVelocity);
         break;
 
       case REVERSING_ROLLERS:
@@ -88,5 +90,10 @@ public class ShooterRollersSubsystem extends SubsystemBase {
 
   public void setVelocityRollers(double rps) {
     rollersIO.setVelocity(rps);
+  }
+
+  public void setCustom(double rps) {
+    this.desiredVelocity = rps;
+    setDesiredState(DesiredState.FORWARD_ROLLERS);
   }
 }

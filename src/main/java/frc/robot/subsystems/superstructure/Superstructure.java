@@ -10,6 +10,7 @@ import frc.robot.RobotState;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.intake.pivot.IntakePivotSubsystem;
 import frc.robot.subsystems.intake.rollers.IntakeRollersSubsystem;
+import frc.robot.subsystems.shooter.ShootCalculator;
 import frc.robot.subsystems.shooter.hood.ShooterHoodSubsystem;
 import frc.robot.subsystems.shooter.rollers.ShooterRollersSubsystem;
 import frc.robot.subsystems.transfer.TransferSubsystem;
@@ -27,6 +28,8 @@ public class Superstructure extends SubsystemBase {
 
   private SuperstructureStates currentState = SuperstructureStates.DEFAULT;
   private SuperstructureStates desiredState = SuperstructureStates.DEFAULT;
+
+  private ShootCalculator.LaunchPreset activePreset = null;
 
   public Superstructure(
       DriveSubsystem driveSub,
@@ -85,6 +88,10 @@ public class Superstructure extends SubsystemBase {
       case EJECT:
         def();
         break;
+
+      case SHOOTER_TEST:
+        presetShoot();
+        break;
     }
   }
 
@@ -141,6 +148,24 @@ public class Superstructure extends SubsystemBase {
     intakeRollersSub.setDesiredState(IntakeRollersSubsystem.DesiredState.STOPPED);
     shooterRollerSub.setDesiredState(ShooterRollersSubsystem.DesiredState.FORWARD_ROLLERS);
     shooterHoodSub.setDesiredState(ShooterHoodSubsystem.DesiredState.CALC_POS_TO_TAXI);
+
+    if (driveSub.isAlignedToAngle() && shooterHoodSub.isOut()) {
+      transferSub.setDesiredState(TransferSubsystem.DesiredState.OSCILLATE_FORWARD);
+    } else {
+      transferSub.setDesiredState(TransferSubsystem.DesiredState.STOPPED);
+    }
+  }
+
+  public void presetShoot() {
+    if (activePreset == null) return;
+
+    driveSub.setDesiredRotationToLock(
+        new Rotation2d(robotState.isRedAlliance() ? (Math.PI / 2) : (Math.PI + (Math.PI / 2))));
+
+    shooterHoodSub.setAngle(activePreset.hoodAngleDeg().get());
+    shooterRollerSub.setCustom(activePreset.flywheelSpeed().get());
+
+    intakeRollersSub.setDesiredState(IntakeRollersSubsystem.DesiredState.STOPPED);
 
     if (driveSub.isAlignedToAngle() && shooterHoodSub.isOut()) {
       transferSub.setDesiredState(TransferSubsystem.DesiredState.OSCILLATE_FORWARD);

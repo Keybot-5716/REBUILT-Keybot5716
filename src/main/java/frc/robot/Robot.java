@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj.Threads;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.lib.util.RobotCore;
 import java.util.Optional;
 import org.ironmaple.simulation.SimulatedArena;
 import org.littletonrobotics.junction.LogFileUtil;
@@ -36,9 +37,17 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
  */
 public class Robot extends LoggedRobot {
 
+  private RobotCore buildRobotCore() {
+    if (RobotBase.isSimulation()) {
+      return new RobotContainerSim();
+    } else {
+      return new RobotContainer();
+    }
+  }
+
   private Command autonomousCommand;
 
-  private final RobotContainer robotContainer;
+  private final RobotCore robotContainer;
 
   public static Optional<Alliance> alliance = Optional.of(Alliance.Blue);
 
@@ -91,7 +100,8 @@ public class Robot extends LoggedRobot {
       RobotController.setTimeSource(RobotController::getFPGATime);
     }
 
-    robotContainer = new RobotContainer();
+    robotContainer = buildRobotCore();
+
     SmartDashboard.putData("Command Scheduler", CommandScheduler.getInstance());
     SignalLogger.enableAutoLogging(false);
   }
@@ -108,9 +118,6 @@ public class Robot extends LoggedRobot {
     // robotContainer.getRobotVisualizer().updateRobotVisualizer();
     robotContainer.getRobotState().updateLogger();
     robotContainer.getRobotVisualizer().updateRobotVisualizer();
-    if (RobotBase.isSimulation()) {
-      robotContainer.getSimRobotState().updateSim();
-    }
   }
 
   /** This function is called once when the robot is disabled. */

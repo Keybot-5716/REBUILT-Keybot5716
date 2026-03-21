@@ -6,6 +6,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.lib.team254.ConcurrentTimeInterpolatableBuffer;
+import frc.lib.util.State;
 import frc.robot.subsystems.vision.VisionPoseEstimateInField;
 import java.util.Map;
 import java.util.Optional;
@@ -14,7 +15,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import org.littletonrobotics.junction.Logger;
 
-public class RobotState {
+public class RobotState implements State {
   public static final double BUFFER_TIME = 1.0;
 
   private final Consumer<VisionPoseEstimateInField> fieldEstimation;
@@ -181,6 +182,8 @@ public class RobotState {
 
     Logger.recordOutput("RobotState/isRedAlliance", isRedAlliance());
     Logger.recordOutput("RobotState/PassedTrench", passedTrench());
+
+    Logger.recordOutput("RobotState/ArmDeg", getArmDeg());
   }
 
   private final AtomicReference<Optional<Integer>> exclusiveTag =
@@ -252,5 +255,16 @@ public class RobotState {
 
   public double getArmAngle() {
     return armAngle.get();
+  }
+
+  // ------ Intake pivot
+  private final AtomicReference<Double> armDeg = new AtomicReference<>(0.0);
+
+  public void setIntakePivotDeg(double deg) {
+    armDeg.set(deg);
+  }
+
+  public double getArmDeg() {
+    return armDeg.get();
   }
 }

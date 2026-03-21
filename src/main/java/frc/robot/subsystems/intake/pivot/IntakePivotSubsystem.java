@@ -6,6 +6,8 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.team6328.LoggedTunableNumber;
 import frc.lib.util.DataProcessor;
+import frc.robot.RobotState;
+import frc.robot.subsystems.superstructure.SuperstructureConstants;
 import frc.robot.subsystems.superstructure.SuperstructureConstants.IntakeConstants;
 import org.littletonrobotics.junction.Logger;
 
@@ -17,8 +19,10 @@ public class IntakePivotSubsystem extends SubsystemBase {
   private TrapezoidProfile.Constraints profileConstraints =
       new TrapezoidProfile.Constraints(2.0, 2.0);
 
+  private TrapezoidProfile trapezoidProfile = new TrapezoidProfile(profileConstraints);
+
   private ProfiledPIDController controller =
-      new ProfiledPIDController(4, 0, 0.08, profileConstraints);
+      new ProfiledPIDController(10, 0, 0.08, profileConstraints);
 
   private TrapezoidProfile.State goal = new TrapezoidProfile.State(0, 0);
 
@@ -28,14 +32,14 @@ public class IntakePivotSubsystem extends SubsystemBase {
   private IntakeState intakeState = IntakeState.STOPPING_PIVOT;
   private DesiredState desiredState = DesiredState.STOPPPED_PIVOT;
 
+  private RobotState robotState;
+
   public enum DesiredState {
     FORWARD_PIVOT,
     REVERSE_PIVOT,
     STOPPPED_PIVOT,
     IN,
-    OUT,
-    TEST,
-    TEST2
+    OUT
   }
 
   private enum IntakeState {
@@ -43,13 +47,12 @@ public class IntakePivotSubsystem extends SubsystemBase {
     REVERSING_PIVOT,
     STOPPING_PIVOT,
     INING,
-    OUTING,
-    TEST,
-    TEST2
+    OUTING
   }
 
-  public IntakePivotSubsystem(IntakePivotIO pivotIO) {
+  public IntakePivotSubsystem(IntakePivotIO pivotIO, RobotState robotState) {
     this.pivotIO = pivotIO;
+    this.robotState = robotState;
     controller.setTolerance(0.02);
     DataProcessor.initDataProcessor(
         () -> {
@@ -67,6 +70,12 @@ public class IntakePivotSubsystem extends SubsystemBase {
 
       Logger.recordOutput("Intake/Pivot/DesiredState", desiredState);
       Logger.recordOutput("Intake/Pivot/CurrentState", intakeState);
+
+      double rot = pivotInputs.position;
+      double angleRad = rotationsToIntakeRadians(rot);
+
+      robotState.setArmAngle(angleRad);
+
       intakeState = setStateTransition();
       applyStates();
     }
@@ -79,19 +88,17 @@ public class IntakePivotSubsystem extends SubsystemBase {
       case STOPPPED_PIVOT -> IntakeState.STOPPING_PIVOT;
       case IN -> IntakeState.INING;
       case OUT -> IntakeState.OUTING;
-      case TEST -> IntakeState.TEST;
-      case TEST2 -> IntakeState.TEST2;
     };
   }
 
   private void applyStates() {
     switch (intakeState) {
       case INING:
-        setPosition(0.0);
+        setPosition(SuperstructureConstants.IntakeConstants.IN);
         break;
 
       case OUTING:
-        setPosition(0.0);
+        setPosition(SuperstructureConstants.IntakeConstants.OUT);
         break;
 
       case FORWARDING_PIVOT:
@@ -105,14 +112,6 @@ public class IntakePivotSubsystem extends SubsystemBase {
       case STOPPING_PIVOT:
         stopPivot();
         break;
-
-      case TEST:
-        test(0.0);
-        break;
-
-      case TEST2:
-        test(0.0);
-        break;
     }
   }
 
@@ -124,13 +123,8 @@ public class IntakePivotSubsystem extends SubsystemBase {
     return MathUtil.isNear(IntakeConstants.IN, pivotInputs.position, 0.08);
   }
 
-  public void test(double position) {
-    pivotIO.setPosition(position);
-  }
-
   public void setPosition(double position) {
-    goal = new TrapezoidProfile.State(position, 0);
-    controller.setGoal(goal);
+    pivotIO.setPosition(position);
   }
 
   public void runPivotOL(double voltage) {
@@ -143,5 +137,15 @@ public class IntakePivotSubsystem extends SubsystemBase {
 
   public void setDesiredState(DesiredState desiredState) {
     this.desiredState = desiredState;
+  }
+
+  public double rotationsToIntakeRadians(double rot) {
+    double minRot = 0.0;
+    double maxRot = 4.94;
+
+    double scale = (Math.PI / 2.0) / (maxRot - minRot); // 90° = π/2
+    double rad = (rot - minRot) * scale;
+
+    return MathUtil.clamp(rad, 0.0, Math.PI / 2.0);
   }
 }

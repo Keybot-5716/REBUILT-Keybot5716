@@ -1,5 +1,6 @@
 package frc.robot.subsystems.transfer;
 
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.team6328.LoggedTunableNumber;
 import frc.lib.util.DataProcessor;
@@ -13,13 +14,17 @@ public class TransferSubsystem extends SubsystemBase {
   private DesiredState desiredState = DesiredState.STOPPED;
   private TransferState transferState = TransferState.STOPPING;
 
+  private final Timer oscillationTimer = new Timer();
+  boolean oscillating = false;
+
   private static final LoggedTunableNumber rollerRPS =
       new LoggedTunableNumber("Transfer/Rollers/RollerRPS", 25.0);
 
   public enum DesiredState {
     STOPPED,
     FORWARD,
-    REVERSE
+    REVERSE,
+    OSCILLATE_FORWARD
   }
 
   private enum TransferState {
@@ -56,13 +61,26 @@ public class TransferSubsystem extends SubsystemBase {
       case STOPPED -> TransferState.STOPPING;
       case FORWARD -> TransferState.FORWARDING;
       case REVERSE -> TransferState.REVERSING;
+      case OSCILLATE_FORWARD -> TransferState.FORWARDING;
     };
   }
 
   private void applyStates() {
     switch (transferState) {
       case FORWARDING:
-        setVelocity(rollerRPS.get());
+        if (desiredState == DesiredState.OSCILLATE_FORWARD) {
+
+          double cycleTime = oscillationTimer.get() % 2.0;
+
+          if (cycleTime < 1.8) {
+            setVelocity(rollerRPS.get());
+          } else {
+            setVelocity(-rollerRPS.get() * 0.5);
+          }
+
+        } else {
+          setVelocity(rollerRPS.get());
+        }
         break;
 
       case REVERSING:
@@ -84,6 +102,28 @@ public class TransferSubsystem extends SubsystemBase {
   }
 
   public void setDesiredState(DesiredState desiredState) {
+    if (this.desiredState != desiredState) {
+
+      if (desiredState == DesiredState.OSCILLATE_FORWARD) {
+        oscillationTimer.stop();
+        oscillationTimer.reset();
+        oscillationTimer.start();
+      }
+    }
+
     this.desiredState = desiredState;
+  }
+
+  public void startOscillatingForward() {
+    oscillationTimer.stop();
+    oscillationTimer.reset();
+    oscillationTimer.start();
+    oscillating = true;
+    desiredState = DesiredState.FORWARD;
+  }
+
+  public void stopOscillating() {
+    oscillating = false;
+    oscillationTimer.stop();
   }
 }

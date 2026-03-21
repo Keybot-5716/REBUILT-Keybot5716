@@ -174,6 +174,13 @@ public class Superstructure extends SubsystemBase {
     }
   }
 
+  public Command setPresetCommand(ShootCalculator.LaunchPreset preset) {
+    return Commands.runOnce(() -> {
+      this.activePreset = preset; // Guardamos el preset deseado
+      setDesiredState(SuperstructureStates.SHOOTER_TEST); // Cambiamos el estado global
+    }, this);
+  }
+
   public Command setCommand(SuperstructureStates superState) {
     Command commandToReturn = new InstantCommand(() -> setDesiredState(superState));
     return commandToReturn;

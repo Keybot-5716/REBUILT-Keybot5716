@@ -33,6 +33,7 @@ import frc.robot.subsystems.visualizers.RobotVisualizer;
 import java.util.function.Consumer;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+import frc.robot.subsystems.shooter.ShootCalculator;
 
 public class RobotContainer implements RobotCore {
   private DriveSubsystem buildDriveSubsystem() {
@@ -118,6 +119,7 @@ public class RobotContainer implements RobotCore {
   private final IntakeRollersSubsystem intakeRollersSub = buildIntakeRollers();
   private final IntakePivotSubsystem intakePivotSub = buildIntakePivot();
   private final VisionSubsystem visionSub = buildVisionSubsystem();
+  private final ShootCalculator shootCalculator = new ShootCalculator(robotState);
 
   private final Superstructure superstructure = buildSuperstructure();
   private final ShootCalculator s = new ShootCalculator(robotState);
@@ -181,6 +183,12 @@ public class RobotContainer implements RobotCore {
             Commands.runOnce(
                 () -> transferSub.setDesiredState(TransferSubsystem.DesiredState.STOPPED),
                 transferSub));
+    
+    controller
+        .b()
+        .onTrue(superstructure.setPresetCommand(shootCalculator.hubPreset))
+        .onFalse(superstructure.setCommand(SuperstructureStates.HOME));
+
 
     controller
         .x()

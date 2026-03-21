@@ -33,7 +33,6 @@ import frc.robot.subsystems.visualizers.RobotVisualizer;
 import java.util.function.Consumer;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
-import frc.robot.subsystems.shooter.ShootCalculator;
 
 public class RobotContainer implements RobotCore {
   private DriveSubsystem buildDriveSubsystem() {
@@ -177,18 +176,17 @@ public class RobotContainer implements RobotCore {
         .a()
         .whileTrue(
             Commands.run(
-                () -> transferSub.setDesiredState(TransferSubsystem.DesiredState.REVERSE),
+                () -> transferSub.setDesiredState(TransferSubsystem.DesiredState.OSCILLATE_FORWARD),
                 transferSub))
         .onFalse(
             Commands.runOnce(
                 () -> transferSub.setDesiredState(TransferSubsystem.DesiredState.STOPPED),
                 transferSub));
-    
+
     controller
         .b()
-        .onTrue(superstructure.setPresetCommand(shootCalculator.hubPreset))
+        .onTrue(superstructure.setPresetCommand(ShootCalculator.hubPreset))
         .onFalse(superstructure.setCommand(SuperstructureStates.HOME));
-
 
     controller
         .x()

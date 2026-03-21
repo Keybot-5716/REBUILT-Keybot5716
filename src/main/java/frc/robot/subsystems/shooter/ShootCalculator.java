@@ -100,11 +100,11 @@ public class ShootCalculator {
   }
 
   // Presets
-  public static final double hubPresetDistance = 0.96;
+  public static final double hubPresetDistance = 1.0;
   public static final double towerPresetDistance = 2.5;
   public static final double trenchPresetDistance = 3.03;
   public static final double outpostPresetDistance = 4.84;
-  public static final double passingPresetDistance = 7.0;
+  public static final double passingPresetDistance = 1.0;
   public static final LaunchPreset passingPreset;
   public static final LaunchPreset hubPreset;
   public static final LaunchPreset towerPreset;
@@ -118,13 +118,13 @@ public class ShootCalculator {
     passingMaxDistance = 7.5;
     phaseDelay = 0.25;
 
-    hoodAngleMap.put(0.96, 0.0);
-    hoodAngleMap.put(0.96, 0.0);
-    hoodAngleMap.put(0.96, 0.0);
+    hoodAngleMap.put(1.5, 0.0);
+    hoodAngleMap.put(2.0, 0.15);
+    hoodAngleMap.put(5.2, 0.20);
 
-    rollersSpeedMap.put(0.96, 0.0);
-    rollersSpeedMap.put(0.96, 0.0);
-    rollersSpeedMap.put(0.96, 0.0);
+    rollersSpeedMap.put(2.0, 47.0);
+    rollersSpeedMap.put(3.0, 50.0);
+    rollersSpeedMap.put(5.2, 60.0);
 
     TimeOffLightMap.put(0.96, 0.5);
     TimeOffLightMap.put(0.96, 0.5);
@@ -148,7 +148,7 @@ public class ShootCalculator {
                 "ShootCalculator/Presets/Passed/HoodAngle",
                 hoodAngleMap.get(passingPresetDistance)),
             new LoggedTunableNumber(
-                "ShootCalculator/Presets/Passed/RollersSpeed",
+                "ShootCalculator/Presets/Passed/RollersTestSpeed",
                 rollersSpeedMap.get(passingPresetDistance)));
 
     hubPreset =

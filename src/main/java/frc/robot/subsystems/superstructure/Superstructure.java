@@ -1,6 +1,7 @@
 package frc.robot.subsystems.superstructure;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -25,6 +26,9 @@ public class Superstructure extends SubsystemBase {
   private final ShooterHoodSubsystem shooterHoodSub;
   private final ShooterRollersSubsystem shooterRollerSub;
   private final RobotState robotState;
+
+  private Timer scoreTimer = new Timer();
+  private boolean timerStarted = false;
 
   private SuperstructureStates currentState = SuperstructureStates.DEFAULT;
   private SuperstructureStates desiredState = SuperstructureStates.DEFAULT;
@@ -119,14 +123,13 @@ public class Superstructure extends SubsystemBase {
     transferSub.setDesiredState(TransferSubsystem.DesiredState.STOPPED);
     shooterHoodSub.setDesiredState(ShooterHoodSubsystem.DesiredState.STOPPED);
     shooterRollerSub.setDesiredState(ShooterRollersSubsystem.DesiredState.STOPPED);
-    intakeRollersSub.setDesiredState(IntakeRollersSubsystem.DesiredState.FORWARD_ROLLERS);
+    // intakeRollersSub.setDesiredState(IntakeRollersSubsystem.DesiredState.FORWARD_ROLLERS);
 
-    /*
     if (intakePivotSubsystem.isOut()) {
       intakeRollersSub.setDesiredState(IntakeRollersSubsystem.DesiredState.FORWARD_ROLLERS);
     } else {
       intakeRollersSub.setDesiredState(IntakeRollersSubsystem.DesiredState.STOPPED);
-    } */
+    }
   }
 
   private void score() {
@@ -136,9 +139,21 @@ public class Superstructure extends SubsystemBase {
     shooterHoodSub.setDesiredState(ShooterHoodSubsystem.DesiredState.CALC_POS_TO_SCORE);
 
     if (driveSub.isAlignedToPoint() && shooterHoodSub.atHome()) {
-      transferSub.setDesiredState(TransferSubsystem.DesiredState.OSCILLATE_FORWARD);
+
+      if (!timerStarted) {
+        scoreTimer.reset();
+        scoreTimer.start();
+        timerStarted = true;
+      }
+
+      if (scoreTimer.hasElapsed(2)) {
+        transferSub.setDesiredState(TransferSubsystem.DesiredState.OSCILLATE_FORWARD);
+      }
+
     } else {
       transferSub.setDesiredState(TransferSubsystem.DesiredState.STOPPED);
+      scoreTimer.stop();
+      timerStarted = false;
     }
   }
 
@@ -159,26 +174,31 @@ public class Superstructure extends SubsystemBase {
   public void presetShoot() {
     if (activePreset == null) return;
 
-    driveSub.setDesiredRotationToLock(
-        new Rotation2d(robotState.isRedAlliance() ? (Math.PI / 2) : (Math.PI + (Math.PI / 2))));
+    // driveSub.setDesiredRotationToLock(
+    // new Rotation2d(robotState.isRedAlliance() ? (Math.PI / 2) : (Math.PI + (Math.PI / 2))));
 
     shooterHoodSub.setAngle(activePreset.hoodAngleDeg().get());
     shooterRollerSub.setCustom(activePreset.flywheelSpeed().get());
 
     intakeRollersSub.setDesiredState(IntakeRollersSubsystem.DesiredState.STOPPED);
 
+    transferSub.setDesiredState(TransferSubsystem.DesiredState.OSCILLATE_FORWARD);
+    /*
     if (driveSub.isAlignedToAngle() && shooterHoodSub.isOut()) {
       transferSub.setDesiredState(TransferSubsystem.DesiredState.OSCILLATE_FORWARD);
     } else {
       transferSub.setDesiredState(TransferSubsystem.DesiredState.STOPPED);
     }
+      */
   }
 
   public Command setPresetCommand(ShootCalculator.LaunchPreset preset) {
-    return Commands.runOnce(() -> {
-      this.activePreset = preset; // Guardamos el preset deseado
-      setDesiredState(SuperstructureStates.SHOOTER_TEST); // Cambiamos el estado global
-    }, this);
+    return Commands.runOnce(
+        () -> {
+          this.activePreset = preset; // Guardamos el preset deseado
+          setDesiredState(SuperstructureStates.SHOOTER_TEST); // Cambiamos el estado global
+        },
+        this);
   }
 
   public Command setCommand(SuperstructureStates superState) {

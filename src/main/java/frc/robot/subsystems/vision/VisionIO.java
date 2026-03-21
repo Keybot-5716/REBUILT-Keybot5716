@@ -9,7 +9,7 @@ public interface VisionIO {
 
     public static class CameraInputs {
       public boolean seesTarget;
-      public FiducialAprilTagObservation[] fiducialAprilTagObservation;
+      public FiducialAprilTagObservation fiducialAprilTagObservation[];
 
       public int megatagcount;
       public int megatag2count;
@@ -22,6 +22,8 @@ public interface VisionIO {
     }
 
     public CameraInputs cameraA = new CameraInputs();
+    public CameraInputs cameraB = new CameraInputs();
+
   }
 
   void readInputs(VisionIOInputs inputs);

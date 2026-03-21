@@ -25,16 +25,27 @@ public class VisionConstants {
   public static final AprilTagFieldLayout kAprilTagLayout =
       AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltAndymark);
 
-  public static final double kCameraAPitchDegrees = 25.62481;
+  public static final double kCameraAPitchDegrees = 20.0;
   public static final double kCameraAPitchRads = Units.degreesToRadians(kCameraAPitchDegrees);
-  public static final double kCameraAHeightOffGroundMeters =  0.14986;
-  public static final String kLimelightATableName = "limelight-frontal";
-  public static final double kRobotToCameraAForward = -0.14;
-  public static final double kRobotToCameraASide = -0.12;
+  public static final double kCameraAHeightOffGroundMeters = 0.0;
+  public static final String kLimelightATableName = "limelight-uno";
+  public static final double kRobotToCameraAForward =0.0;
+  public static final double kRobotToCameraASide = 0.0;
   public static final Rotation2d kCameraAYawOffset = Rotation2d.fromDegrees(0.0);
   public static final Transform2d kRobotToCameraA =
       new Transform2d(
           new Translation2d(kRobotToCameraAForward, kRobotToCameraASide), kCameraAYawOffset);
+
+  public static final double kCameraBPitchDegrees = 20.0;
+  public static final double kCameraBPitchRads = Units.degreesToRadians(kCameraAPitchDegrees);
+  public static final double kCameraBHeightOffGroundMeters =0.0;
+  public static final String kLimelightBTableName = "limelight-dos";
+  public static final double kRobotToCameraBForward = 0.0;
+  public static final double kRobotToCameraBSide = 0.0;
+  public static final Rotation2d kCameraBYawOffset = Rotation2d.fromDegrees(0.0);
+  public static final Transform2d kRobotToCameraB =
+      new Transform2d(
+          new Translation2d(kRobotToCameraBForward, kRobotToCameraBSide), kCameraBYawOffset);
 
   public static final double kDefaultAmbiguityThreshold = 0.19;
   public static final double kDefaultYawDiffThreshold = 5.0;

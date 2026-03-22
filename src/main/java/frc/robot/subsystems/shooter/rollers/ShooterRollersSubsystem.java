@@ -18,6 +18,7 @@ public class ShooterRollersSubsystem extends SubsystemBase {
       new LoggedTunableNumber("Shooter/Rollers/RollerVelocity", 56.7);
 
   private double desiredVelocity = 0.0;
+  private double velocityTolerance = 10.0;
 
   public enum DesiredState {
     STOPPED,
@@ -95,5 +96,12 @@ public class ShooterRollersSubsystem extends SubsystemBase {
   public void setCustom(double rps) {
     this.desiredVelocity = rps;
     setDesiredState(DesiredState.FORWARD_ROLLERS);
+  }
+
+  public boolean atDesiredVelocity() {
+    double currentVelocity = rollersInputs.velocity;
+    double targetVelocity = this.desiredVelocity;
+
+    return Math.abs(currentVelocity - targetVelocity) <= velocityTolerance;
   }
 }

@@ -138,7 +138,7 @@ public class Superstructure extends SubsystemBase {
     shooterRollerSub.setDesiredState(ShooterRollersSubsystem.DesiredState.FORWARD_ROLLERS);
     shooterHoodSub.setDesiredState(ShooterHoodSubsystem.DesiredState.CALC_POS_TO_SCORE);
 
-    if (driveSub.isAlignedToPoint() && shooterHoodSub.atHome()) {
+    if (driveSub.isAlignedToPoint() && shooterRollerSub.atDesiredVelocity()) {
 
       if (!timerStarted) {
         scoreTimer.reset();

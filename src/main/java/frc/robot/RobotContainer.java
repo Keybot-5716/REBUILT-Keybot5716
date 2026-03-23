@@ -133,19 +133,7 @@ public class RobotContainer implements RobotCore {
 
   public RobotContainer() {
     configureButtonBindings(DRIVE_CONTROLLER);
-    NamedCommands.registerCommand(
-        "SCORE",
-        Commands.run(
-            () -> {
-              driveSub.setDesiredPointToLock(FieldConstants.getHubShootingPose().getTranslation());
-              intakeRollersSub.setDesiredState(IntakeRollersSubsystem.DesiredState.STOPPED);
-              shooterRollersSub.setCustom(50.5);
-              shooterHoodSub.setDesiredState(ShooterHoodSubsystem.DesiredState.CALC_POS_TO_SCORE);
-
-              if (driveSub.isAlignedToPoint() && shooterRollersSub.atDesiredVelocity()) {
-                transferSub.setDesiredState(TransferSubsystem.DesiredState.OSCILLATE_FORWARD);
-              }
-            }));
+    configNamedCommands();
     configureAuto();
     driveSub.setState(DriveSubsystem.DesiredState.MANUAL_FIELD_DRIVE);
   }
@@ -239,6 +227,22 @@ public class RobotContainer implements RobotCore {
 
     // controller.povLeft().onTrue(superstructureCommands.setCommand(superstructure,
     // SuperstructureStates.HOME));
+  }
+
+  private void configNamedCommands() {
+    NamedCommands.registerCommand(
+        "SCORE",
+        Commands.run(
+            () -> {
+              driveSub.setDesiredPointToLock(FieldConstants.getHubShootingPose().getTranslation());
+              intakeRollersSub.setDesiredState(IntakeRollersSubsystem.DesiredState.STOPPED);
+              shooterRollersSub.setCustom(50.5);
+              shooterHoodSub.setDesiredState(ShooterHoodSubsystem.DesiredState.CALC_POS_TO_SCORE);
+
+              if (driveSub.isAlignedToPoint() && shooterRollersSub.atDesiredVelocity()) {
+                transferSub.setDesiredState(TransferSubsystem.DesiredState.OSCILLATE_FORWARD);
+              }
+            }));
   }
 
   /*

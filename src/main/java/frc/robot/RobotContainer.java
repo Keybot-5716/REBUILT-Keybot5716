@@ -91,6 +91,19 @@ public class RobotContainer implements RobotCore {
       new Consumer<VisionPoseEstimateInField>() {
         @Override
         public void accept(VisionPoseEstimateInField estimation) {
+
+          if (driveSub == null) return;
+          if (estimation == null) return;
+          if (estimation.getRobotPose() == null) return;
+
+          Pose2d p = estimation.getRobotPose();
+
+          if (Double.isNaN(p.getX()) || Double.isNaN(p.getY())) return;
+
+          if (estimation.getNumTags() <= 0) return;
+
+          if (estimation.getVisionMeasurementStdDevs() == null) return;
+
           driveSub.addVisionMeasurement(estimation);
         }
       };
@@ -146,8 +159,7 @@ public class RobotContainer implements RobotCore {
   public void configureButtonBindings(CommandXboxController controller) {
     controller
         .start()
-        .onTrue(
-            Commands.runOnce(() -> driveSub.resetOdometry(FieldConstants.getRightTrenchTesting())));
+        .onTrue(Commands.runOnce(() -> driveSub.resetOdometry(FieldConstants.getTestingPose())));
     controller
         .back()
         .onTrue(Commands.runOnce(() -> driveSub.resetOdometry(FieldConstants.getTaxiPose())));

@@ -141,7 +141,7 @@ public class IntakePivotSubsystem extends SubsystemBase {
 
   public double rotationsToIntakeRadians(double rot) {
     double minRot = 0.0;
-    double maxRot = 4.94;
+    double maxRot = Math.abs(IntakeConstants.OUT);
 
     double scale = (Math.PI / 2.0) / (maxRot - minRot); // 90° = π/2
     double rad = (rot - minRot) * scale;

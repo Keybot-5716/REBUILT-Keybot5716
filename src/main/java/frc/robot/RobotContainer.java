@@ -2,6 +2,7 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.MetersPerSecond;
 
+import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.FollowPathCommand;
 import com.pathplanner.lib.commands.PathfindingCommand;
 import com.pathplanner.lib.pathfinding.Pathfinding;
@@ -78,6 +79,7 @@ public class RobotContainer implements RobotCore {
         transferSub,
         shooterHoodSub,
         shooterRollersSub,
+        shootCalculator,
         robotState);
   }
 
@@ -121,7 +123,6 @@ public class RobotContainer implements RobotCore {
   private final ShootCalculator shootCalculator = new ShootCalculator(robotState);
 
   private final Superstructure superstructure = buildSuperstructure();
-  private final ShootCalculator s = new ShootCalculator(robotState);
 
   // -- AutoChooser
   private final LoggedDashboardChooser<AutoBuilder> autoChooser =
@@ -132,6 +133,19 @@ public class RobotContainer implements RobotCore {
 
   public RobotContainer() {
     configureButtonBindings(DRIVE_CONTROLLER);
+    NamedCommands.registerCommand(
+        "SCORE",
+        Commands.run(
+            () -> {
+              driveSub.setDesiredPointToLock(FieldConstants.getHubShootingPose().getTranslation());
+              intakeRollersSub.setDesiredState(IntakeRollersSubsystem.DesiredState.STOPPED);
+              shooterRollersSub.setCustom(50.5);
+              shooterHoodSub.setDesiredState(ShooterHoodSubsystem.DesiredState.CALC_POS_TO_SCORE);
+
+              if (driveSub.isAlignedToPoint() && shooterRollersSub.atDesiredVelocity()) {
+                transferSub.setDesiredState(TransferSubsystem.DesiredState.OSCILLATE_FORWARD);
+              }
+            }));
     configureAuto();
     driveSub.setState(DriveSubsystem.DesiredState.MANUAL_FIELD_DRIVE);
   }
@@ -164,7 +178,7 @@ public class RobotContainer implements RobotCore {
 
     controller
         .rightTrigger()
-        .onTrue(superstructure.setCommand(SuperstructureStates.TAXI, SuperstructureStates.SCORE))
+        .onTrue(superstructure.setCommand(SuperstructureStates.TAXI, ShootCalculator.hubPreset))
         .onFalse(superstructure.setCommand(SuperstructureStates.HOME));
 
     controller
@@ -237,6 +251,9 @@ public class RobotContainer implements RobotCore {
     autoChooser.addOption("Auto Forward", new AutoForwardTest());
     autoChooser.addOption("Testing Auto 3", new Auto3Test());
     autoChooser.addOption("Testing Auto 4", new Auto4Test());
+    autoChooser.addOption("Right Trench", new AutoRightTrench());
+    autoChooser.addOption("Right Outpost", new AutoRightOutpost());
+    autoChooser.addOption("MechTest", new AutoMech());
 
     autoChooser.onChange(
         auto -> {
@@ -255,7 +272,6 @@ public class RobotContainer implements RobotCore {
     CommandScheduler.getInstance().schedule(FollowPathCommand.warmupCommand());
 
     SmartDashboard.putData("AutoPrev", autoPrev);
-
     /*
     NamedCommands.registerCommand("SCORE", superstructure.setCommand(SuperstructureStates.SCORE));
     NamedCommands.registerCommand("HOME", superstructure.setCommand(SuperstructureStates.HOME));
@@ -278,6 +294,10 @@ public class RobotContainer implements RobotCore {
 
   public RobotVisualizer getRobotVisualizer() {
     return robotVisualizer;
+  }
+
+  public ShootCalculator getShootCalculator() {
+    return shootCalculator;
   }
 
   public Command getAutonomousCommand() {

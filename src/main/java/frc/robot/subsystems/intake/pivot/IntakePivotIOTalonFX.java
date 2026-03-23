@@ -40,7 +40,7 @@ public class IntakePivotIOTalonFX implements IntakePivotIO {
     motor = new TalonFX(IDs.INTAKE_PIVOT_ID);
 
     config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-    config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+    config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
     config.MotorOutput.DutyCycleNeutralDeadband = 0.04;
     config.MotorOutput.PeakForwardDutyCycle = 1.0;
     config.MotorOutput.PeakReverseDutyCycle = -1.0;
@@ -59,9 +59,10 @@ public class IntakePivotIOTalonFX implements IntakePivotIO {
     config.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RotorSensor;
 
     config.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
-    config.Slot0.kP = 1.0;
+    config.Slot0.kP = 1.2;
     config.Slot0.kI = 0.0;
-    config.Slot0.kD = 0.01;
+    config.Slot0.kD = 0.0;
+    config.Slot0.kG = 1.0;
 
     config.Audio.BeepOnBoot = true;
 

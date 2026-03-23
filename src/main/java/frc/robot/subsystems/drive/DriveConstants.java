@@ -13,9 +13,9 @@ import frc.robot.Robot;
 
 public class DriveConstants {
 
-  public static final double ROBOT_MASS = 50;
-  public static final double BUMPER_LENGTH_INCHES = 30;
-  public static final double BUMPER_WIDTH_INCHES = 30;
+  public static final double ROBOT_MASS = 40;
+  public static final double BUMPER_LENGTH_INCHES = 35;
+  public static final double BUMPER_WIDTH_INCHES = 35;
 
   public static final double DRIVE_TO_POSE_STATIC_FRICTION_CONSTANT = 0.02;
 

@@ -62,7 +62,7 @@ public class IntakePivotIOTalonFX implements IntakePivotIO {
     config.Slot0.kP = 1.2;
     config.Slot0.kI = 0.0;
     config.Slot0.kD = 0.0;
-    config.Slot0.kG = 1.0;
+    config.Slot0.kG = 0.8;
 
     config.Audio.BeepOnBoot = true;
 

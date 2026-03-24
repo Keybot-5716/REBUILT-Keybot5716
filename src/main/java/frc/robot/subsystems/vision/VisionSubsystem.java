@@ -138,21 +138,21 @@ public class VisionSubsystem extends SubsystemBase {
 
   private void logCameraInputs(String prefix, VisionIO.VisionIOInputs.CameraInputs cam) {
     Logger.recordOutput(prefix + "/SeesTarget", cam.seesTarget);
-    Logger.recordOutput(prefix + "/MegatagCount", cam.megatagcount);
+    Logger.recordOutput(prefix + "/BestTagCount", cam.bestTagCount);
 
     if (DriverStation.isDisabled()) {
       SmartDashboard.putBoolean(prefix + "/SeesTarget", cam.seesTarget);
-      SmartDashboard.putNumber(prefix + "/MegatagCount", cam.megatagcount);
+      SmartDashboard.putNumber(prefix + "/BestTagCount", cam.bestTagCount);
     }
 
     if (cam.pose3d != null) {
       Logger.recordOutput(prefix + "/Pose3d", cam.pose3d);
     }
 
-    if (cam.megatagPoseEstimate != null) {
-      Logger.recordOutput(prefix + "/MegatagPoseEstimate", cam.megatagPoseEstimate.fieldToRobot());
-      Logger.recordOutput(prefix + "/Quality", cam.megatagPoseEstimate.quality());
-      Logger.recordOutput(prefix + "/AvgTagArea", cam.megatagPoseEstimate.avgTagArea());
+    if (cam.bestPoseEstimate != null) {
+      Logger.recordOutput(prefix + "/BestPose", cam.bestPoseEstimate.fieldToRobot());
+      Logger.recordOutput(prefix + "/Quality", cam.bestPoseEstimate.quality());
+      Logger.recordOutput(prefix + "/AvgTagArea", cam.bestPoseEstimate.avgTagArea());
     }
 
     if (cam.fiducialAprilTagObservation != null) {
@@ -171,96 +171,23 @@ public class VisionSubsystem extends SubsystemBase {
 
     Optional<VisionPoseEstimateInField> estimate = Optional.empty();
 
-    if (cam.megatagPoseEstimate != null) {
+    if (cam.bestPoseEstimate != null) {
+
       Optional<VisionPoseEstimateInField> mtEstimate =
-          processMegatagPoseEstimate(cam.megatagPoseEstimate, cam, logPrefix);
+          processMegatagPoseEstimate(cam.bestPoseEstimate, cam, logPrefix);
 
       mtEstimate.ifPresent(
           est -> Logger.recordOutput(logPrefix + "/AcceptedMegatagEstimate", est.getRobotPose()));
 
-      Optional<VisionPoseEstimateInField> gyroEstimate =
-          fuseWithGyro(cam.megatagPoseEstimate, cam, logPrefix);
-
-      gyroEstimate.ifPresent(
-          est -> Logger.recordOutput(logPrefix + "/FuseWithGyroEstimate", est.getRobotPose()));
-
-      // Prefer Megatag when available
       if (mtEstimate.isPresent()) {
         estimate = mtEstimate;
         Logger.recordOutput(logPrefix + "/AcceptMegatag", true);
-        Logger.recordOutput(logPrefix + "/AcceptGyro", false);
-      } else if (gyroEstimate.isPresent()) {
-        estimate = gyroEstimate;
-        Logger.recordOutput(logPrefix + "/AcceptMegatag", false);
-        Logger.recordOutput(logPrefix + "/AcceptGyro", true);
       } else {
         Logger.recordOutput(logPrefix + "/AcceptMegatag", false);
-        Logger.recordOutput(logPrefix + "/AcceptGyro", false);
       }
     }
 
     return estimate;
-  }
-
-  private Optional<VisionPoseEstimateInField> fuseWithGyro(
-      MegaTagPoseEstimate poseEstimate,
-      VisionIO.VisionIOInputs.CameraInputs cam,
-      String logPrefix) {
-
-    if (poseEstimate.timestampSeconds() <= state.lastMegatagTimestamp()) {
-      return Optional.empty();
-    }
-
-    // Use Megatag directly when 2 or more tags are visible
-    if (poseEstimate.fiducialIds().length > 1) {
-      return Optional.empty();
-    }
-
-    // Reject if the robot is yawing rapidly (time‑sync unreliable)
-    final double kHighYawLookbackS = 0.3;
-    final double kHighYawVelocityRadS = 5.0;
-
-    if (state
-            .getMaxAbsDriveYawAngularVelocityInRange(
-                poseEstimate.timestampSeconds() - kHighYawLookbackS,
-                poseEstimate.timestampSeconds())
-            .orElse(Double.POSITIVE_INFINITY)
-        > kHighYawVelocityRadS) {
-      return Optional.empty();
-    }
-
-    var priorPose = state.getFieldToRobot(poseEstimate.timestampSeconds());
-    if (priorPose.isEmpty()) {
-      return Optional.empty();
-    }
-
-    var maybeFieldToTag = VisionConstants.kAprilTagLayout.getTagPose(poseEstimate.fiducialIds()[0]);
-    if (maybeFieldToTag.isEmpty()) {
-      return Optional.empty();
-    }
-
-    Pose2d fieldToTag =
-        new Pose2d(maybeFieldToTag.get().toPose2d().getTranslation(), Rotation2d.kZero);
-
-    Pose2d robotToTag = fieldToTag.relativeTo(poseEstimate.fieldToRobot());
-
-    Pose2d posteriorPose =
-        new Pose2d(
-            fieldToTag
-                .getTranslation()
-                .minus(robotToTag.getTranslation().rotateBy(priorPose.get().getRotation())),
-            priorPose.get().getRotation());
-
-    double xStd = cam.standardDeviations[VisionConstants.kMegatag1XStdDevIndex];
-    double yStd = cam.standardDeviations[VisionConstants.kMegatag1YStdDevIndex];
-    double xyStd = Math.max(xStd, yStd);
-
-    return Optional.of(
-        new VisionPoseEstimateInField(
-            posteriorPose,
-            poseEstimate.timestampSeconds(),
-            VecBuilder.fill(xyStd, xyStd, VisionConstants.kLargeVariance),
-            poseEstimate.fiducialIds().length));
   }
 
   private Optional<VisionPoseEstimateInField> processMegatagPoseEstimate(
@@ -327,9 +254,15 @@ public class VisionSubsystem extends SubsystemBase {
     Pose2d estimatePose = poseEstimate.fieldToRobot();
 
     double scaleFactor = 1.0 / poseEstimate.quality();
-    double xStd = cam.standardDeviations[VisionConstants.kMegatag1XStdDevIndex] * scaleFactor;
-    double yStd = cam.standardDeviations[VisionConstants.kMegatag1YStdDevIndex] * scaleFactor;
-    double rotStd = cam.standardDeviations[VisionConstants.kMegatag1YawStdDevIndex] * scaleFactor;
+
+    int baseIndex =
+        (cam.bestTagCount >= 2)
+            ? VisionConstants.kMegatag2XStdDevIndex
+            : VisionConstants.kMegatag1XStdDevIndex;
+
+    double xStd = cam.standardDeviations[baseIndex] * scaleFactor;
+    double yStd = cam.standardDeviations[baseIndex + 1] * scaleFactor;
+    double rotStd = cam.standardDeviations[baseIndex + 5] * scaleFactor;
 
     double xyStd = Math.max(xStd, yStd);
     Matrix<N3, N1> visionStdDevs = VecBuilder.fill(xyStd, xyStd, rotStd);

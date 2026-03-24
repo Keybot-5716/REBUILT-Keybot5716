@@ -21,7 +21,7 @@ public class SuperstructureConstants {
 
   public static class IntakeConstants {
     // -- PIVOT CONSTANTS
-    public static final double IN = 0.0;
+    public static final double IN = 0.1;
     public static final double OUT = -4.5;
 
     // -- ROLLER CONSTANTS

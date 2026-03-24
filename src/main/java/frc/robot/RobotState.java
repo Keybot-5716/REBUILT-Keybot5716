@@ -204,8 +204,16 @@ public class RobotState implements State {
   }
 
   public void updateMegatagEstimate(VisionPoseEstimateInField megatag) {
+    if (megatag == null) return;
+    if (megatag.getRobotPose() == null) return;
+
+    Pose2d p = megatag.getRobotPose();
+
+    if (Double.isNaN(p.getX()) || Double.isNaN(p.getY())) return;
+
     megatagTimestamp = megatag.getTimestamp();
-    megatagPose = megatag.getRobotPose();
+    megatagPose = p;
+
     fieldEstimation.accept(megatag);
   }
 

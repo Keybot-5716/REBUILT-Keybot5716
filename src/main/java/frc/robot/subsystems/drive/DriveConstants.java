@@ -47,10 +47,10 @@ public class DriveConstants {
           Constants.ROBOT_MASS_KG,
           Constants.ROBOT_MOI,
           moduleConfig,
-          new Translation2d(0.292, 0.292),
-          new Translation2d(0.292, -0.292),
-          new Translation2d(-0.292, 0.292),
-          new Translation2d(-0.292, -0.292));
+          new Translation2d(0.27686, 0.27686),
+          new Translation2d(0.27686, -0.27686),
+          new Translation2d(-0.27686, 0.27686),
+          new Translation2d(-0.27686, -0.27686));
 
   public static PPHolonomicDriveController pathPlannerController =
       new PPHolonomicDriveController(

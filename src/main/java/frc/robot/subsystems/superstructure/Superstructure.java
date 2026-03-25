@@ -113,7 +113,7 @@ public class Superstructure extends SubsystemBase {
 
   private void def() {
     driveSub.setState(DriveSubsystem.DesiredState.MANUAL_FIELD_DRIVE);
-    // intakePivotSubsystem.setDesiredState(IntakePivotSubsystem.DesiredState.IN);
+    //intakePivotSubsystem.setDesiredState(IntakePivotSubsystem.DesiredState.OUT);
     intakeRollersSub.setDesiredState(IntakeRollersSubsystem.DesiredState.STOPPED);
     transferSub.setDesiredState(TransferSubsystem.DesiredState.STOPPED);
     shooterHoodSub.setDesiredState(ShooterHoodSubsystem.DesiredState.HOME);
@@ -122,7 +122,7 @@ public class Superstructure extends SubsystemBase {
 
   private void home() {
     driveSub.setState(DriveSubsystem.DesiredState.MANUAL_FIELD_DRIVE);
-    intakePivotSubsystem.setDesiredState(IntakePivotSubsystem.DesiredState.IN);
+    intakePivotSubsystem.setDesiredState(IntakePivotSubsystem.DesiredState.OUT);
     intakeRollersSub.setDesiredState(IntakeRollersSubsystem.DesiredState.STOPPED);
     transferSub.setDesiredState(TransferSubsystem.DesiredState.STOPPED);
     shooterHoodSub.setDesiredState(ShooterHoodSubsystem.DesiredState.HOME);
@@ -200,7 +200,7 @@ public class Superstructure extends SubsystemBase {
   private void taxi() {
     driveSub.setDesiredRotationToLock(
         new Rotation2d(robotState.isRedAlliance() ? (Math.PI / 2) : (Math.PI + (Math.PI / 2))));
-    intakeRollersSub.setDesiredState(IntakeRollersSubsystem.DesiredState.STOPPED);
+    intakeRollersSub.setDesiredState(IntakeRollersSubsystem.DesiredState.FORWARD_ROLLERS);
     shooterRollerSub.setCustom(ShooterConstants.TAXI_RPS);
     shooterHoodSub.setDesiredState(ShooterHoodSubsystem.DesiredState.CALC_POS_TO_TAXI);
 

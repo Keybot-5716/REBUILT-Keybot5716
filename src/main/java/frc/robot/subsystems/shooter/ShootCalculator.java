@@ -118,20 +118,20 @@ public class ShootCalculator {
     passingMaxDistance = 7.5;
     phaseDelay = 0.25;
 
-    hoodAngleMap.put(1.5, 0.0);
-    hoodAngleMap.put(2.0, 0.0);
-    hoodAngleMap.put(3.0, 0.3);
-    hoodAngleMap.put(5.2, 0.15);
+    hoodAngleMap.put(2.18, 0.0);
+    hoodAngleMap.put(2.86, 0.0);
+    hoodAngleMap.put(3.72, 0.1);
+    hoodAngleMap.put(5.07, 0.25);
 
-    rollersSpeedMap.put(1.5, 52.0);
-    rollersSpeedMap.put(2.0, 57.0);
-    rollersSpeedMap.put(2.5, 62.0);
-    rollersSpeedMap.put(5.2, 70.0);
+    rollersSpeedMap.put(2.18, 52.0);
+    rollersSpeedMap.put(2.86, 56.0);
+    rollersSpeedMap.put(3.72, 65.0);
+    rollersSpeedMap.put(5.07, 85.0);
 
-    TimeOffLightMap.put(0.96, 0.5);
-    TimeOffLightMap.put(0.96, 0.5);
-    TimeOffLightMap.put(0.96, 0.5);
-    TimeOffLightMap.put(0.96, 0.5);
+    TimeOffLightMap.put(2.18, 0.78);
+    TimeOffLightMap.put(2.86, 1.055);
+    TimeOffLightMap.put(3.72, 1.12);
+    TimeOffLightMap.put(5.07, 1.725);
 
     passedHoodAngleMap.put(0.96, 0.0);
     passedHoodAngleMap.put(0.96, 0.0);

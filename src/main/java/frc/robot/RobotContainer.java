@@ -164,7 +164,7 @@ public class RobotContainer implements RobotCore {
     controller
         .back()
         .onTrue(
-            Commands.runOnce(() -> driveSub.resetOdometry(FieldConstants.getTaxiPose()))
+            Commands.runOnce(() -> driveSub.resetOdometry(FieldConstants.getRightTrenchTesting()))
                 .ignoringDisable(true));
     controller
         .rightBumper()
@@ -234,8 +234,8 @@ public class RobotContainer implements RobotCore {
     NamedCommands.registerCommand(
         "SCORE",
         Commands.sequence(
-            Commands.runOnce(() -> superstructure.setDesiredState(SuperstructureStates.SCORE)),
-            Commands.waitSeconds(5.0),
+            superstructure.setPresetCommand(ShootCalculator.hubPreset),
+            Commands.waitSeconds(10.0),
             Commands.runOnce(() -> superstructure.setDesiredState(SuperstructureStates.DEFAULT))));
 
     NamedCommands.registerCommand(
@@ -245,7 +245,7 @@ public class RobotContainer implements RobotCore {
         "INTAKE",
         Commands.sequence(
             Commands.runOnce(() -> superstructure.setDesiredState(SuperstructureStates.INTAKE)),
-            Commands.waitSeconds(10.0),
+            Commands.waitSeconds(3),
             Commands.runOnce(() -> superstructure.setDesiredState(SuperstructureStates.HOME))));
   }
 
@@ -303,6 +303,6 @@ public class RobotContainer implements RobotCore {
   }
 
   public Command getAutonomousCommand() {
-    return autoChooser.get();
+    return new AutoRightTrench();
   }
 }

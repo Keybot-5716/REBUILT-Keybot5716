@@ -335,7 +335,7 @@ public class DriveSubsystem extends SubsystemBase {
 
     angularMagnitude = Math.copySign(angularMagnitude * angularMagnitude, angularMagnitude);
 
-    teleopVelocityCoefficient = controller.leftBumper().getAsBoolean() ? 0.3 : 0.6;
+    teleopVelocityCoefficient = controller.rightTrigger().getAsBoolean() ? 0.3 : 0.6;
 
     double xVelocity =
         (robotState.isRedAlliance() ? xMagnitude * maxVelocity : -xMagnitude * maxVelocity)

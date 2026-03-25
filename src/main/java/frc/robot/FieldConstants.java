@@ -11,6 +11,11 @@ public class FieldConstants {
   private static final Pose2d HUB_SHOOTING = new Pose2d(4.4, 4.5, new Rotation2d());
   private static final Pose2d RIGHT_TRENCH = new Pose2d(3.560, 0.527, new Rotation2d());
 
+  /*
+   *
+   * SIX SEVEN
+   */
+
   public static boolean isRedAlliance() {
     return Robot.alliance.isPresent() && Robot.alliance.get() == DriverStation.Alliance.Red;
   }

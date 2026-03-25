@@ -10,17 +10,19 @@ import java.util.List;
 public class AutoRightTrench extends AutoBuilder {
   private final PathPlannerPath right_to_center;
   private final PathPlannerPath right_center_intake;
+  private final PathPlannerPath right_center_to_hub;
 
   public AutoRightTrench() {
     right_to_center = loadPath("RIGHT_TRENCH_TO_CENTER");
     right_center_intake = loadPath("RIGHTCENTER_INTAKE");
+    right_center_to_hub = loadPath("RIGHT_CENTER_TO_HUB");
 
     addCommands(Commands.deadline(Commands.sequence(new PathPlannerAuto("RIGHT_TRENCH_AUTO"))));
   }
 
   @Override
   public List<Pose2d> getPathPoses() {
-    return getPathPosesList(right_to_center, right_center_intake);
+    return getPathPosesList(right_to_center, right_center_intake, right_center_to_hub);
   }
 
   @Override

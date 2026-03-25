@@ -13,7 +13,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "RIGHT_TRENCH_TO_CENTER"
+            "pathName": "LEFT_TRENCH_TO_CENTER"
           }
         },
         {
@@ -23,7 +23,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "RIGHTCENTER_INTAKE"
+                  "pathName": "LEFTCENTER_INTAKE"
                 }
               },
               {
@@ -38,7 +38,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "RIGHT_CENTER_TO_HUB"
+            "pathName": "LEFT_CENTER_TO_HUB"
           }
         },
         {

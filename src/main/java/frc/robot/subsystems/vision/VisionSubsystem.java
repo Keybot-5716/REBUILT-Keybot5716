@@ -255,10 +255,7 @@ public class VisionSubsystem extends SubsystemBase {
 
     double scaleFactor = 1.0 / poseEstimate.quality();
 
-    int baseIndex =
-        (cam.bestTagCount >= 2)
-            ? VisionConstants.kMegatag2XStdDevIndex
-            : VisionConstants.kMegatag1XStdDevIndex;
+    int baseIndex = VisionConstants.kMegatag1XStdDevIndex;
 
     double xStd = cam.standardDeviations[baseIndex] * scaleFactor;
     double yStd = cam.standardDeviations[baseIndex + 1] * scaleFactor;

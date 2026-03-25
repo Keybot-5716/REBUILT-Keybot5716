@@ -1,7 +1,6 @@
 package frc.robot.subsystems.vision;
 
 import edu.wpi.first.networktables.*;
-import edu.wpi.first.wpilibj.Timer;
 import frc.lib.limelight.LimelightHelpers;
 import frc.robot.RobotState;
 import java.util.concurrent.atomic.AtomicReference;
@@ -60,83 +59,42 @@ public class VisionIOHardwareLimelight implements VisionIO {
   }
 
   private void readCameraData(
-    NetworkTable table, VisionIOInputs.CameraInputs camera, String limelightName) {
+      NetworkTable table, VisionIOInputs.CameraInputs camera, String limelightName) {
 
     camera.seesTarget = table.getEntry("tv").getDouble(0) == 1.0;
 
+    // 🔥 Limpia SIEMPRE para evitar datos viejos
+    camera.megatag1PoseEstimate = null;
+    camera.megatag2PoseEstimate = null;
+    camera.bestPoseEstimate = null;
+    camera.megatag1Count = 0;
+    camera.megatag2Count = 0;
+    camera.bestTagCount = 0;
+    camera.fiducialAprilTagObservation = new FiducialObservation[0];
+
     if (camera.seesTarget) {
       try {
-        double latencySec =
-            (LimelightHelpers.getLatency_Pipeline(limelightName)
-                    + LimelightHelpers.getLatency_Capture(limelightName))
-                / 1000.0;
-
-        double timestamp = Timer.getFPGATimestamp() - latencySec;
-
-        double yawDeg =
-            robotState
-                .getFieldToRobot(timestamp)
-                .map(p -> p.getRotation().getDegrees())
-                .orElseGet(
-                    () ->
-                        robotState
-                            .getLatestFieldToRobot()
-                            .getValue()
-                            .getRotation()
-                            .getDegrees());
-
-        LimelightHelpers.SetRobotOrientation(limelightName, yawDeg, 0, 0, 0, 0, 0);
 
         var mt1 = LimelightHelpers.getBotPoseEstimate_wpiBlue(limelightName);
-        var mt2 = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(limelightName);
 
         var robotPose3d =
             LimelightHelpers.toPose3D(LimelightHelpers.getBotPose_wpiBlue(limelightName));
 
-        if (mt1 != null) {
+        if (mt1 != null && mt1.tagCount > 0) {
           camera.megatag1PoseEstimate = MegaTagPoseEstimate.fromLimelight(mt1);
           camera.megatag1Count = mt1.tagCount;
-        }
 
-        if (mt2 != null && mt2.tagCount > 0) {
-
-          if (mt2.pose != null
-              && !Double.isNaN(mt2.pose.getX())
-              && !Double.isNaN(mt2.pose.getY())) {
-
-            camera.megatag2PoseEstimate = MegaTagPoseEstimate.fromLimelight(mt2);
-            camera.megatag2Count = mt2.tagCount;
-
-          } else {
-            camera.megatag2PoseEstimate = null;
-            camera.megatag2Count = 0;
-          }
-        }
-
-        boolean useMT2 =
-            camera.megatag2PoseEstimate != null && camera.megatag2Count >= 2;
-
-        if (useMT2) {
-          camera.bestPoseEstimate = camera.megatag2PoseEstimate;
-          camera.bestTagCount = camera.megatag2Count;
-
-          camera.fiducialAprilTagObservation =
-              FiducialObservation.fromLimelight(mt2.rawFiducials);
-
-        } else if (mt1 != null && mt1.tagCount > 0) {
           camera.bestPoseEstimate = camera.megatag1PoseEstimate;
           camera.bestTagCount = camera.megatag1Count;
 
-          camera.fiducialAprilTagObservation =
-              FiducialObservation.fromLimelight(mt1.rawFiducials);
+          camera.fiducialAprilTagObservation = FiducialObservation.fromLimelight(mt1.rawFiducials);
         }
 
         if (robotPose3d != null) {
           camera.pose3d = robotPose3d;
         }
 
-        camera.standardDeviations =
-            table.getEntry("stddevs").getDoubleArray(DEFAULT_STDDEVS);
+        camera.standardDeviations = table.getEntry("stddevs").getDoubleArray(DEFAULT_STDDEVS);
 
       } catch (Exception e) {
         System.err.println("Error processing Limelight data: " + e.getMessage());

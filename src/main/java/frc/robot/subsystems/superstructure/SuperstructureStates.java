@@ -9,6 +9,7 @@ public enum SuperstructureStates {
   INTAKE,
   SCORE,
   MANUAL_SCORE,
+  MANUAL_TAXI,
   TAXI,
   SHOOTER_TEST,
   EJECT;
@@ -36,6 +37,9 @@ public enum SuperstructureStates {
         return EnumSet.of(HOME, DEFAULT);
 
       case MANUAL_SCORE:
+        return EnumSet.of(HOME, DEFAULT);
+
+      case MANUAL_TAXI:
         return EnumSet.of(HOME, DEFAULT);
 
       case SHOOTER_TEST:

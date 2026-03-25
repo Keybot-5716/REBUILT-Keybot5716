@@ -112,20 +112,23 @@ public class ShootCalculator {
   public static final LaunchPreset outpostPreset;
 
   static {
-    minDistance = 0.9;
-    maxDistance = 4.9;
+    minDistance = 0.8;
+    maxDistance = 5.2;
     passingMinDistance = 5.4;
     passingMaxDistance = 7.5;
     phaseDelay = 0.25;
 
     hoodAngleMap.put(1.5, 0.0);
-    hoodAngleMap.put(2.0, 0.15);
-    hoodAngleMap.put(5.2, 0.20);
+    hoodAngleMap.put(2.0, 0.0);
+    hoodAngleMap.put(3.0, 0.3);
+    hoodAngleMap.put(5.2, 0.15);
 
-    rollersSpeedMap.put(2.0, 47.0);
-    rollersSpeedMap.put(3.0, 50.0);
-    rollersSpeedMap.put(5.2, 60.0);
+    rollersSpeedMap.put(1.5, 52.0);
+    rollersSpeedMap.put(2.0, 57.0);
+    rollersSpeedMap.put(2.5, 62.0);
+    rollersSpeedMap.put(5.2, 70.0);
 
+    TimeOffLightMap.put(0.96, 0.5);
     TimeOffLightMap.put(0.96, 0.5);
     TimeOffLightMap.put(0.96, 0.5);
     TimeOffLightMap.put(0.96, 0.5);
@@ -133,11 +136,14 @@ public class ShootCalculator {
     passedHoodAngleMap.put(0.96, 0.0);
     passedHoodAngleMap.put(0.96, 0.0);
     passedHoodAngleMap.put(0.96, 0.0);
+    passedHoodAngleMap.put(0.96, 0.0);
 
     passedRollersSpeedMap.put(0.96, 0.0);
     passedRollersSpeedMap.put(0.96, 0.0);
     passedRollersSpeedMap.put(0.96, 0.0);
+    passedRollersSpeedMap.put(0.96, 0.0);
 
+    passedTimeOffLightMap.put(0.96, 0.5);
     passedTimeOffLightMap.put(0.96, 0.5);
     passedTimeOffLightMap.put(0.96, 0.5);
     passedTimeOffLightMap.put(0.96, 0.5);

@@ -168,12 +168,14 @@ public class RobotContainer implements RobotCore {
                 .ignoringDisable(true));
     controller
         .rightBumper()
-        .onTrue(superstructure.setCommand(SuperstructureStates.MANUAL_SCORE))
-        .onFalse(superstructure.setCommand(SuperstructureStates.HOME));
+        .onTrue(
+            superstructure.setCommand(
+                SuperstructureStates.MANUAL_TAXI, SuperstructureStates.MANUAL_SCORE))
+        .onFalse(superstructure.setCommand(SuperstructureStates.DEFAULT));
     controller
         .rightTrigger()
         .onTrue(superstructure.setCommand(SuperstructureStates.TAXI, ShootCalculator.hubPreset))
-        .onFalse(superstructure.setCommand(SuperstructureStates.HOME));
+        .onFalse(superstructure.setCommand(SuperstructureStates.DEFAULT));
     controller
         .leftTrigger()
         .onTrue(superstructure.setCommand(SuperstructureStates.INTAKE))

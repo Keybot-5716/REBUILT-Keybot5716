@@ -83,7 +83,7 @@ public class RobotState implements State {
       ChassisSpeeds measuredSpeeds,
       ChassisSpeeds measuredFieldRelativeSpeeds,
       ChassisSpeeds fusedFieldRelativeSpeeds) {
-    this.driveRollAngularVelocity.addSample(timestamp, angularPitchRadPS);
+    this.driveRollAngularVelocity.addSample(timestamp, angularRollRadPS);
     this.drivePitchAngularVelocity.addSample(timestamp, angularPitchRadPS);
     this.driveYawAngularVelocity.addSample(timestamp, angularYawRadPS);
     this.drivePitchRads.addSample(timestamp, pitchRad);

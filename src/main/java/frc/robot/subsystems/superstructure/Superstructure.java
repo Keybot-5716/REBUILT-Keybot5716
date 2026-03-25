@@ -104,6 +104,10 @@ public class Superstructure extends SubsystemBase {
       case MANUAL_SCORE:
         manualScore();
         break;
+
+      case MANUAL_TAXI:
+        manualTaxi();
+        break;
     }
   }
 
@@ -112,7 +116,7 @@ public class Superstructure extends SubsystemBase {
     // intakePivotSubsystem.setDesiredState(IntakePivotSubsystem.DesiredState.IN);
     intakeRollersSub.setDesiredState(IntakeRollersSubsystem.DesiredState.STOPPED);
     transferSub.setDesiredState(TransferSubsystem.DesiredState.STOPPED);
-    shooterHoodSub.setDesiredState(ShooterHoodSubsystem.DesiredState.STOPPED);
+    shooterHoodSub.setDesiredState(ShooterHoodSubsystem.DesiredState.HOME);
     shooterRollerSub.setDesiredState(ShooterRollersSubsystem.DesiredState.STOPPED);
   }
 
@@ -175,6 +179,18 @@ public class Superstructure extends SubsystemBase {
     // intakeRollersSub.setDesiredState(IntakeRollersSubsystem.DesiredState.STOPPED);
     shooterHoodSub.setAngle(params.hoodAngle());
     shooterRollerSub.setCustom(params.rollersHoodVelocity());
+
+    if (shooterRollerSub.atDesiredVelocity()) {
+      transferSub.setDesiredState(TransferSubsystem.DesiredState.OSCILLATE_FORWARD);
+    }
+  }
+
+  private void manualTaxi() {
+    // shooterHoodSub.setAngle(activePreset.hoodAngleDeg().get());
+    // shooterRollerSub.setCustom(activePreset.flywheelSpeed().get());
+    // intakeRollersSub.setDesiredState(IntakeRollersSubsystem.DesiredState.STOPPED);
+    shooterHoodSub.setAngle(ShooterConstants.OUT_TEST);
+    shooterRollerSub.setCustom(55.0);
 
     if (shooterRollerSub.atDesiredVelocity()) {
       transferSub.setDesiredState(TransferSubsystem.DesiredState.OSCILLATE_FORWARD);

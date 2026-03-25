@@ -202,5 +202,12 @@ public class Robot extends LoggedRobot {
   public void simulationPeriodic() {
     Logger.recordOutput(
         "FieldSimulation/Fuel", SimulatedArena.getInstance().getGamePiecesArrayByType("Fuel"));
+    if (robotContainer instanceof RobotContainerSim) {
+      RobotContainerSim simContainer = (RobotContainerSim) robotContainer;
+
+      if (simContainer.getSimRobotState() != null) {
+        simContainer.getSimRobotState().updateSim();
+      }
+    }
   }
 }

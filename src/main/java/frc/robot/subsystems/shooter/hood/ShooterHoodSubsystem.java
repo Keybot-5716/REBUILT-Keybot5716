@@ -106,4 +106,8 @@ public class ShooterHoodSubsystem extends SubsystemBase {
   public void setDesiredState(DesiredState desiredState) {
     this.desiredState = desiredState;
   }
+
+  public double getAngle() {
+    return hoodInputs.position;
+  }
 }

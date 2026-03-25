@@ -39,6 +39,7 @@ import frc.robot.subsystems.drive.DriveIOSim;
 import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.subsystems.drive.TunerConstants;
 import frc.robot.subsystems.intake.pivot.IntakePivotIOSim;
+import frc.robot.subsystems.shooter.ShootCalculator;
 import frc.robot.subsystems.vision.VisionPoseEstimateInField;
 import frc.robot.subsystems.visualizers.RobotSimVisualizer;
 import java.util.function.Consumer;
@@ -64,6 +65,11 @@ public class RobotContainerSim implements RobotCore {
         TunerConstants.kSpeedAt12Volts.in(MetersPerSecond));
   }
 
+  private final CommandXboxController DRIVE_CONTROLLER = new CommandXboxController(0);
+
+  SimulatedRobotState simulatedRobotState =
+      RobotBase.isSimulation() ? new SimulatedRobotState(this) : null;
+
   private final Consumer<VisionPoseEstimateInField> visionFieldEstimate =
       new Consumer<VisionPoseEstimateInField>() {
         @Override
@@ -72,28 +78,28 @@ public class RobotContainerSim implements RobotCore {
         }
       };
 
+  public static Field2d autoPrev = new Field2d();
+  private final LoggedDashboardChooser<AutoBuilder> autoChooser =
+      new LoggedDashboardChooser<>("Auto Chooser");
+
+  private final RobotState robotState = new RobotState(visionFieldEstimate);
+
   private DriveSubsystem driveSub = buildDriveSubsystem();
 
   private IntakePivotIOSim buildIntakePivotSim() {
     return new IntakePivotIOSim(driveSub.getMapleSimDrive().mapleSimDrive);
   }
 
-  private final LoggedDashboardChooser<AutoBuilder> autoChooser =
-      new LoggedDashboardChooser<>("Auto Chooser");
-
+  // Subsystems
   private IntakePivotIOSim intakePivotSubSim = buildIntakePivotSim();
-
-  private final RobotState robotState = new RobotState(visionFieldEstimate);
-
-  private final CommandXboxController DRIVE_CONTROLLER = new CommandXboxController(0);
+  private ShootCalculator shootCalculator = new ShootCalculator(robotState);
+  public static final double HOOD_MIN_POS = 0.0;
+  public static final double HOOD_MAX_POS = 1.0;
+  public static final double HOOD_MIN_ANGLE_DEG = 30.0;
+  public static final double HOOD_MAX_ANGLE_DEG = 80.0;
 
   private final RobotSimVisualizer robotVisualizer =
       new RobotSimVisualizer(robotState, intakePivotSubSim);
-
-  public static Field2d autoPrev = new Field2d();
-
-  SimulatedRobotState simulatedRobotState =
-      RobotBase.isSimulation() ? new SimulatedRobotState(this) : null;
 
   public RobotContainerSim() {
     assert this.simulatedRobotState != null;
@@ -178,10 +184,13 @@ public class RobotContainerSim implements RobotCore {
 
   public void generateFuel() {
     IntakeSimulation intakeSimulation = intakePivotSubSim.getIntakeSimulation();
+
+    var params = shootCalculator.getParameters();
+
     if (intakePivotSubSim.isFuelInsideIntake()) {
       RebuiltFuelOnFly fuelOnFly =
           new RebuiltFuelOnFly(
-              // Specify the position of the chassis when the note is launched
+              // Specify the position of the chassis when the fuel is launched
               driveSub.getDesiredPoint(),
               // Specify the translation of the shooter from the robot center (in the shooter’s
               // reference frame)
@@ -198,13 +207,17 @@ public class RobotContainerSim implements RobotCore {
                   .minus(new Rotation2d(Math.PI / 2)),
               // Add the shooter’s rotation
               // + shooterRotation,
-              // Initial height of the flying note
+              // Initial height of the flying fuel
               Distance.ofRelativeUnits(0.56, Meters),
               // The launch speed is proportional to the RPM
               // RPM
-              LinearVelocity.ofRelativeUnits(7, MetersPerSecond),
+
+              LinearVelocity.ofRelativeUnits(
+                  params.rollersHoodVelocity() * (2 * Math.PI * 1.30) / 60.0, MetersPerSecond),
+              // LinearVelocity.ofRelativeUnits(7, MetersPerSecond),
               // The angle at which the fuel is launched
-              Angle.ofRelativeUnits(54, Degrees));
+              Angle.ofRelativeUnits(getPositionToDegrees(params.hoodAngle()), Degrees));
+      // Angle.ofRelativeUnits(54, Degrees));
 
       fuelOnFly
           // Set the target center to the Rebbuilt Hub of the current alliance
@@ -234,12 +247,22 @@ public class RobotContainerSim implements RobotCore {
       SimulatedArena.getInstance().addGamePieceProjectile(fuelOnFly);
 
       intakeSimulation.setGamePiecesCount(intakePivotSubSim.getFuelAmount() - 1);
+
+      System.out.println(
+          "Distancia: "
+              + shootCalculator.getParameters().distance()
+              + " | Angulo Calculado: "
+              + getPositionToDegrees(params.hoodAngle())
+              + " | Velocidad Calculada: "
+              + params.rollersHoodVelocity() * (2 * Math.PI * 1.30) / 60.0);
     }
   }
 
   private void generateFuelTaxi() {
     IntakeSimulation intakeSimulation = intakePivotSubSim.getIntakeSimulation();
+
     if (intakePivotSubSim.isFuelInsideIntake()) {
+
       RebuiltFuelOnFly fuelOnFly =
           new RebuiltFuelOnFly(
               // Specify the position of the chassis when the note is launched
@@ -252,7 +275,11 @@ public class RobotContainerSim implements RobotCore {
               // the projectile
               robotState.getLatestFusedFieldRelativeChassisSpeeds(),
               // The shooter facing direction is the same as the robot’s facing direction
-              robotState.getLatestFieldToRobot().getValue().getRotation(),
+              robotState
+                  .getLatestFieldToRobot()
+                  .getValue()
+                  .getRotation()
+                  .minus(new Rotation2d(Math.PI * 2)),
               // Add the shooter’s rotation
               // + shooterRotation,
               // Initial height of the flying note
@@ -316,5 +343,14 @@ public class RobotContainerSim implements RobotCore {
 
   public Command getAutonomousCommand() {
     return autoChooser.get();
+  }
+
+  public double getPositionToDegrees(double currentPosition) {
+    // Calculamos qué porcentaje del recorrido ha hecho el motor (de 0.0 a 1.0)
+    double percentage = currentPosition / HOOD_MAX_POS;
+
+    // Interpola entre 30 y 80 grados usando ese porcentaje
+    return edu.wpi.first.math.MathUtil.interpolate(
+        HOOD_MIN_ANGLE_DEG, HOOD_MAX_ANGLE_DEG, percentage);
   }
 }

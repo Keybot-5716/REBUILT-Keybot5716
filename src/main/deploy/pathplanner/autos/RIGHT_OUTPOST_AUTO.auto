@@ -5,6 +5,12 @@
     "data": {
       "commands": [
         {
+          "type": "named",
+          "data": {
+            "name": "HOME"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "RIGHT_START_TO_OUTPOST"

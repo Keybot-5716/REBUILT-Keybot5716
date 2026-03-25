@@ -100,6 +100,10 @@ public class Superstructure extends SubsystemBase {
       case SHOOTER_TEST:
         presetShoot();
         break;
+
+      case MANUAL_SCORE:
+        manualScore();
+        break;
     }
   }
 
@@ -160,6 +164,21 @@ public class Superstructure extends SubsystemBase {
       scoreTimer.stop();
       timerStarted = false;
     }*/
+  }
+
+  private void manualScore() {
+    if (activePreset == null) return;
+    var params = shootCalculator.getParameters();
+
+    // shooterHoodSub.setAngle(activePreset.hoodAngleDeg().get());
+    // shooterRollerSub.setCustom(activePreset.flywheelSpeed().get());
+    // intakeRollersSub.setDesiredState(IntakeRollersSubsystem.DesiredState.STOPPED);
+    shooterHoodSub.setAngle(params.hoodAngle());
+    shooterRollerSub.setCustom(params.rollersHoodVelocity());
+
+    if (shooterRollerSub.atDesiredVelocity()) {
+      transferSub.setDesiredState(TransferSubsystem.DesiredState.OSCILLATE_FORWARD);
+    }
   }
 
   private void taxi() {

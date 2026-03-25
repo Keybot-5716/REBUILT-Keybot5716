@@ -8,7 +8,6 @@ import com.pathplanner.lib.commands.PathfindingCommand;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -159,33 +158,26 @@ public class RobotContainer implements RobotCore {
   public void configureButtonBindings(CommandXboxController controller) {
     controller
         .start()
-        .onTrue(Commands.runOnce(() -> driveSub.resetOdometry(FieldConstants.getTestingPose())));
+        .onTrue(
+            Commands.runOnce(() -> driveSub.resetOdometry(FieldConstants.getTestingPose()))
+                .ignoringDisable(true));
     controller
         .back()
-        .onTrue(Commands.runOnce(() -> driveSub.resetOdometry(FieldConstants.getTaxiPose())));
+        .onTrue(
+            Commands.runOnce(() -> driveSub.resetOdometry(FieldConstants.getTaxiPose()))
+                .ignoringDisable(true));
     controller
         .rightBumper()
-        .whileTrue(
-            Commands.run(
-                () ->
-                    driveSub.setDesiredPointToLock(
-                        new Translation2d(
-                            FieldConstants.getHubShootingPose().getX(),
-                            FieldConstants.getHubShootingPose().getY()))))
-        .onFalse(
-            Commands.runOnce(
-                () -> driveSub.setState(DriveSubsystem.DesiredState.MANUAL_FIELD_DRIVE)));
-
+        .onTrue(superstructure.setCommand(SuperstructureStates.MANUAL_SCORE))
+        .onFalse(superstructure.setCommand(SuperstructureStates.HOME));
     controller
         .rightTrigger()
         .onTrue(superstructure.setCommand(SuperstructureStates.TAXI, ShootCalculator.hubPreset))
         .onFalse(superstructure.setCommand(SuperstructureStates.HOME));
-
     controller
         .leftTrigger()
         .onTrue(superstructure.setCommand(SuperstructureStates.INTAKE))
         .onFalse(superstructure.setCommand(SuperstructureStates.DEFAULT));
-
     controller
         .a()
         .whileTrue(
@@ -196,12 +188,10 @@ public class RobotContainer implements RobotCore {
             Commands.runOnce(
                 () -> transferSub.setDesiredState(TransferSubsystem.DesiredState.STOPPED),
                 transferSub));
-
     controller
         .b()
         .onTrue(superstructure.setPresetCommand(ShootCalculator.hubPreset))
         .onFalse(superstructure.setCommand(SuperstructureStates.HOME));
-
     controller
         .x()
         .whileTrue(
@@ -213,7 +203,6 @@ public class RobotContainer implements RobotCore {
             Commands.runOnce(
                 () ->
                     intakeRollersSub.setDesiredState(IntakeRollersSubsystem.DesiredState.STOPPED)));
-
     controller
         .y()
         .whileTrue(
@@ -225,7 +214,6 @@ public class RobotContainer implements RobotCore {
             Commands.runOnce(
                 () ->
                     intakeRollersSub.setDesiredState(IntakeRollersSubsystem.DesiredState.STOPPED)));
-
     controller
         .povUp()
         .onTrue(
@@ -237,24 +225,26 @@ public class RobotContainer implements RobotCore {
             Commands.runOnce(
                 () -> intakePivotSub.setDesiredState(IntakePivotSubsystem.DesiredState.OUT)));
 
-    // controller.povLeft().onTrue(superstructureCommands.setCommand(superstructure,
-    // SuperstructureStates.HOME));
+    controller.povLeft().onTrue(superstructure.setCommand(SuperstructureStates.HOME));
   }
 
   private void configNamedCommands() {
     NamedCommands.registerCommand(
         "SCORE",
-        Commands.run(
-            () -> {
-              driveSub.setDesiredPointToLock(FieldConstants.getHubShootingPose().getTranslation());
-              intakeRollersSub.setDesiredState(IntakeRollersSubsystem.DesiredState.STOPPED);
-              shooterRollersSub.setCustom(50.5);
-              shooterHoodSub.setDesiredState(ShooterHoodSubsystem.DesiredState.CALC_POS_TO_SCORE);
+        Commands.sequence(
+            Commands.runOnce(() -> superstructure.setDesiredState(SuperstructureStates.SCORE)),
+            Commands.waitSeconds(5.0),
+            Commands.runOnce(() -> superstructure.setDesiredState(SuperstructureStates.DEFAULT))));
 
-              if (driveSub.isAlignedToPoint() && shooterRollersSub.atDesiredVelocity()) {
-                transferSub.setDesiredState(TransferSubsystem.DesiredState.OSCILLATE_FORWARD);
-              }
-            }));
+    NamedCommands.registerCommand(
+        "HOME", Commands.runOnce(() -> superstructure.setDesiredState(SuperstructureStates.HOME)));
+
+    NamedCommands.registerCommand(
+        "INTAKE",
+        Commands.sequence(
+            Commands.runOnce(() -> superstructure.setDesiredState(SuperstructureStates.INTAKE)),
+            Commands.waitSeconds(10.0),
+            Commands.runOnce(() -> superstructure.setDesiredState(SuperstructureStates.HOME))));
   }
 
   /*
@@ -288,12 +278,6 @@ public class RobotContainer implements RobotCore {
     CommandScheduler.getInstance().schedule(FollowPathCommand.warmupCommand());
 
     SmartDashboard.putData("AutoPrev", autoPrev);
-    /*
-    NamedCommands.registerCommand("SCORE", superstructure.setCommand(SuperstructureStates.SCORE));
-    NamedCommands.registerCommand("HOME", superstructure.setCommand(SuperstructureStates.HOME));
-    NamedCommands.registerCommand("INTAKE", superstructure.setCommand(SuperstructureStates.INTAKE));
-    NamedCommands.registerCommand("TAXI", superstructure.setCommand(SuperstructureStates.TAXI));
-    NamedCommands.registerCommand("DEFAULT", superstructure.setCommand(SuperstructureStates.DEFAULT));*/
   }
 
   public DriveSubsystem getDriveSubsystem() {

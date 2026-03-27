@@ -141,9 +141,7 @@ public class RobotContainerSim implements RobotCore {
             Commands.run(
                 () ->
                     driveSub.setDesiredPointToLock(
-                        new Translation2d(
-                            FieldConstants.getHubShootingPose().getX(),
-                            FieldConstants.getHubShootingPose().getY()))))
+                        FieldConstants.getSimulatedHubShooting().getTranslation())))
         .onFalse(
             Commands.runOnce(
                 () -> driveSub.setState(DriveSubsystem.DesiredState.MANUAL_FIELD_DRIVE)));
@@ -162,13 +160,13 @@ public class RobotContainerSim implements RobotCore {
                         Commands.run(
                             () ->
                                 driveSub.setDesiredPointToLock(
-                                    new Translation2d(
-                                        FieldConstants.getHubShootingPose().getX(),
-                                        FieldConstants.getHubShootingPose().getY()))),
+                                    FieldConstants.getHubShootingPose().getTranslation())),
                         Commands.run(
                             () ->
                                 driveSub.setDesiredRotationToLock(
-                                    new Rotation2d(robotState.isRedAlliance() ? 0 : Math.PI))),
+                                    (robotState.isRedAlliance()
+                                        ? Rotation2d.fromDegrees(90)
+                                        : Rotation2d.fromDegrees(-90)))),
                         () -> !robotState.passedTrench())
                     .withTimeout(0.7),
                 Commands.repeatingSequence(
@@ -176,7 +174,7 @@ public class RobotContainerSim implements RobotCore {
                         Commands.runOnce(() -> generateFuel()),
                         Commands.runOnce(() -> generateFuelTaxi()),
                         () -> !robotState.passedTrench()),
-                    Commands.waitSeconds(0.2))))
+                    Commands.waitSeconds(0.285))))
         .onFalse(
             Commands.runOnce(
                 () -> driveSub.setState(DriveSubsystem.DesiredState.MANUAL_FIELD_DRIVE)));
@@ -213,10 +211,10 @@ public class RobotContainerSim implements RobotCore {
               // RPM
 
               LinearVelocity.ofRelativeUnits(
-                  params.rollersHoodVelocity() * (2 * Math.PI * 1.30) / 60.0, MetersPerSecond),
+                  params.rollersHoodVelocity() * (2 * Math.PI * 1.2) / 60.0, MetersPerSecond),
               // LinearVelocity.ofRelativeUnits(7, MetersPerSecond),
               // The angle at which the fuel is launched
-              Angle.ofRelativeUnits(getPositionToDegrees(params.hoodAngle()), Degrees));
+              Angle.ofRelativeUnits(50, Degrees));
       // Angle.ofRelativeUnits(54, Degrees));
 
       fuelOnFly
@@ -269,7 +267,7 @@ public class RobotContainerSim implements RobotCore {
               driveSub.getDesiredPoint(),
               // Specify the translation of the shooter from the robot center (in the shooter’s
               // reference frame)
-              new Translation2d(0.2, 0),
+              new Translation2d(-0.275, -0.15),
               // Specify the field-relative speed of the chassis, adding it to the initial velocity
               // of
               // the projectile
@@ -279,7 +277,7 @@ public class RobotContainerSim implements RobotCore {
                   .getLatestFieldToRobot()
                   .getValue()
                   .getRotation()
-                  .minus(new Rotation2d(Math.PI * 2)),
+                  .minus(Rotation2d.fromDegrees(90)),
               // Add the shooter’s rotation
               // + shooterRotation,
               // Initial height of the flying note

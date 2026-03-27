@@ -164,13 +164,15 @@ public class RobotContainer implements RobotCore {
     controller
         .back()
         .onTrue(
-            Commands.runOnce(() -> driveSub.resetOdometry(FieldConstants.getRightTrenchTesting()))
+            Commands.runOnce(() -> driveSub.resetOdometry(autoChooser.get().getStartingPose()))
                 .ignoringDisable(true));
     controller
         .rightBumper()
-        .onTrue(
-            superstructure.setCommand(
-                SuperstructureStates.MANUAL_TAXI, SuperstructureStates.MANUAL_SCORE))
+        .onTrue(superstructure.setCommand(SuperstructureStates.MANUAL_SCORE))
+        .onFalse(superstructure.setCommand(SuperstructureStates.DEFAULT));
+    controller
+        .leftBumper()
+        .onTrue(superstructure.setCommand(SuperstructureStates.MANUAL_TAXI))
         .onFalse(superstructure.setCommand(SuperstructureStates.DEFAULT));
     controller
         .rightTrigger()
@@ -180,20 +182,8 @@ public class RobotContainer implements RobotCore {
         .leftTrigger()
         .onTrue(superstructure.setCommand(SuperstructureStates.INTAKE))
         .onFalse(superstructure.setCommand(SuperstructureStates.DEFAULT));
-    controller
-        .a()
-        .whileTrue(
-            Commands.run(
-                () -> transferSub.setDesiredState(TransferSubsystem.DesiredState.OSCILLATE_FORWARD),
-                transferSub))
-        .onFalse(
-            Commands.runOnce(
-                () -> transferSub.setDesiredState(TransferSubsystem.DesiredState.STOPPED),
-                transferSub));
-    controller
-        .b()
-        .onTrue(superstructure.setPresetCommand(ShootCalculator.hubPreset))
-        .onFalse(superstructure.setCommand(SuperstructureStates.HOME));
+        
+    // --- MANUAL CONTROLS
     controller
         .x()
         .whileTrue(
@@ -217,12 +207,12 @@ public class RobotContainer implements RobotCore {
                 () ->
                     intakeRollersSub.setDesiredState(IntakeRollersSubsystem.DesiredState.STOPPED)));
     controller
-        .povUp()
+        .a()
         .onTrue(
             Commands.runOnce(
                 () -> intakePivotSub.setDesiredState(IntakePivotSubsystem.DesiredState.IN)));
     controller
-        .povDown()
+        .b()
         .onTrue(
             Commands.runOnce(
                 () -> intakePivotSub.setDesiredState(IntakePivotSubsystem.DesiredState.OUT)));
@@ -239,6 +229,12 @@ public class RobotContainer implements RobotCore {
             Commands.runOnce(() -> superstructure.setDesiredState(SuperstructureStates.DEFAULT))));
 
     NamedCommands.registerCommand(
+        "PRESCORE",
+        Commands.sequence(
+            superstructure.setPresetCommand(ShootCalculator.hubPreset),
+            Commands.waitSeconds(4),
+            Commands.runOnce(() -> superstructure.setDesiredState(SuperstructureStates.DEFAULT))));
+    NamedCommands.registerCommand(
         "HOME", Commands.runOnce(() -> superstructure.setDesiredState(SuperstructureStates.HOME)));
 
     NamedCommands.registerCommand(
@@ -254,14 +250,9 @@ public class RobotContainer implements RobotCore {
    */
   public void configureAuto() {
     autoChooser.addDefaultOption("None Auto", new NoneAuto());
-    autoChooser.addOption("Testing Auto", new Auto1Test());
-    autoChooser.addOption("Testing Auto 2", new Auto2Test());
-    autoChooser.addOption("Auto Forward", new AutoForwardTest());
-    autoChooser.addOption("Testing Auto 3", new Auto3Test());
-    autoChooser.addOption("Testing Auto 4", new Auto4Test());
     autoChooser.addOption("Right Trench", new AutoRightTrench());
     autoChooser.addOption("Right Outpost", new AutoRightOutpost());
-    autoChooser.addOption("MechTest", new AutoMech());
+    autoChooser.addOption("Center", new AutoCenter());
 
     autoChooser.onChange(
         auto -> {
@@ -303,6 +294,6 @@ public class RobotContainer implements RobotCore {
   }
 
   public Command getAutonomousCommand() {
-    return new AutoRightTrench();
+    return autoChooser.get();
   }
 }

@@ -21,15 +21,15 @@
           "data": {
             "commands": [
               {
-                "type": "path",
-                "data": {
-                  "pathName": "RIGHTCENTER_INTAKE"
-                }
-              },
-              {
                 "type": "named",
                 "data": {
                   "name": "INTAKE"
+                }
+              },
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "RIGHTCENTER_INTAKE"
                 }
               }
             ]

@@ -11,6 +11,7 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
@@ -91,7 +92,7 @@ public class DriveSubsystem extends SubsystemBase {
     this.maxVelocity = maxVelocity;
     this.maxAngularVelocity = maxAngularVelocity;
 
-    rotationLocked.HeadingController = new PhoenixPIDController(5, 0, 0);
+    rotationLocked.HeadingController = new PhoenixPIDController(7, 0, 0);
     rotationLocked.HeadingController.enableContinuousInput(-Math.PI, Math.PI);
 
     autoAllign.HeadingController = new PhoenixPIDController(5, 0, 0);
@@ -245,14 +246,19 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   private void rotatedToPoint() {
-    var pos = inputs.Pose.getTranslation();
-    var delta = desiredPoint.minus(pos);
+    Pose2d robotPose = inputs.Pose;
+    Transform2d robotToShooter = new Transform2d(new Translation2d(-0.26, 0.13), new Rotation2d());
+    Pose2d shooterPose = robotPose.transformBy(robotToShooter);
+    var delta = desiredPoint.minus(shooterPose.getTranslation());
+    Rotation2d targetAngle = delta.getAngle();
+    Rotation2d shooterFacing = new Rotation2d(Math.PI / 2);
+    Rotation2d deltaAngle = targetAngle.plus(shooterFacing);
 
     io.setRequest(
         rotationLocked
             .withVelocityX(calculateSpeedsBasedOnJoystickInputs().vxMetersPerSecond)
             .withVelocityY(calculateSpeedsBasedOnJoystickInputs().vyMetersPerSecond)
-            .withTargetDirection(delta.getAngle().plus(new Rotation2d((Math.PI / 2)))));
+            .withTargetDirection(deltaAngle));
   }
 
   public boolean isAlignedToPoint() {

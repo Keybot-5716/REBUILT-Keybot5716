@@ -8,8 +8,6 @@
 package frc.robot;
 
 import com.ctre.phoenix6.SignalLogger;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -122,9 +120,7 @@ public class Robot extends LoggedRobot {
 
   /** This function is called once when the robot is disabled. */
   @Override
-  public void disabledInit() {
-    autonomousCommand = robotContainer.getAutonomousCommand();
-  }
+  public void disabledInit() {}
 
   /** This function is called periodically when disabled. */
   @Override
@@ -142,6 +138,8 @@ public class Robot extends LoggedRobot {
   @Override
   public void autonomousInit() {
     Threads.setCurrentThreadPriority(true, REAL_TIME_PRIORITY);
+    autonomousCommand = robotContainer.getAutonomousCommand();
+
     if (autonomousCommand != null) {
       CommandScheduler.getInstance().schedule(autonomousCommand);
     }
@@ -191,7 +189,7 @@ public class Robot extends LoggedRobot {
   /** This function is called once when the robot is first started up. */
   @Override
   public void simulationInit() {
-    robotContainer.getDriveSubsystem().resetOdometry(new Pose2d(2, 2, new Rotation2d()));
+    robotContainer.getDriveSubsystem().resetOdometry(FieldConstants.getSimulatedStartPos());
     // robotContainer.getDriveSubsystem().resetOdometry(new Pose2d(0, 0, new Rotation2d()));
 
     // AIRobotSimulated.startOpponentRobotSimulations();

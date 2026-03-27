@@ -113,7 +113,7 @@ public class Superstructure extends SubsystemBase {
 
   private void def() {
     driveSub.setState(DriveSubsystem.DesiredState.MANUAL_FIELD_DRIVE);
-    //intakePivotSubsystem.setDesiredState(IntakePivotSubsystem.DesiredState.OUT);
+    // intakePivotSubsystem.setDesiredState(IntakePivotSubsystem.DesiredState.OUT);
     intakeRollersSub.setDesiredState(IntakeRollersSubsystem.DesiredState.STOPPED);
     transferSub.setDesiredState(TransferSubsystem.DesiredState.STOPPED);
     shooterHoodSub.setDesiredState(ShooterHoodSubsystem.DesiredState.HOME);
@@ -171,14 +171,11 @@ public class Superstructure extends SubsystemBase {
   }
 
   private void manualScore() {
-    if (activePreset == null) return;
-    var params = shootCalculator.getParameters();
-
     // shooterHoodSub.setAngle(activePreset.hoodAngleDeg().get());
     // shooterRollerSub.setCustom(activePreset.flywheelSpeed().get());
     // intakeRollersSub.setDesiredState(IntakeRollersSubsystem.DesiredState.STOPPED);
-    shooterHoodSub.setAngle(params.hoodAngle());
-    shooterRollerSub.setCustom(params.rollersHoodVelocity());
+    shooterHoodSub.setAngle(0.0);
+    shooterRollerSub.setCustom(50.5);
 
     if (shooterRollerSub.atDesiredVelocity()) {
       transferSub.setDesiredState(TransferSubsystem.DesiredState.OSCILLATE_FORWARD);
@@ -228,14 +225,6 @@ public class Superstructure extends SubsystemBase {
     if (shooterRollerSub.atDesiredVelocity() && driveSub.isAlignedToPoint()) {
       transferSub.setDesiredState(TransferSubsystem.DesiredState.OSCILLATE_FORWARD);
     }
-
-    /*
-    if (driveSub.isAlignedToAngle() && shooterHoodSub.isOut()) {
-      transferSub.setDesiredState(TransferSubsystem.DesiredState.OSCILLATE_FORWARD);
-    } else {
-      transferSub.setDesiredState(TransferSubsystem.DesiredState.STOPPED);
-    }
-      */
   }
 
   public Command setPresetCommand(ShootCalculator.LaunchPreset preset) {

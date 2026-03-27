@@ -83,7 +83,7 @@ public class ShooterHoodSubsystem extends SubsystemBase {
   }
 
   public boolean isOut() {
-    return MathUtil.isNear(ShooterConstants.OUT_TEST, hoodInputs.position, 0.08);
+    return MathUtil.isNear(ShooterConstants.OUT_TEST, hoodInputs.position, 0.2);
   }
 
   public boolean atHome() {

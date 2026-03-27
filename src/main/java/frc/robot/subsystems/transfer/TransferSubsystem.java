@@ -73,9 +73,9 @@ public class TransferSubsystem extends SubsystemBase {
           double cycleTime = oscillationTimer.get() % 2.0;
 
           if (cycleTime < 1.8) {
-            setVelocity(rollerRPS.get());
+            setVelocity(55.0);
           } else {
-            setVelocity(-rollerRPS.get() * 0.5);
+            setVelocity(-(55.0) * 0.7);
           }
 
         } else {

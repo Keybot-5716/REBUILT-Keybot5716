@@ -31,7 +31,7 @@ public class VisionConstants {
   public static final int kMinFiducialCount = 1;
 
   // Camera A (Left-side Camera)
-  public static final double kCameraAPitchDegrees = 25.62481;
+  public static final double kCameraAPitchDegrees = 25.6;
   public static final double kCameraAPitchRads = Units.degreesToRadians(kCameraAPitchDegrees);
   public static final double kCameraAHeightOffGroundMeters = 0.463;
   public static final String kLimelightATableName = "limelight-frontal";
@@ -44,9 +44,9 @@ public class VisionConstants {
           new Translation2d(kRobotToCameraAForward, kRobotToCameraASide), kCameraAYawOffset);
 
   // Camera B (Right-side camera)
-  public static final double kCameraBPitchDegrees = 15.0;
+  public static final double kCameraBPitchDegrees = 15;
   public static final double kCameraBPitchRads = Units.degreesToRadians(kCameraBPitchDegrees);
-  public static final double kCameraBHeightOffGroundMeters = 0.463;
+  public static final double kCameraBHeightOffGroundMeters = 0.453;
   public static final String kLimelightBTableName = "limelight-back";
   public static final double kRobotToCameraBForward = -0.258;
   public static final double kRobotToCameraBSide = -0.335;

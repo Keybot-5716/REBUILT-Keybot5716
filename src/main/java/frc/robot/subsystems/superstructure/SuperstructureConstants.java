@@ -21,8 +21,8 @@ public class SuperstructureConstants {
 
   public static class IntakeConstants {
     // -- PIVOT CONSTANTS
-    public static final double IN = -0.2;
-    public static final double OUT = -4.8;
+    public static final double IN = -0.0;
+    public static final double OUT = -5.2;
 
     // -- ROLLER CONSTANTS
     public static final double ZERO_RVOLTAGE = 0.0;
@@ -37,13 +37,12 @@ public class SuperstructureConstants {
   public static class ShooterConstants {
     public static final double TAXI_RPS = 55.0;
 
-    public static final double HOME = 0.0;
-    public static final double IN_TEST = 0.0;
+    public static final double HOME = 0.15;
+    public static final double IN_TEST = 0.15;
     public static final double OUT_TEST = 0.87;
     public static final double MID_TEST = 0.3;
 
-    public static Transform2d robotToLauncher =
-        new Transform2d(new Translation2d(-0.276, -0.12), Rotation2d.fromDegrees(90));
+    public static Transform2d robotToLauncher = new Transform2d(new Translation2d(-0.26, 0.13), new Rotation2d());
   }
 
   public static class TransferConstants {

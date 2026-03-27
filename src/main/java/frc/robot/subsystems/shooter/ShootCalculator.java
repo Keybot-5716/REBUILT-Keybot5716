@@ -123,10 +123,10 @@ public class ShootCalculator {
     hoodAngleMap.put(3.72, 0.1);
     hoodAngleMap.put(5.07, 0.25);
 
-    rollersSpeedMap.put(2.18, 52.0);
-    rollersSpeedMap.put(2.86, 56.0);
-    rollersSpeedMap.put(3.72, 65.0);
-    rollersSpeedMap.put(5.07, 85.0);
+    rollersSpeedMap.put(2.18, 50.0);
+    rollersSpeedMap.put(2.86, 54.0); // 54.0
+    rollersSpeedMap.put(3.72, 63.0);
+    rollersSpeedMap.put(5.07, 83.0);
 
     TimeOffLightMap.put(2.18, 0.78);
     TimeOffLightMap.put(2.86, 1.055);

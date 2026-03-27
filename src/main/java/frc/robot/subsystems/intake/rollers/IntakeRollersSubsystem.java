@@ -63,11 +63,11 @@ public class IntakeRollersSubsystem extends SubsystemBase {
   private void applyStates() {
     switch (rollersState) {
       case FORWARDING_ROLLERS:
-        setVelocity(rollerVelocity.get());
+        setVelocity(90.0);
         break;
 
       case REVERSING_ROLLERS:
-        setVelocity(-rollerVelocity.get());
+        setVelocity(-90.0);
         break;
 
       case STOPPING:

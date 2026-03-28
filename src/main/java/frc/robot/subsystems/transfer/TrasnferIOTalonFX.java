@@ -55,7 +55,7 @@ public class TrasnferIOTalonFX implements TransferIO {
     config.Slot0.kP = 0.3;
     config.Slot0.kI = 0.0;
     config.Slot0.kD = 0.0;
-    config.Slot0.kV = 0.13;
+    config.Slot0.kV = 0.15;
 
     config.Audio.BeepOnBoot = true;
 

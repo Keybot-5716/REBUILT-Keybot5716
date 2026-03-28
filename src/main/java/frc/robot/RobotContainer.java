@@ -182,7 +182,7 @@ public class RobotContainer implements RobotCore {
         .leftTrigger()
         .onTrue(superstructure.setCommand(SuperstructureStates.INTAKE))
         .onFalse(superstructure.setCommand(SuperstructureStates.DEFAULT));
-        
+
     // --- MANUAL CONTROLS
     controller
         .x()
@@ -225,7 +225,7 @@ public class RobotContainer implements RobotCore {
         "SCORE",
         Commands.sequence(
             superstructure.setPresetCommand(ShootCalculator.hubPreset),
-            Commands.waitSeconds(10.0),
+            Commands.waitSeconds(3.0),
             Commands.runOnce(() -> superstructure.setDesiredState(SuperstructureStates.DEFAULT))));
 
     NamedCommands.registerCommand(
@@ -241,7 +241,14 @@ public class RobotContainer implements RobotCore {
         "INTAKE",
         Commands.sequence(
             Commands.runOnce(() -> superstructure.setDesiredState(SuperstructureStates.INTAKE)),
-            Commands.waitSeconds(3),
+            Commands.waitSeconds(1.0),
+            Commands.runOnce(() -> superstructure.setDesiredState(SuperstructureStates.HOME))));
+
+    NamedCommands.registerCommand(
+        "INTAKE2",
+        Commands.sequence(
+            Commands.runOnce(() -> superstructure.setDesiredState(SuperstructureStates.INTAKE)),
+            Commands.waitSeconds(2.5),
             Commands.runOnce(() -> superstructure.setDesiredState(SuperstructureStates.HOME))));
   }
 

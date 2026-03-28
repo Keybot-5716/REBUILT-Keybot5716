@@ -254,6 +254,8 @@ public class DriveSubsystem extends SubsystemBase {
     Rotation2d shooterFacing = new Rotation2d(Math.PI / 2);
     Rotation2d deltaAngle = targetAngle.plus(shooterFacing);
 
+    Logger.recordOutput("Drive/DriveToPose/Traslation", delta);
+
     io.setRequest(
         rotationLocked
             .withVelocityX(calculateSpeedsBasedOnJoystickInputs().vxMetersPerSecond)
@@ -341,7 +343,7 @@ public class DriveSubsystem extends SubsystemBase {
 
     angularMagnitude = Math.copySign(angularMagnitude * angularMagnitude, angularMagnitude);
 
-    teleopVelocityCoefficient = controller.rightTrigger().getAsBoolean() ? 0.3 : 0.6;
+    teleopVelocityCoefficient = controller.rightTrigger().getAsBoolean() ? 0.3 : 0.75;
 
     double xVelocity =
         (robotState.isRedAlliance() ? xMagnitude * maxVelocity : -xMagnitude * maxVelocity)

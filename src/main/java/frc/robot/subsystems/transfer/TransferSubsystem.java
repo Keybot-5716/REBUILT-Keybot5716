@@ -4,6 +4,8 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.team6328.LoggedTunableNumber;
 import frc.lib.util.DataProcessor;
+import frc.robot.subsystems.superstructure.SuperstructureConstants.TransferConstants;
+
 import org.littletonrobotics.junction.Logger;
 
 public class TransferSubsystem extends SubsystemBase {
@@ -70,21 +72,23 @@ public class TransferSubsystem extends SubsystemBase {
       case FORWARDING:
         if (desiredState == DesiredState.OSCILLATE_FORWARD) {
 
-          double cycleTime = oscillationTimer.get() % 2.0;
+          double cycleTime = oscillationTimer.get() % 1.5;
 
-          if (cycleTime < 1.8) {
-            setVelocity(55.0);
-          } else {
-            setVelocity(-(55.0) * 0.7);
+          
+          if (cycleTime < 0.2) {
+            setVelocity((-TransferConstants.FORWARD_RPS) * 0.7);
+          }
+          else {
+            setVelocity(TransferConstants.FORWARD_RPS);
           }
 
         } else {
-          setVelocity(rollerRPS.get());
+          setVelocity(TransferConstants.FORWARD_RPS);
         }
         break;
 
       case REVERSING:
-        setVelocity(-rollerRPS.get());
+        setVelocity(-TransferConstants.FORWARD_RPS);
         break;
 
       case STOPPING:

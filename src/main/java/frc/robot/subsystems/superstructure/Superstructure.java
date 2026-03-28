@@ -174,8 +174,8 @@ public class Superstructure extends SubsystemBase {
     // shooterHoodSub.setAngle(activePreset.hoodAngleDeg().get());
     // shooterRollerSub.setCustom(activePreset.flywheelSpeed().get());
     // intakeRollersSub.setDesiredState(IntakeRollersSubsystem.DesiredState.STOPPED);
-    shooterHoodSub.setAngle(0.0);
-    shooterRollerSub.setCustom(50.5);
+    shooterHoodSub.setAngle(0.15);
+    shooterRollerSub.setCustom(ShooterConstants.SCORE_RPS);
 
     if (shooterRollerSub.atDesiredVelocity()) {
       transferSub.setDesiredState(TransferSubsystem.DesiredState.OSCILLATE_FORWARD);
@@ -197,7 +197,7 @@ public class Superstructure extends SubsystemBase {
   private void taxi() {
     driveSub.setDesiredRotationToLock(
         new Rotation2d(robotState.isRedAlliance() ? (Math.PI / 2) : (Math.PI + (Math.PI / 2))));
-    intakeRollersSub.setDesiredState(IntakeRollersSubsystem.DesiredState.FORWARD_ROLLERS);
+    intakeRollersSub.setDesiredState(IntakeRollersSubsystem.DesiredState.STOPPED);
     shooterRollerSub.setCustom(ShooterConstants.TAXI_RPS);
     shooterHoodSub.setDesiredState(ShooterHoodSubsystem.DesiredState.CALC_POS_TO_TAXI);
 
@@ -211,18 +211,21 @@ public class Superstructure extends SubsystemBase {
   }
 
   public void presetShoot() {
-    if (activePreset == null) return;
-    var params = shootCalculator.getParameters();
+    //if (activePreset == null) return;
+    //var params = shootCalculator.getParameters();
 
     driveSub.setDesiredPointToLock(FieldConstants.getHubShootingPose().getTranslation());
 
+    shooterHoodSub.setAngle(0.15);
+    shooterRollerSub.setCustom(ShooterConstants.SCORE_RPS);
+
     // shooterHoodSub.setAngle(activePreset.hoodAngleDeg().get());
     // shooterRollerSub.setCustom(activePreset.flywheelSpeed().get());
-    // intakeRollersSub.setDesiredState(IntakeRollersSubsystem.DesiredState.STOPPED);
-    shooterHoodSub.setAngle(params.hoodAngle());
-    shooterRollerSub.setCustom(params.rollersHoodVelocity());
 
-    if (shooterRollerSub.atDesiredVelocity() && driveSub.isAlignedToPoint()) {
+    // shooterHoodSub.setAngle(params.hoodAngle());
+    // shooterRollerSub.setCustom(params.rollersHoodVelocity());
+
+    if (shooterRollerSub.atDesiredVelocity()) {
       transferSub.setDesiredState(TransferSubsystem.DesiredState.OSCILLATE_FORWARD);
     }
   }

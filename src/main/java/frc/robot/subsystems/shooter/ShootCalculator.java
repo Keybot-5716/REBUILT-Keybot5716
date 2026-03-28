@@ -230,6 +230,7 @@ public class ShootCalculator {
               ? passedTimeOffLightMap.get(lookAheadLauncherToTargetDistance)
               : TimeOffLightMap.get(lookAheadLauncherToTargetDistance);
       double offSetX = launcherVelocity.vxMetersPerSecond * timeOffFlight;
+
       double offSetY = launcherVelocity.vyMetersPerSecond * timeOffFlight;
       lookaheadPose =
           new Pose2d(

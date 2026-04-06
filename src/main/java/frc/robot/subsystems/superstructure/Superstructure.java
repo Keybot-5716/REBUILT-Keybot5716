@@ -211,8 +211,8 @@ public class Superstructure extends SubsystemBase {
   }
 
   public void presetShoot() {
-    //if (activePreset == null) return;
-    //var params = shootCalculator.getParameters();
+    // if (activePreset == null) return;
+    // var params = shootCalculator.getParameters();
 
     driveSub.setDesiredPointToLock(FieldConstants.getHubShootingPose().getTranslation());
 

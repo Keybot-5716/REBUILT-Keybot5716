@@ -56,6 +56,19 @@
                 "data": {
                   "pathName": "LEFT_CENTER_INTAKE2"
                 }
+              }
+            ]
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "LEFT_INTAKE22"
+                }
               },
               {
                 "type": "named",
@@ -64,6 +77,18 @@
                 }
               }
             ]
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "LEFTINTAKE_TO_HUB2"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "SCORE"
           }
         }
       ]

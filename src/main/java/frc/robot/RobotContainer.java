@@ -225,7 +225,7 @@ public class RobotContainer implements RobotCore {
         "SCORE",
         Commands.sequence(
             superstructure.setPresetCommand(ShootCalculator.hubPreset),
-            Commands.waitSeconds(3.0),
+            Commands.waitSeconds(3.7),
             Commands.runOnce(() -> superstructure.setDesiredState(SuperstructureStates.DEFAULT))));
 
     NamedCommands.registerCommand(
@@ -260,6 +260,7 @@ public class RobotContainer implements RobotCore {
     autoChooser.addOption("Right Trench", new AutoRightTrench());
     autoChooser.addOption("Right Outpost", new AutoRightOutpost());
     autoChooser.addOption("Center", new AutoCenter());
+    autoChooser.addOption("Left Trench", new AutoLeftTrench());
 
     autoChooser.onChange(
         auto -> {

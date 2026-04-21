@@ -6,6 +6,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.lib.team254.ConcurrentTimeInterpolatableBuffer;
+import frc.lib.util.State;
 import frc.robot.subsystems.vision.VisionPoseEstimateInField;
 import java.util.Map;
 import java.util.Optional;
@@ -14,7 +15,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import org.littletonrobotics.junction.Logger;
 
-public class RobotState {
+public class RobotState implements State {
   public static final double BUFFER_TIME = 1.0;
 
   private final Consumer<VisionPoseEstimateInField> fieldEstimation;
@@ -82,7 +83,7 @@ public class RobotState {
       ChassisSpeeds measuredSpeeds,
       ChassisSpeeds measuredFieldRelativeSpeeds,
       ChassisSpeeds fusedFieldRelativeSpeeds) {
-    this.driveRollAngularVelocity.addSample(timestamp, angularPitchRadPS);
+    this.driveRollAngularVelocity.addSample(timestamp, angularRollRadPS);
     this.drivePitchAngularVelocity.addSample(timestamp, angularPitchRadPS);
     this.driveYawAngularVelocity.addSample(timestamp, angularYawRadPS);
     this.drivePitchRads.addSample(timestamp, pitchRad);
@@ -203,8 +204,16 @@ public class RobotState {
   }
 
   public void updateMegatagEstimate(VisionPoseEstimateInField megatag) {
+    if (megatag == null) return;
+    if (megatag.getRobotPose() == null) return;
+
+    Pose2d p = megatag.getRobotPose();
+
+    if (Double.isNaN(p.getX()) || Double.isNaN(p.getY())) return;
+
     megatagTimestamp = megatag.getTimestamp();
-    megatagPose = megatag.getRobotPose();
+    megatagPose = p;
+
     fieldEstimation.accept(megatag);
   }
 

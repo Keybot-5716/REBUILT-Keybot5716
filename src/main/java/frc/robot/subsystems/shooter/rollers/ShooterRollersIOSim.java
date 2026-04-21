@@ -5,11 +5,6 @@ import frc.robot.RobotContainer;
 public class ShooterRollersIOSim implements ShooterRollersIO {
 
   private RobotContainer container;
-  /*
-  public Command shoot() {
-    return Commands.runOnce(() -> container.generateFuel());
-  }
-    */
 
   @Override
   public void updateInputs(ShooterRollersIOInputs inputs) {}

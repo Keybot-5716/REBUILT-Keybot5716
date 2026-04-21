@@ -13,9 +13,9 @@ import frc.robot.Robot;
 
 public class DriveConstants {
 
-  public static final double ROBOT_MASS = 50;
-  public static final double BUMPER_LENGTH_INCHES = 30;
-  public static final double BUMPER_WIDTH_INCHES = 30;
+  public static final double ROBOT_MASS = 40;
+  public static final double BUMPER_LENGTH_INCHES = 35;
+  public static final double BUMPER_WIDTH_INCHES = 35;
 
   public static final double DRIVE_TO_POSE_STATIC_FRICTION_CONSTANT = 0.02;
 
@@ -47,10 +47,10 @@ public class DriveConstants {
           Constants.ROBOT_MASS_KG,
           Constants.ROBOT_MOI,
           moduleConfig,
-          new Translation2d(0.292, 0.292),
-          new Translation2d(0.292, -0.292),
-          new Translation2d(-0.292, 0.292),
-          new Translation2d(-0.292, -0.292));
+          new Translation2d(0.27686, 0.27686),
+          new Translation2d(0.27686, -0.27686),
+          new Translation2d(-0.27686, 0.27686),
+          new Translation2d(-0.27686, -0.27686));
 
   public static PPHolonomicDriveController pathPlannerController =
       new PPHolonomicDriveController(

@@ -4,6 +4,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.team6328.LoggedTunableNumber;
 import frc.lib.util.DataProcessor;
+import frc.robot.subsystems.superstructure.SuperstructureConstants.TransferConstants;
 import org.littletonrobotics.junction.Logger;
 
 public class TransferSubsystem extends SubsystemBase {
@@ -15,15 +16,16 @@ public class TransferSubsystem extends SubsystemBase {
   private TransferState transferState = TransferState.STOPPING;
 
   private final Timer oscillationTimer = new Timer();
-  private boolean oscillating = false;
+  boolean oscillating = false;
 
   private static final LoggedTunableNumber rollerRPS =
-      new LoggedTunableNumber("Transfer/Rollers/RollerRPS", 25.0);
+      new LoggedTunableNumber("Transfer/Rollers/RollerRPS", 55.0);
 
   public enum DesiredState {
     STOPPED,
     FORWARD,
-    REVERSE
+    REVERSE,
+    OSCILLATE_FORWARD
   }
 
   private enum TransferState {
@@ -60,28 +62,30 @@ public class TransferSubsystem extends SubsystemBase {
       case STOPPED -> TransferState.STOPPING;
       case FORWARD -> TransferState.FORWARDING;
       case REVERSE -> TransferState.REVERSING;
+      case OSCILLATE_FORWARD -> TransferState.FORWARDING;
     };
   }
 
   private void applyStates() {
     switch (transferState) {
       case FORWARDING:
-        if (oscillating) {
-          double cycleTime = oscillationTimer.get() % 2.0;
+        if (desiredState == DesiredState.OSCILLATE_FORWARD) {
 
-          if (cycleTime < 1.8) {
-            setVelocity(rollerRPS.get());
+          double cycleTime = oscillationTimer.get() % 1.2;
+
+          if (cycleTime < 0.2) {
+            setVelocity((-TransferConstants.FORWARD_RPS) * 0.8);
           } else {
-            setVelocity(-rollerRPS.get() * 0.5);
+            setVelocity(TransferConstants.FORWARD_RPS);
           }
 
         } else {
-          setVelocity(rollerRPS.get());
+          setVelocity(TransferConstants.FORWARD_RPS);
         }
         break;
 
       case REVERSING:
-        setVelocity(-rollerRPS.get());
+        setVelocity(-TransferConstants.FORWARD_RPS);
         break;
 
       case STOPPING:
@@ -99,6 +103,15 @@ public class TransferSubsystem extends SubsystemBase {
   }
 
   public void setDesiredState(DesiredState desiredState) {
+    if (this.desiredState != desiredState) {
+
+      if (desiredState == DesiredState.OSCILLATE_FORWARD) {
+        oscillationTimer.stop();
+        oscillationTimer.reset();
+        oscillationTimer.start();
+      }
+    }
+
     this.desiredState = desiredState;
   }
 

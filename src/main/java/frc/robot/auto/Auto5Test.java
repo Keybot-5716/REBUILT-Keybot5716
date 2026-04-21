@@ -24,13 +24,25 @@ public class Auto5Test extends AutoBuilder {
 
   @Override
   public List<Pose2d> getPathPoses() {
+<<<<<<< Updated upstream
+=======
+
+>>>>>>> Stashed changes
     return getPathPosesList(test11, test12, test13);
   }
 
   @Override
+<<<<<<< Updated upstream
   public Pose2d getStartingPose() {
     if (test11 != null) {
       return test11.getStartingDifferentialPose();
+=======
+  public List<Posed2d> getStartingPose() {
+
+    if (test5 != null) {
+
+      return getStartingDifferentialPose();
+>>>>>>> Stashed changes
     }
 
     DriverStation.reportError("Path is null", true);
